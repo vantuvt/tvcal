@@ -97,7 +97,8 @@
   @media (prefers-reduced-motion: reduce) { .more.show button { animation: none; } }
   .bar .inner { max-width: 520px; margin: 0 auto; display: flex; gap: 10px; }
   .bar button { flex: 1 1 0; min-width: 0; }
-  .bar #next.skip { background: var(--panel2); color: var(--dim); border-color: var(--line); }
+  /* Skip is a real, enabled action: same weight as Back, with a visible border. */
+  .bar #next.skip { background: var(--panel2); color: var(--text); border-color: #4a4a56; }
 
   #localView { position: fixed; inset: 0; background: #000; display: none; z-index: 10; }
   #localView video { width: 100%; height: 100%; object-fit: contain; }
@@ -390,7 +391,7 @@ function render() {
   const finished = !s.flow || !!(s.flow[node] && s.flow[node].text);
   backBtn.style.display = idx === 0 ? 'none' : '';
   nextBtn.style.display = idx === STEPS.length - 1 ? 'none' : '';
-  nextBtn.textContent = idx === 0 ? 'Start' : finished ? 'Next' : 'Skip this step';
+  nextBtn.textContent = idx === 0 ? 'Start' : finished ? 'Next' : 'Skip this step →';
   nextBtn.classList.toggle('skip', !finished);
   store.set('step', idx);
   showPattern(s.pattern);
