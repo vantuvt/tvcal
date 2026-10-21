@@ -95,7 +95,13 @@
     <h1>TV Picture Setup</h1>
     <google-cast-launcher title="Cast to your TV"></google-cast-launcher>
   </header>
-  <div class="status"><span class="dot" id="dot"></span><span id="statusText">Checking for Cast…</span></div>
+  <div class="status"><span class="dot" id="dot"></span><span id="statusText">Loading Cast support…</span></div>
+  <button id="connect" class="wide" style="display:none;margin:-4px 0 14px">Connect to TV</button>
+  <details id="castHelp" style="display:none"><summary>TV not found?</summary><div class="inner">
+    <p>Make sure the phone and the Chromecast are on the <b>same Wi-Fi network</b> (not a guest network, and not mobile data).</p>
+    <p>On Android 12 or later, Chrome needs the <b>Nearby devices</b> permission: Settings → Apps → Chrome → Permissions → Nearby devices → Allow. Then reload this page.</p>
+    <p>Check that casting works at all: open the YouTube app and look for its Cast icon. If YouTube can’t find the TV either, the issue is the network or the Chromecast, not this page.</p>
+  </div></details>
   <div class="progress" id="progress"></div>
   <section id="card"></section>
 </main>
@@ -126,12 +132,12 @@ const STEPS = [
     custom: () => `
       <ol class="check" style="counter-reset:n">
         ${['Turn the lights down to how you normally watch.',
-           'Tap the Cast icon at the top right and choose your TV.',
+           'Tap “Connect to TV” above and choose your TV.',
            'Open your TV’s picture settings menu with the remote. You’ll use it throughout.']
           .map((t, i) => `<li style="cursor:default"><span class="tick" style="border-color:var(--accent);color:var(--accent);font-size:14px;font-weight:700">${i + 1}</span><span>${t}</span></li>`).join('')}
       </ol>
-      <details><summary>No Cast icon, or using an iPhone?</summary><div class="inner">
-        <p>Casting from a web page works in Chrome on Android or on a computer. On an iPhone, the Cast icon won’t appear.</p>
+      <details><summary>Using an iPhone?</summary><div class="inner">
+        <p>Casting from a web page works in Chrome on Android or on a computer, but not on an iPhone.</p>
         <p>You can still follow along and <button class="linkish" data-local>see each pattern on this phone</button>, but the TV steps need the pattern shown on the TV.</p>
       </div></details>`
   },
@@ -346,11 +352,31 @@ function showPattern(name, force) {
 }
 
 window['__onGCastApiAvailable'] = function (available) {
-  if (!available) { setStatus('Casting isn’t available in this browser. You can still follow the steps.'); return; }
+  if (!available) { setStatus('Casting isn’t available in this browser. Use Chrome on Android or a computer.'); return; }
   const ctx = cast.framework.CastContext.getInstance();
   ctx.setOptions({ receiverApplicationId: chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID,
                    autoJoinPolicy: chrome.cast.AutoJoinPolicy.ORIGIN_SCOPED });
   castReady = true;
+  const connectBtn = document.getElementById('connect'), help = document.getElementById('castHelp');
+  connectBtn.style.display = 'block';
+  connectBtn.onclick = () => {
+    if (ctx.getCurrentSession()) { ctx.endCurrentSession(true); return; }
+    ctx.requestSession().catch(err => {
+      if (err === 'cancel') return;
+      setStatus(err === chrome.cast.ErrorCode.RECEIVER_UNAVAILABLE || err === 'receiver_unavailable'
+        ? 'No TV found. See “TV not found?” below.' : 'Couldn’t connect (' + err + ').');
+      help.style.display = 'block';
+    });
+  };
+  const CS = cast.framework.CastState;
+  const onCastState = st => {
+    connectBtn.textContent = st === CS.CONNECTED ? 'Disconnect from TV' : 'Connect to TV';
+    connectBtn.classList.toggle('primary', st === CS.NOT_CONNECTED);
+    if (st === CS.NO_DEVICES_AVAILABLE) { setStatus('Looking for your TV… none found yet.'); help.style.display = 'block'; }
+    else if (st === CS.NOT_CONNECTED) { setStatus('TV found. Tap “Connect to TV”.'); help.style.display = 'none'; }
+    else if (st === CS.CONNECTING) setStatus('Connecting…', true);
+  };
+  ctx.addEventListener(cast.framework.CastContextEventType.CAST_STATE_CHANGED, e => onCastState(e.castState));
   ctx.addEventListener(cast.framework.CastContextEventType.SESSION_STATE_CHANGED, e => {
     const S = cast.framework.SessionState;
     if (e.sessionState === S.SESSION_STARTED || e.sessionState === S.SESSION_RESUMED) {
@@ -358,15 +384,15 @@ window['__onGCastApiAvailable'] = function (available) {
       setStatus('Connected to ' + ctx.getCurrentSession().getCastDevice().friendlyName, true);
       showPattern(STEPS[idx].pattern, true);
     } else if (e.sessionState === S.SESSION_ENDED) {
-      lastCast = undefined; setStatus('Not connected. Tap the Cast icon to choose your TV.');
+      lastCast = undefined;
     }
   });
-  setStatus('Not connected. Tap the Cast icon to choose your TV.');
+  onCastState(ctx.getCastState());
 };
 setTimeout(() => {
-  if (!castReady && statusText.textContent.startsWith('Checking'))
-    setStatus('Casting isn’t available here. It needs Chrome on Android or a computer.');
-}, 4000);
+  if (!castReady && statusText.textContent.startsWith('Loading'))
+    setStatus('Cast support didn’t load. Casting needs Chrome on Android or a computer, and an internet connection.');
+}, 6000);
 
 /* ---------- Pattern on this screen ---------- */
 const localView = document.getElementById('localView'), localVideo = document.getElementById('localVideo');
