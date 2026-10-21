@@ -25,6 +25,14 @@
   .progress span { flex: 1; height: 4px; border-radius: 2px; background: var(--line); }
   .progress span.done { background: var(--accent); }
   h2 { font-size: 26px; line-height: 1.2; margin: 0 0 6px; }
+  .pos { display: flex; gap: 10px; align-items: flex-start; border-radius: 10px; padding: 9px 12px; margin: 4px 0 12px;
+    background: var(--panel); border: 1px solid var(--line); }
+  .pos svg { flex: none; width: 22px; height: 22px; margin-top: 1px; fill: none; stroke: currentColor; stroke-width: 1.8;
+    stroke-linecap: round; stroke-linejoin: round; color: var(--accent); }
+  .pos b { display: block; font-size: 15px; }
+  .pos span { display: block; font-size: 13px; color: var(--dim); }
+  .pos.close { background: #2a2214; border-color: #5a4620; }
+  .pos.close svg, .pos.close b { color: #f0c46a; }
   .lead { color: var(--dim); margin: 0 0 14px; }
   figure { margin: 0 0 16px; }
   figure img { width: 100%; display: block; border-radius: 10px; border: 1px solid var(--line); background: #000; }
@@ -173,7 +181,7 @@ const STEPS = [
       </div></details>`
   },
   {
-    id: 'mode', title: 'Quick settings first', pattern: null, record: 'Picture mode',
+    id: 'mode', pos: 'any', title: 'Quick settings first', pattern: null, record: 'Picture mode',
     lead: 'These make the biggest difference. Tap each one when it’s done.',
     checklist: [
       ['Picture mode: Filmmaker, Movie or Cinema', 'If you have Filmmaker Mode, use it. Otherwise Movie, Cinema or Calibrated.'],
@@ -192,7 +200,7 @@ const STEPS = [
       <p>Usually Settings → <b>Picture</b>, then <b>Expert</b> or <b>Advanced</b> settings. Make the changes on the HDMI input the Chromecast is plugged into; most TVs remember settings per input.</p></div></details>`
   },
   {
-    id: 'fit', title: 'Fit to screen', pattern: '01-fit', record: 'Picture size', ph: 'Just Scan',
+    id: 'fit', pos: 'seat', title: 'Fit to screen', pattern: '01-fit', record: 'Picture size', ph: 'Just Scan',
     lead: 'Look at the edges of your TV.',
     caption: 'There’s a thin white border around the very edge, with arrows in each corner.',
     flow: {
@@ -204,7 +212,7 @@ const STEPS = [
     }
   },
   {
-    id: 'brightness', title: 'Brightness', pattern: '02-brightness', record: 'Brightness',
+    id: 'brightness', pos: 'seat', title: 'Brightness', pattern: '02-brightness', record: 'Brightness',
     lead: 'This makes dark scenes look right: true black, with shadow detail still visible.',
     caption: 'Look inside the grey frames. When it’s right, box A is completely gone and box B is a very faint grey square. (Brightened here so you can see it.)',
     where: `<p>Use the setting called <b>Brightness</b>. On some TVs, Brightness changes the backlight (the whole screen gets lighter or dimmer but the boxes don’t change). If so, use <b>Black level</b> or <b>Shadow detail</b> instead.</p>`,
@@ -220,7 +228,7 @@ const STEPS = [
     }
   },
   {
-    id: 'contrast', title: 'Contrast', pattern: '03-contrast', record: 'Contrast',
+    id: 'contrast', pos: 'seat', title: 'Contrast', pattern: '03-contrast', record: 'Contrast',
     lead: 'This makes bright scenes look right, without losing detail in clouds, snow or white shirts.',
     caption: 'When it’s right, you can see all three boxes. A is easy, B is lighter, C is very faint. (Darkened here so you can see them.)',
     where: `<p>Use the setting called <b>Contrast</b>. Don’t confuse it with <b>Dynamic contrast</b> or <b>Contrast enhancer</b>, which should be off.</p>`,
@@ -233,7 +241,7 @@ const STEPS = [
     }
   },
   {
-    id: 'sharpness', title: 'Sharpness', pattern: '04-sharpness', record: 'Sharpness',
+    id: 'sharpness', pos: 'close', title: 'Sharpness', pattern: '04-sharpness', record: 'Sharpness',
     lead: 'Most TVs add fake outlines to make the picture look crisper. Here’s the difference:',
     compare: true,
     where: `<p>Use the setting called <b>Sharpness</b>. Also turn off <b>Edge enhancement</b>, <b>Super resolution</b> or <b>Reality creation</b> if you have them.</p>
@@ -242,11 +250,11 @@ const STEPS = [
       start: 'q',
       q: { ask: 'Walk up close to the TV. Do the black lines have bright outlines beside them, like the “Halos” example?', answers: [['Yes', 'down'], ['No, they look clean', 'ok']] },
       down: { do: 'Press Sharpness down a few steps', sub: 'Then look closely at the lines again.', then: 'q' },
-      ok: { do: 'Sharpness is set.', text: 'No artificial outlines.' }
+      ok: { do: 'Sharpness is set.', text: 'No artificial outlines. Go back to your usual seat for the next step.' }
     }
   },
   {
-    id: 'final', title: 'Final check', pattern: '05-final',
+    id: 'final', pos: 'seat', title: 'Final check', pattern: '05-final',
     lead: 'Look at the row of grey squares at the top.',
     caption: 'The squares go from dark grey to white. Each should look plain grey, with no colour.',
     flow: {
@@ -267,7 +275,7 @@ const STEPS = [
     }
   },
   {
-    id: 'hdrmode', title: 'Is HDR on?', pattern: 'h1-black', record: 'HDR picture mode', ph: 'HDR Filmmaker',
+    id: 'hdrmode', pos: 'any', title: 'Is HDR on?', pattern: 'h1-black', record: 'HDR picture mode', ph: 'HDR Filmmaker',
     lead: 'Look at the TV just after the pattern starts.',
     caption: 'This is the next pattern. First, check the TV switched into HDR.',
     where: `<p>Press the <b>Info</b> or <b>Settings</b> button while the pattern plays: the picture mode name usually shows “HDR” (for example HDR Filmmaker, HDR Movie or HDR Cinema).</p>`,
@@ -282,7 +290,7 @@ const STEPS = [
     }
   },
   {
-    id: 'hdrbright', title: 'HDR brightness', pattern: 'h1-black', record: 'HDR brightness',
+    id: 'hdrbright', pos: 'seat', title: 'HDR brightness', pattern: 'h1-black', record: 'HDR brightness',
     lead: 'Same as before, but for HDR. Most TVs keep a separate Brightness setting for HDR.',
     caption: 'Look inside the grey frames. When it’s right, box A is gone and box B is a very faint grey square. (Brightened here so you can see it.)',
     where: `<p>Use <b>Brightness</b> (or <b>Black level</b> / <b>Shadow detail</b>) while HDR is playing. Changes here usually only affect HDR.</p>`,
@@ -298,7 +306,7 @@ const STEPS = [
     }
   },
   {
-    id: 'hdrhigh', title: 'HDR highlights', pattern: 'h2-highlights', record: 'HDR tone mapping', ph: 'On',
+    id: 'hdrhigh', pos: 'seat', title: 'HDR highlights', pattern: 'h2-highlights', record: 'HDR tone mapping', ph: 'On',
     lead: 'Four bright boxes, from bright (A) to very bright (D). Most TVs can’t reach the brightest levels, so they compress them. This checks they do it gracefully.',
     caption: 'When it’s right, you can tell all four boxes apart, each a little brighter than the last.',
     where: `<p>Look for <b>Dynamic Tone Mapping</b>, <b>HDR Tone Mapping</b>, <b>Dynamic HDR</b> or <b>HDR Brightness</b> in the picture menu. Names vary a lot by brand.</p>
@@ -313,7 +321,7 @@ const STEPS = [
     }
   },
   {
-    id: 'hdrfinal', title: 'HDR final check', pattern: 'h3-steps',
+    id: 'hdrfinal', pos: 'seat', title: 'HDR final check', pattern: 'h3-steps',
     lead: 'A row of grey bars, from nearly black on the left to very bright on the right.',
     caption: 'Each bar should be a little brighter than the one before.',
     flow: {
@@ -325,7 +333,7 @@ const STEPS = [
     }
   },
   {
-    id: 'extras', title: 'Your devices and room (optional)', pattern: null,
+    id: 'extras', pos: 'any', title: 'Your devices and room (optional)', pattern: null,
     lead: 'A few things outside the picture menu that also make a difference. Tap the ones you’ve done, and skip any that don’t apply.',
     checklist: [
       ['#', 'Your devices'],
@@ -381,12 +389,28 @@ function flowHtml(s) {
   return `<div class="box ok"><p class="do">✓ ${n.do}</p><p>${n.text}</p>${rec}</div>`;
 }
 
+/* Where the viewer should be for each step. Judging the picture is done from
+   the usual seat (distance, angle and eye adaptation all change what you see);
+   sharpness halos are fine detail, so that check is done up close. */
+const POSITIONS = {
+  seat:  { label: 'From your usual seat, straight on', note: 'Distance, viewing angle and how used your eyes are to the room all change what you see.',
+           icon: '<path d="M4 11V8a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v3"/><path d="M2 12a2 2 0 0 1 4 0v2h12v-2a2 2 0 0 1 4 0v5H2z"/><path d="M5 17v2M19 17v2"/>' },
+  close: { label: 'Up close: about 1 m (3 ft) from the screen', note: 'This detail is too fine to judge from a sofa.',
+           icon: '<rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M12 19v-3M9 21h6"/><path d="M8 10h8M13 7l3 3-3 3"/>' },
+  any:   { label: 'Anywhere you can see the TV menu', note: 'This step is just settings.',
+           icon: '<rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M7 8h10M7 12h6"/><path d="M12 19v-3M9 21h6"/>' }
+};
+function posBadge(k) {
+  const p = POSITIONS[k];
+  return `<div class="pos ${k}"><svg viewBox="0 0 24 24" aria-hidden="true">${p.icon}</svg><div><b>${p.label}</b><span>${p.note}</span></div></div>`;
+}
+
 function render() {
   const s = STEPS[idx];
   if (node === null) { node = s.flow ? s.flow.start : null; loops = 0; }
   [...progress.children].forEach((el, i) => el.classList.toggle('done', i <= idx));
 
-  let h = `<h2>${s.title}</h2><p class="lead">${s.lead}</p>`;
+  let h = `<h2>${s.title}</h2>${s.pos ? posBadge(s.pos) : ''}<p class="lead">${s.lead}</p>`;
   if (s.compare) {
     h += `<div class="pair"><figure><img src="patterns/sharpness-clean.png" alt="Clean lines"><figcaption>✓ Clean</figcaption></figure>
       <figure><img src="patterns/sharpness-halo.png" alt="Lines with bright halos"><figcaption>✗ Halos</figcaption></figure></div>`;
