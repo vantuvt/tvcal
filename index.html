@@ -98,10 +98,11 @@
   <div class="status"><span class="dot" id="dot"></span><span id="statusText">Loading Cast support…</span></div>
   <button id="connect" class="wide" style="display:none;margin:-4px 0 14px">Connect to TV</button>
   <div id="lnaBox" style="display:none;margin:-4px 0 14px">
-    <button id="lnaBtn" class="wide">Allow access to devices on your network</button>
+    <button id="lnaBtn" class="wide">Let this page find my TV</button>
     <div id="lnaStatus" style="font-size:13px;color:var(--dim);margin-top:6px"></div>
   </div>
   <details id="castHelp" style="display:none"><summary>TV not found?</summary><div class="inner">
+    <p>Chrome must allow this site to <b>find devices on your local network</b>. Use the button above, or tap the icon left of the web address → Site settings → Local network access → Allow.</p>
     <p>Make sure the phone and the Chromecast are on the <b>same Wi-Fi network</b> (not a guest network, and not mobile data).</p>
     <p>On Android 12 or later, Chrome needs the <b>Nearby devices</b> permission: Settings → Apps → Chrome → Permissions → Nearby devices → Allow. Then reload this page.</p>
     <p>Check that casting works at all: open the YouTube app and look for its Cast icon. If YouTube can’t find the TV either, the issue is the network or the Chromecast, not this page.</p>
@@ -136,7 +137,7 @@ const STEPS = [
     custom: () => `
       <ol class="check" style="counter-reset:n">
         ${['Turn the lights down to how you normally watch.',
-           'Tap “Connect to TV” above and choose your TV.',
+           'At the top, tap “Connect to TV” and choose your TV. If you see “Let this page find my TV”, tap that first and choose Allow.',
            'Open your TV’s picture settings menu with the remote. You’ll use it throughout.']
           .map((t, i) => `<li style="cursor:default"><span class="tick" style="border-color:var(--accent);color:var(--accent);font-size:14px;font-weight:700">${i + 1}</span><span>${t}</span></li>`).join('')}
       </ol>
@@ -392,6 +393,13 @@ window['__onGCastApiAvailable'] = function (available) {
     }
   });
   onCastState(ctx.getCastState());
+  lnaState().then(st => {
+    if (st === 'prompt' || st === 'denied') {
+      connectBtn.style.display = 'none';
+      lnaBtn.classList.add('primary');
+      showLna().then(() => { setStatus('First, let this page find your TV.'); help.style.display = 'none'; });
+    }
+  });
 };
 setTimeout(() => {
   if (!castReady && statusText.textContent.startsWith('Loading'))
@@ -415,9 +423,9 @@ async function showLna() {
   lnaBox.style.display = 'block';
   lnaBtn.style.display = st === 'granted' ? 'none' : 'block';
   lnaStatus.textContent = {
-    granted: 'Local network access: allowed for this site.',
-    denied: 'Local network access is blocked for this site. Tap the icon left of the address → Site settings → Local network access → Allow, then reload.',
-    prompt: 'Chrome will ask you to allow this site to find devices on your network.',
+    granted: 'This site is allowed to find your TV.',
+    denied: 'This site was blocked from finding devices. Tap the icon left of the web address → Site settings → Local network access → Allow, then reload the page.',
+    prompt: 'Chrome will ask to let this site find devices on your network. Choose Allow.',
     unsupported: 'This browser doesn’t use a per-site local network permission.'
   }[st] || ('Local network access: ' + st);
   return st;

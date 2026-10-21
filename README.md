@@ -20,7 +20,7 @@ so the below-black box (12) survives instead of being clipped. Decoded test patc
 were checked to match their intended values exactly.
 
 ## Hosting (GitHub Pages, ~5 minutes)
-1. Create a public GitHub repo and upload everything in this folder.
+1. Create a public GitHub repo and upload everything in this folder (live copy: github.com/vantuvt/tvcal).
 2. Settings → Pages → Deploy from branch → `main` / root.
 3. Open `https://<you>.github.io/<repo>/` in **Chrome on Android** (or desktop Chrome)
    on the same Wi-Fi as the Chromecast.
@@ -28,8 +28,17 @@ were checked to match their intended values exactly.
 Casting requires HTTPS — it won't work from a local file. GitHub Pages serves MP4s
 with CORS enabled, which the Cast receiver needs.
 
+## Local network permission (Chrome 142+)
+Chrome now asks, per site, before a page can find devices on the home network.
+Without it, Cast discovery finds nothing ("no devices"), even though YouTube and
+Chrome's own Cast menu still work. On first visit the page shows
+**Let this page find my TV**; tapping it makes a request to a private address with
+`targetAddressSpace: 'local'`, which triggers Chrome's permission prompt. After
+Allow, the page reloads and the TV appears. If the site was blocked earlier, the
+page explains how to re-enable it in Site settings → Local network access.
+
 ## Testing checklist
-- Tap the Cast icon, pick the TV, then Start → Next. Each pattern step should load on the TV and loop.
+- Tap "Let this page find my TV" (first visit) and Allow, then "Connect to TV", pick the TV, then Start → Next. Each pattern step should load on the TV and loop.
 - The player shows a title/progress overlay for a few seconds after loading; judge the pattern after it fades.
 - Chromecast with Google TV / Google TV Streamer: set Dynamic range to match content, or the SDR patterns may be shown in HDR.
 - iPhone: casting isn't possible from a web page; the steps and "View on this screen" still work.
