@@ -391,7 +391,7 @@ function render() {
   const finished = !s.flow || !!(s.flow[node] && s.flow[node].text);
   backBtn.style.display = idx === 0 ? 'none' : '';
   nextBtn.style.display = idx === STEPS.length - 1 ? 'none' : '';
-  nextBtn.textContent = idx === 0 ? 'Start' : finished ? 'Next' : 'Skip this step →';
+  nextBtn.textContent = idx === 0 ? 'Start' : finished ? 'Next' : 'Skip this step';
   nextBtn.classList.toggle('skip', !finished);
   store.set('step', idx);
   showPattern(s.pattern);
