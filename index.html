@@ -33,6 +33,11 @@
   .pos span { display: block; font-size: 13px; color: var(--dim); }
   .pos.close { background: #2a2214; border-color: #5a4620; }
   .pos.close svg, .pos.close b { color: #f0c46a; }
+  .brand-opt.on { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  .brand-note { font-size: 14px; color: var(--dim); margin: 12px 0 0; }
+  .brand.attn { animation: attn .9s ease-in-out 2; }
+  @keyframes attn { 50% { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(125,179,255,.35); } }
+  h1 .chip { font-size: 13px; margin-left: 8px; color: var(--dim); text-decoration: none; }
   .lead { color: var(--dim); margin: 0 0 14px; }
   figure { margin: 0 0 16px; }
   figure img { width: 100%; display: block; border-radius: 10px; border: 1px solid var(--line); background: #000; }
@@ -118,7 +123,7 @@
 <body>
 <main>
   <header>
-    <h1>TV Picture Setup</h1>
+    <h1>TV Picture Setup <button id="brandChip" class="linkish chip" style="display:none"></button></h1>
     <google-cast-launcher title="Cast to your TV"></google-cast-launcher>
   </header>
   <div class="status"><span class="dot" id="dot"></span><span id="statusText">Loading Cast support…</span></div>
@@ -163,19 +168,134 @@ const DIMMING_HELP = `<details><summary>Does your TV have local dimming?</summar
   <p>If box B still never appears, even after raising Brightness a lot, local dimming is hiding it. Set local dimming one level lower (for example from High to Medium) and try again. Don’t keep raising Brightness: that makes every dark scene grey.</p>
 </div></details>`;
 
+/* ---------- Brand-specific wording ----------
+   Each brand can override any part of a step (text, checklist, flow nodes).
+   Anything not overridden falls back to the generic wording in STEPS.
+   TCL names are from TCL's Google TV settings guide and reviewers' calibration
+   settings; where a name couldn't be confirmed, the generic wording is kept. */
+const BRANDS = {
+  tcl: {
+    name: 'TCL',
+    note: 'Using TCL Google TV menu names. Some older or Roku-based TCL TVs use different menus; if a name doesn’t match, look for the closest one.',
+    dimmingHelp: `<details><summary>About Local Contrast (local dimming)</summary><div class="inner">
+      <p>Many TCL TVs dim parts of the backlight in dark areas. TCL calls this <b>Local Contrast</b> (under Picture → Brightness settings).</p>
+      <p>The grey frames around the boxes keep the backlight on, like in a real dark scene. Judge the boxes inside the frames, not the black edges of the screen.</p>
+      <p>If box B still never appears, even after raising Black Level a lot, Local Contrast is hiding it. Set it one level lower (for example from High to Medium) and try again. Don’t keep raising Black Level: that makes every dark scene grey.</p>
+    </div></details>`,
+    steps: {
+      start: {
+        items: [
+          'Update your TV’s software first: Settings → System → About → System update. Updates can change picture processing or reset settings, so do it before you start.',
+          'Turn the lights down to how you normally watch.',
+          'At the top, tap “Connect to TV” and choose your TV. If you see “Let this page find my TV”, tap that first and choose Allow.',
+          'Open the picture menu with the remote: Settings → Display &amp; Sound → Picture. You’ll use it throughout.'
+        ]
+      },
+      mode: {
+        checklist: [
+          ['Picture Mode: FILMMAKER MODE or Movie', 'Picture → Picture Mode. Either is fine; FILMMAKER MODE also turns off most extra processing.'],
+          ['Motion Clarity: Off', 'Under Motion settings. LED Motion Clear (sharper motion, but can flicker) is a personal choice; leave it off if unsure.'],
+          ['Adaptive Brightness and energy saving: Off', 'Adaptive Brightness is in the extra picture options (on some models under Eye Health Protection). Energy saving is under Settings → System → Power &amp; Energy.'],
+          ['Color Space: Auto', 'Under Color settings. If there’s no Auto, leave it at the picture mode’s default.'],
+          ['Color Saturation and Tint: default; dynamic options Off', 'Turn off Dynamic Color, Adaptive Color Temperature, Dynamic Contrast, Black Stretch and Dynamic Brightness.'],
+          ['Gamma: 2.4 in a dark room, 2.2 in a bright one', 'Under Brightness settings. If those values aren’t offered, leave it at the default.'],
+          ['Noise Reduction and Digital Noise Reduction: Off', 'Under Clarity settings. Low is fine for an old, grainy source.'],
+        ],
+        extra: `<details><summary>Where are these settings?</summary><div class="inner">
+          <p>Settings → <b>Display &amp; Sound</b> → <b>Picture</b>. The detailed controls are grouped as <b>Brightness</b>, <b>Color</b>, <b>Clarity</b> and <b>Motion</b> settings.</p>
+          <p>TCL keeps separate settings for HDR content, so the HDR steps later will check those.</p></div></details>`
+      },
+      temp: {
+        ph: 'Warm',
+        where: `<p>Picture → Color settings → <b>Color Temperature</b>. The options are usually Cool, Normal and one or more Warm settings; some models offer several Warm levels. Turn off <b>Adaptive Color Temperature</b> too.</p>`,
+        flow: {
+          set: { do: 'Set Color Temperature to its warmest Warm option', sub: 'Picture → Color settings → Color Temperature. Flick to Normal and Cool to see the difference on the white and greys, then come back.' },
+          cooler: { do: 'Go one step toward Normal', sub: 'For example the next Warm level down. Then wait a moment and look again.' }
+        }
+      },
+      fit: {
+        ph: 'Overscan Off',
+        flow: {
+          fix: { do: 'Turn Overscan off', sub: 'Display &amp; Sound → Screen settings → Overscan → Off. Also check Aspect Ratio is set to Auto.' }
+        }
+      },
+      brightness: {
+        title: 'Black Level', record: 'Black Level',
+        lead: 'This makes dark scenes look right: true black, with shadow detail still visible. On TCL this is the Black Level setting.',
+        where: `<p>On TCL, <b>Brightness</b> sets the backlight: how bright the whole screen is. For this step, use <b>Black Level</b> instead (Picture → Brightness settings → Black Level). Set Brightness itself to whatever is comfortable for your room.</p>`,
+        stuck: 'Not changing? Make sure you’re adjusting Black Level, not Brightness. If box B never appears however high you go, see “About Local Contrast” below.',
+        flow: {
+          down: { do: 'Press Black Level down by 1' },
+          up: { do: 'Press Black Level up by 1' },
+          ok: { do: 'Black Level is set.' }
+        }
+      },
+      contrast: {
+        where: `<p>Picture → Brightness settings → <b>Contrast</b>. Turn off <b>Dynamic Contrast</b> as well.</p>`,
+        stuck: 'If box C never appears, check that Dynamic Contrast is off and Peak Luminance is at its default.'
+      },
+      sharpness: {
+        where: `<p>Picture → Clarity settings → <b>Sharpness</b>. If your model has <b>Super Resolution</b> or <b>Precision Detail</b>, turn them off too.</p>`
+      },
+      hdrmode: {
+        ph: 'Movie',
+        where: `<p>While the HDR pattern plays, open Settings → Display &amp; Sound → Picture: the picture mode list switches to its HDR versions.</p>`,
+        flow: {
+          fix: { do: 'Turn on HDR for this input', sub: 'If you’re casting to the TV’s built-in Google TV, HDR switches on by itself, so check the pattern is still playing. If you use a separate Chromecast in an HDMI port: set that port’s HDMI Mode to HDMI 2.1 or Auto in the TV’s input settings, and on the Chromecast set Dynamic range to match content. Then go Back one step and Next again.' },
+          mode: { do: 'Choose FILMMAKER MODE or Movie for HDR', sub: 'TCL keeps a separate picture mode for HDR. Turn off Dynamic Contrast and Adaptive Brightness here too.' }
+        }
+      },
+      hdrbright: {
+        title: 'HDR Black Level', record: 'HDR Black Level',
+        where: `<p>Use <b>Black Level</b> (Picture → Brightness settings) while HDR is playing. For HDR, set <b>Brightness</b> (the backlight) high, since HDR needs it.</p>`,
+        stuck: 'Not changing? Make sure you’re adjusting Black Level, not Brightness. If box B never appears, see “About Local Contrast” below.',
+        flow: {
+          down: { do: 'Press Black Level down by 1' },
+          up: { do: 'Press Black Level up by 1' },
+          ok: { do: 'HDR Black Level is set.' }
+        }
+      },
+      hdrhigh: {
+        record: 'Dynamic Tone Mapping', ph: 'On',
+        where: `<p><b>Dynamic Tone Mapping</b> and <b>Peak Luminance</b> are under Picture → Brightness settings. Leave <b>Contrast</b> at the HDR mode’s default.</p>`,
+        flow: {
+          tm: { do: 'Turn on Dynamic Tone Mapping', sub: 'Picture → Brightness settings → Dynamic Tone Mapping. If it’s already on, try it off. Then look at the boxes again.' }
+        }
+      },
+      hdrfinal: {
+        flow: { dark: { do: 'Press Black Level up by 1' } }
+      },
+      extras: {
+        checklist: [
+          ['#', 'Your devices'],
+          ['HDMI black level: Auto', 'For anything plugged in by HDMI (game console, Blu-ray, streaming stick). Set the device’s output range to Auto, and leave the TV’s matching setting at Auto if it has one. A mismatch crushes or washes out blacks.'],
+          ['Streaming device: match content', 'On a separate Chromecast, Apple TV or Fire TV, turn on match dynamic range and match frame rate, so films play at their natural speed without judder.'],
+          ['Film motion: natural cadence', 'Motion Clarity Off plays films as they were shot. If slow camera pans look jerky to you, try Motion Clarity → Custom with a little Judder Reduction.'],
+          ['Game console: game mode and HDR calibration', 'Use the TV’s game picture mode (Game Master on some TCL models) on the console’s input, then run the console’s own HDR calibration screen.'],
+          ['Copy settings to other inputs', 'In the picture options, use “Apply All Picture Settings” to copy them, or repeat the values from your summary on each input you use.'],
+          ['Streaming quality: High', 'In Netflix, YouTube and other apps, set playback or data usage to High or Best.'],
+          ['#', 'Your room'],
+          ['Brightness: set for your room', 'On TCL, Brightness is the backlight. Brighter for daytime, dimmer at night.'],
+          ['Reduce reflections', 'Close blinds or move lamps that reflect in the screen. Glare lowers contrast more than any setting.'],
+          ['Bias lighting (optional)', 'A dim, neutral-white light behind the TV (6500 K, about a tenth as bright as the screen) makes blacks look deeper and eases eye strain in a dark room.'],
+          ['Seating', 'Eyes level with about the middle of the screen, sitting straight on. LCD colour and contrast fade when viewed from an angle.'],
+        ]
+      }
+    }
+  }
+};
+
 const STEPS = [
   {
     id: 'start', title: 'Let’s set up your TV picture', pattern: null,
     lead: 'About 10 minutes. You’ll answer simple questions about what you see, and change settings with your TV remote.',
-    custom: () => `
-      <ol class="check" style="counter-reset:n">
-        ${['Update your TV’s software first (usually Settings → System or Support → Software update). Updates can change picture processing or reset settings, so do it before you start.',
-           'Turn the lights down to how you normally watch.',
-           'At the top, tap “Connect to TV” and choose your TV. If you see “Let this page find my TV”, tap that first and choose Allow.',
-           'Open your TV’s picture settings menu with the remote. You’ll use it throughout.']
-          .map((t, i) => `<li style="cursor:default"><span class="tick" style="border-color:var(--accent);color:var(--accent);font-size:14px;font-weight:700">${i + 1}</span><span>${t}</span></li>`).join('')}
-      </ol>
-      <details><summary>Using an iPhone?</summary><div class="inner">
+    items: [
+      'Update your TV’s software first (usually Settings → System or Support → Software update). Updates can change picture processing or reset settings, so do it before you start.',
+      'Turn the lights down to how you normally watch.',
+      'At the top, tap “Connect to TV” and choose your TV. If you see “Let this page find my TV”, tap that first and choose Allow.',
+      'Open your TV’s picture settings menu with the remote. You’ll use it throughout.'
+    ],
+    after: `<details><summary>Using an iPhone?</summary><div class="inner">
         <p>Casting from a web page works in Chrome on Android or on a computer, but not on an iPhone.</p>
         <p>You can still follow along and <button class="linkish" data-local>see each pattern on this phone</button>, but the TV steps need the pattern shown on the TV.</p>
       </div></details>`
@@ -371,6 +491,20 @@ const store = {
   set(k, v) { try { localStorage.setItem('tvcal2.' + k, JSON.stringify(v)); } catch (e) {} }
 };
 let idx = Math.min(store.get('step') || 0, STEPS.length - 1);
+let brand = store.get('brand');   // 'tcl', 'other', or null (not chosen yet)
+function brandInfo() { return BRANDS[brand] || null; }
+// The step as shown: generic step with the chosen brand's overrides on top.
+function S(i) {
+  const base = STEPS[i], o = brandInfo() && brandInfo().steps[base.id];
+  if (!o) return base;
+  const m = Object.assign({}, base, o);
+  if (base.flow && o.flow) {
+    m.flow = Object.assign({}, base.flow);
+    for (const k in o.flow) m.flow[k] = Object.assign({}, base.flow[k], o.flow[k]);
+  }
+  return m;
+}
+function allSteps() { return STEPS.map((_, i) => S(i)); }
 const values = store.get('values') || {};
 const checks = store.get('checks') || {};
 let node = null, loops = 0;
@@ -417,8 +551,22 @@ function posBadge(k) {
   return `<div class="pos ${k}"><svg viewBox="0 0 24 24" aria-hidden="true">${p.icon}</svg><div><b>${p.label}</b><span>${p.note}</span></div></div>`;
 }
 
+function brandPicker() {
+  const opt = (k, label) => `<button class="brand-opt${brand === k ? ' on' : ''}" data-brand="${k}">${label}</button>`;
+  const note = brandInfo() ? `<p class="brand-note">${brandInfo().note}</p>`
+    : brand === 'other' ? `<p class="brand-note">Using general names that work on most TVs. Your TV may use slightly different words.</p>` : '';
+  return `<div class="box q brand" id="brandBox"><p class="ask">What brand is your TV?</p>
+    <div class="answers two">${opt('tcl', 'TCL')}${opt('other', 'Another brand')}</div>${note}</div>`;
+}
+function updateBrandChip() {
+  const chip = document.getElementById('brandChip');
+  if (!brand || idx === 0) { chip.style.display = 'none'; return; }
+  chip.style.display = '';
+  chip.innerHTML = `TV: ${brandInfo() ? brandInfo().name : 'other brand'} · <u>Change</u>`;
+}
+
 function render() {
-  const s = STEPS[idx];
+  const s = S(idx);
   if (node === null) { node = s.flow ? s.flow.start : null; loops = 0; }
   [...progress.children].forEach((el, i) => el.classList.toggle('done', i <= idx));
 
@@ -429,7 +577,9 @@ function render() {
   } else if (s.pattern) {
     h += `<figure><img src="patterns/${s.pattern}.png" alt=""><figcaption>${s.caption}</figcaption></figure>`;
   }
-  if (s.custom) h += s.custom();
+  if (s.id === 'start') h += brandPicker();
+  if (s.items) h += `<ol class="check">${s.items.map((t, i) => `<li style="cursor:default"><span class="tick" style="border-color:var(--accent);color:var(--accent);font-size:14px;font-weight:700">${i + 1}</span><span>${t}</span></li>`).join('')}</ol>`;
+  if (s.after) h += s.after;
   if (s.checklist) {
     h += `<ul class="check">${s.checklist.map(([t, d], i) => {
       if (t === '#') return `<li class="sect">${d}</li>`;
@@ -442,10 +592,10 @@ function render() {
   }
   if (s.flow) h += flowHtml(s);
   if (s.where) h += `<details><summary>Where is this setting?</summary><div class="inner">${s.where}</div></details>`;
-  if (s.dimming) h += DIMMING_HELP;
+  if (s.dimming) h += (brandInfo() && brandInfo().dimmingHelp) || DIMMING_HELP;
   if (s.pattern && !s.compare) h += `<button class="linkish" data-local>See the pattern on this phone</button>`;
   if (s.summary) {
-    h += `<table>${STEPS.filter(x => x.record).map(x => `<tr><td>${x.record}</td><td>${esc(values[x.id] || '—')}</td></tr>`).join('')}</table>
+    h += `<table>${allSteps().filter(x => x.record).map(x => `<tr><td>${x.record}</td><td>${esc(values[x.id] || '—')}</td></tr>`).join('')}</table>
       <div class="answers two"><button id="copy">Copy</button><button id="restart">Start over</button></div>`;
   }
   card.innerHTML = h;
@@ -456,6 +606,7 @@ function render() {
   nextBtn.textContent = idx === 0 ? 'Start' : finished ? 'Next' : 'Skip this step';
   nextBtn.classList.toggle('skip', !finished);
   store.set('step', idx);
+  updateBrandChip();
   showPattern(s.pattern);
 }
 
@@ -470,6 +621,10 @@ function go(i, back) {
 card.addEventListener('click', e => {
   const t = e.target.closest('button, li[data-check]');
   if (!t) return;
+  if (t.dataset.brand) {
+    brand = t.dataset.brand; store.set('brand', brand); render();
+    return;
+  }
   if (t.dataset.go && t.dataset.go[0] === '@') {
     go(STEPS.findIndex(x => x.id === t.dataset.go.slice(1))); return;
   }
@@ -481,7 +636,7 @@ card.addEventListener('click', e => {
   if (t.dataset.check !== undefined) { checks[t.dataset.check] = !checks[t.dataset.check]; store.set('checks', checks); t.classList.toggle('on'); }
   if (t.hasAttribute('data-local')) openLocal();
   if (t.id === 'copy') {
-    const text = 'My TV picture settings\n' + STEPS.filter(x => x.record).map(x => `${x.record}: ${values[x.id] || '-'}`).join('\n');
+    const text = 'My TV picture settings' + (brandInfo() ? ' (' + brandInfo().name + ')' : '') + '\n' + allSteps().filter(x => x.record).map(x => `${x.record}: ${values[x.id] || '-'}`).join('\n');
     (navigator.clipboard ? navigator.clipboard.writeText(text) : Promise.reject())
       .then(() => { t.textContent = 'Copied'; }, () => { t.textContent = 'Copy failed'; });
   }
@@ -492,7 +647,16 @@ card.addEventListener('input', e => {
   if (k) { values[k] = e.target.value.trim(); store.set('values', values); }
 });
 backBtn.onclick = () => { if (idx > 0) go(trail.length ? trail.pop() : idx - 1, true); };
-nextBtn.onclick = () => { if (idx < STEPS.length - 1) go(idx + 1); };
+nextBtn.onclick = () => {
+  if (idx === 0 && !brand) {          // ask for the brand before starting
+    const b = document.getElementById('brandBox');
+    b.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    b.classList.remove('attn'); void b.offsetWidth; b.classList.add('attn');
+    return;
+  }
+  if (idx < STEPS.length - 1) go(idx + 1);
+};
+document.getElementById('brandChip').onclick = () => go(0);
 
 /* ---------- Casting (Google's Default Media Receiver) ---------- */
 let castReady = false, lastCast;

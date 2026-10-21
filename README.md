@@ -32,6 +32,14 @@ Pattern levels are written directly as video code values (16 = black, 235 = whit
 so the below-black box (12) survives instead of being clipped. Decoded test patches
 were checked to match their intended values exactly.
 
+## Brand-specific instructions
+The start screen asks for the TV brand. `BRANDS` in `index.html` holds per-brand
+overrides for any part of a step (wording, checklist items, flow nodes, summary
+labels); anything not overridden falls back to the generic text in `STEPS`.
+Currently: **TCL** (Google TV menu names, e.g. Black Level instead of Brightness,
+Local Contrast, Dynamic Tone Mapping) and **Another brand** (generic wording).
+Only add a brand once its menu names are checked against the manufacturer's docs.
+
 ## Hosting (GitHub Pages, ~5 minutes)
 1. Create a public GitHub repo and upload everything in this folder (live copy: github.com/vantuvt/tvcal).
 2. Settings → Pages → Deploy from branch → `main` / root.
