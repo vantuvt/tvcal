@@ -70,6 +70,8 @@
   .check li.on .tick::after { content: ""; width: 10px; height: 6px; border-left: 3px solid #0d2418; border-bottom: 3px solid #0d2418; transform: rotate(-45deg) translate(1px, -1px); }
   .check .t { font-weight: 600; }
   .check .d { font-size: 14px; color: var(--dim); }
+  .check li.sect { background: none; border: none; padding: 14px 2px 2px; margin: 0; cursor: default;
+    font-size: 13px; text-transform: uppercase; letter-spacing: 1px; color: var(--dim); }
 
   label.rec { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 14px; font-size: 15px; }
   input[type=text] { width: 120px; background: var(--bg); border: 1px solid var(--line); color: var(--text);
@@ -179,6 +181,8 @@ const STEPS = [
       ['Colour temperature: Warm', 'Pick Warm or Warm 2. It looks a little yellow at first; your eyes adjust in a minute.'],
       ['Colour space: Auto', 'Also called Colour gamut. Avoid Native or Wide: they make ordinary shows look oversaturated.'],
       ['Colour and Tint: leave at default', 'Turn off any Colour enhancer, Live colour or Vivid colour option. The picture mode’s defaults are the most accurate.'],
+      ['Gamma: 2.4 in a dark room, 2.2 in a bright one', 'Sometimes shown as BT.1886 (similar to 2.4). It sets how quickly the picture brightens out of black. If your TV has no Gamma setting, skip this.'],
+      ['Noise reduction: Off', 'Also called MPEG noise reduction, Smooth gradation or Noise filter. It smears fine detail in streaming shows. Low is fine for an old, grainy source.'],
     ],
     extra: `<details><summary>Using a Chromecast with Google TV?</summary><div class="inner">
       <p>On the Chromecast: Settings → Display &amp; Sound → Advanced display settings → <b>Dynamic range</b> → turn on <b>match content</b>.
@@ -257,7 +261,7 @@ const STEPS = [
     lead: 'Movies and shows in HDR or Dolby Vision use separate picture settings on most TVs. This checks them in a few minutes.',
     flow: {
       start: 'q',
-      q: { ask: 'Do you watch HDR content? For example 4K HDR or Dolby Vision on Netflix, Disney+, Prime Video or Apple TV.', answers: [['Yes', 'ok'], ['Not sure', 'ok'], ['No, skip HDR', '@done']] },
+      q: { ask: 'Do you watch HDR content? For example 4K HDR or Dolby Vision on Netflix, Disney+, Prime Video or Apple TV.', answers: [['Yes', 'ok'], ['Not sure', 'ok'], ['No, skip HDR', '@extras']] },
       ok: { do: 'Let’s check HDR.', text: 'Tap Next. The TV will switch into HDR for the next few patterns.' }
     }
   },
@@ -319,6 +323,25 @@ const STEPS = [
       ok: { do: 'All done.', text: 'Your TV is set up for SDR and HDR.' }
     }
   },
+  {
+    id: 'extras', title: 'Your devices and room (optional)', pattern: null,
+    lead: 'A few things outside the picture menu that also make a difference. Tap the ones you’ve done, and skip any that don’t apply.',
+    checklist: [
+      ['#', 'Your devices'],
+      ['HDMI black level: Auto', 'For anything plugged in by HDMI (game console, Blu-ray, streaming stick). Also called RGB range or HDMI Black Level. Set Auto on both the TV and the device. A mismatch crushes or washes out blacks.'],
+      ['Streaming device: match content', 'On a Chromecast, Apple TV or Fire TV, turn on match dynamic range and match frame rate, so films play at their natural speed without judder.'],
+      ['Film motion: natural 24p', 'If your TV has Real Cinema, Cinematic Movement or a 24p setting, turn it on. It smooths camera pans without the “soap opera” look.'],
+      ['Game console: Game mode and HDR calibration', 'Use Game mode (and HGIG if offered) on the console’s input, then run the console’s own HDR calibration screen. PS5 and Xbox both have one in their display settings.'],
+      ['Copy settings to other inputs', 'Look for “Apply to all inputs” or “Apply picture settings: All sources”. Otherwise, repeat the values from your summary on each input you use.'],
+      ['Update the TV’s software', 'Usually under Settings → Support or System → Software update. Updates often improve HDR.'],
+      ['Streaming quality: High', 'In Netflix, YouTube and other apps, set playback or data usage to High or Best.'],
+      ['#', 'Your room'],
+      ['Backlight: set for your room', 'Brighter for daytime, dimmer at night. If your TV lets you save two custom modes, keep a Day and a Night version with only the backlight different.'],
+      ['Reduce reflections', 'Close blinds or move lamps that reflect in the screen. Glare lowers contrast more than any setting.'],
+      ['Bias lighting (optional)', 'A dim, neutral-white light behind the TV (6500 K, about a tenth as bright as the screen) makes blacks look deeper and eases eye strain in a dark room.'],
+      ['Seating', 'Eyes level with about the middle of the screen, sitting straight on. LCD colour and contrast fade when viewed from an angle.'],
+    ]
+  },
   { id: 'done', title: 'Your settings', pattern: null, summary: true,
     lead: 'Take a screenshot or copy these. If you also watch through another input (like a game console), set the same values there.' }
 ];
@@ -372,9 +395,12 @@ function render() {
   }
   if (s.custom) h += s.custom();
   if (s.checklist) {
-    h += `<ul class="check">${s.checklist.map(([t, d], i) =>
-      `<li data-check="${i}" class="${checks[i] ? 'on' : ''}"><span class="tick"></span><span><div class="t">${t}</div><div class="d">${d}</div></span></li>`).join('')}</ul>`;
-    h += `<label class="rec" style="margin:0 0 14px">Picture mode you chose (optional)
+    h += `<ul class="check">${s.checklist.map(([t, d], i) => {
+      if (t === '#') return `<li class="sect">${d}</li>`;
+      const key = s.id + ':' + i;
+      return `<li data-check="${key}" class="${checks[key] ? 'on' : ''}"><span class="tick"></span><span><div class="t">${t}</div><div class="d">${d}</div></span></li>`;
+    }).join('')}</ul>`;
+    if (s.id === 'mode') h += `<label class="rec" style="margin:0 0 14px">Picture mode you chose (optional)
       <input type="text" data-record="mode" value="${esc(values.mode || '')}" placeholder="e.g. Filmmaker"></label>`;
     h += s.extra || '';
   }
