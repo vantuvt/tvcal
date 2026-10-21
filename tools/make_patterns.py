@@ -205,12 +205,41 @@ def p_final(guide=False):
     return c
 
 
+def srgb8(r, g, b):
+    """8-bit full-range RGB value -> limited-range code values."""
+    return tuple(16 + 219 * v / 255.0 for v in (r, g, b))
+
+
+# Natural reference colours (X-Rite ColorChecker published sRGB values).
+NATURAL = [
+    ("light skin", srgb8(194, 150, 130)),
+    ("dark skin", srgb8(115, 82, 68)),
+    ("foliage", srgb8(87, 108, 67)),
+    ("blue sky", srgb8(98, 122, 157)),
+]
+
+
+def p_temp(guide=False):
+    """Colour temperature: large white and grey areas (where a colour cast is
+    easiest to see) plus skin tones and other natural colours."""
+    c = Canvas(level(45))
+    c.rect(120, 120, 900, 760, level(90), check=None if guide else "temp_white")
+    for i, pct in enumerate((30, 60, 80)):
+        c.rect(120 + i * 260, 800, 120 + (i + 1) * 260, 960, level(pct), check=None if guide else f"temp_grey_{pct}")
+    for i, (name, rgb) in enumerate(NATURAL):
+        x0, y0 = 1000 + (i % 2) * 400, 120 + (i // 2) * 420
+        c.rect(x0, y0, x0 + 380, y0 + 400, rgb, check=None if guide else f"temp_{name.replace(' ', '_')}")
+    c.text((W / 2 + 460, 1010), "COLOUR TEMPERATURE", 40, level(80), bold=True)
+    return c
+
+
 PATTERNS = [
     ("01-fit", "Fit to screen", p_fit),
     ("02-brightness", "Brightness", p_black),
     ("03-contrast", "Contrast", p_white),
     ("04-sharpness", "Sharpness", p_sharp),
     ("05-final", "Final check", p_final),
+    ("06-temp", "Colour temperature", p_temp),
 ]
 
 
@@ -234,8 +263,11 @@ def encode(name, Y, U, V):
     return raw, out
 
 
+ONLY = os.environ.get("ONLY")  # re-encode a single pattern, e.g. ONLY=06-temp
 manifest = []
 for name, title, fn in PATTERNS:
+    if ONLY and ONLY != name:
+        continue
     c = fn()
     Y, U, V = to_yuv420(c)
     raw, out = encode(name, Y, U, V)

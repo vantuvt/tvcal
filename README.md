@@ -11,12 +11,14 @@ Default Media Receiver (no Cast app registration needed).
 - `patterns/*.png` — "where to look" guides shown on the phone (faint boxes exaggerated), plus clean/halo sharpness examples.
 - `patterns/h*.mp4` — optional HDR10 set: 1920x1080 HEVC Main10 (`hvc1`), PQ / BT.2020, HDR10 metadata
   (mastering display P3-D65, 1000 nits; MaxCLL 1000, MaxFALL 400). Greyscale only.
-- `tools/make_patterns.py` — regenerates the SDR videos (Python 3, numpy, Pillow, ffmpeg).
+- `tools/make_patterns.py` — regenerates the SDR videos (Python 3, numpy, Pillow, ffmpeg). `ONLY=<name>` re-encodes one pattern.
 - `tools/make_hdr_patterns.py` — regenerates the HDR videos (needs ffmpeg with libx265). `ONLY=<name>` re-encodes one pattern.
 
 TV patterns use big labelled boxes with corner marks instead of numbered bars:
 brightness box A = 12 (below black, should vanish), B = 20 (should be faintly visible);
 contrast boxes A/B/C = 216/224/231 (all should be visible).
+Colour temperature pattern (06-temp): large white and 30/60/80% grey areas plus
+ColorChecker skin, foliage and sky colours, shown while switching Warm options.
 Brightness boxes sit inside 40% grey frames so local-dimming LCDs keep the backlight
 on behind them, as in a real dark scene; the phone explains what to do if local
 dimming still hides box B.

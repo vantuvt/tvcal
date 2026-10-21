@@ -187,7 +187,6 @@ const STEPS = [
       ['Picture mode: Filmmaker, Movie or Cinema', 'If you have Filmmaker Mode, use it. Otherwise Movie, Cinema or Calibrated.'],
       ['Motion smoothing: Off', 'Also called TruMotion, Auto Motion Plus, MotionFlow or Motion Interpolation.'],
       ['Energy saving and light sensor: Off', 'Also called Eco, Power saving, Ambient light detection or Adaptive brightness.'],
-      ['Colour temperature: Warm', 'Pick Warm or Warm 2. It looks a little yellow at first; your eyes adjust in a minute.'],
       ['Colour space: Auto', 'Also called Colour gamut. Avoid Native or Wide: they make ordinary shows look oversaturated.'],
       ['Colour and Tint: leave at default', 'Turn off any Colour enhancer, Live colour or Vivid colour option. The picture mode’s defaults are the most accurate.'],
       ['Gamma: 2.4 in a dark room, 2.2 in a bright one', 'Sometimes shown as BT.1886 (similar to 2.4). It sets how quickly the picture brightens out of black. If your TV has no Gamma setting, skip this.'],
@@ -198,6 +197,19 @@ const STEPS = [
       Otherwise the patterns may be shown in HDR and look washed out.</p></div></details>
       <details><summary>Where are these settings?</summary><div class="inner">
       <p>Usually Settings → <b>Picture</b>, then <b>Expert</b> or <b>Advanced</b> settings. Make the changes on the HDMI input the Chromecast is plugged into; most TVs remember settings per input.</p></div></details>`
+  },
+  {
+    id: 'temp', pos: 'seat', title: 'Colour temperature', pattern: '06-temp', record: 'Colour temperature', ph: 'Warm 2',
+    lead: 'Switch between the colour temperature options while watching the TV. The white and grey areas show the difference most clearly: cooler options look bluish, warmer ones look yellowish.',
+    caption: 'The TV is showing white, greys, skin tones, foliage and sky.',
+    where: `<p>Usually Picture → Expert or Advanced settings → <b>Colour temperature</b> (sometimes <b>Colour tone</b> or <b>White balance</b>). Options are often Cool, Standard, Warm 1 and Warm 2; LG uses a scale up to Warm 50, and Sony uses Expert 1 and Expert 2.</p>`,
+    flow: {
+      start: 'set',
+      set: { do: 'Start with the warmest option', sub: 'Warm 2 on most TVs, Warm 50 on LG, Expert 1 on Sony. Flick back and forth to the other options to see the difference on the white and greys, then come back to it.', then: 'q' },
+      q: { ask: 'Give your eyes 30 seconds to adjust. Do the white and grey areas still look clearly yellow or orange?', answers: [['No, they look neutral', 'ok'], ['Yes, still yellow', 'cooler']] },
+      cooler: { do: 'Go one step cooler', sub: 'For example Warm 1 instead of Warm 2. Then wait a moment and look again.', then: 'q' },
+      ok: { do: 'Colour temperature is set.', text: 'Skin tones should look natural, not pink or orange.' }
+    }
   },
   {
     id: 'fit', pos: 'seat', title: 'Fit to screen', pattern: '01-fit', record: 'Picture size', ph: 'Just Scan',
