@@ -81,7 +81,7 @@
   .bar { position: fixed; left: 0; right: 0; bottom: 0; background: linear-gradient(rgba(17,17,19,0), var(--bg) 35%);
     padding: 26px 16px calc(14px + env(safe-area-inset-bottom)); }
   .bar .inner { max-width: 520px; margin: 0 auto; display: flex; gap: 10px; }
-  .bar #next { flex: 1; }
+  .bar button { flex: 1 1 0; min-width: 0; }
   .bar #next.skip { background: var(--panel2); color: var(--dim); border-color: var(--line); }
 
   #localView { position: fixed; inset: 0; background: #000; display: none; z-index: 10; }
@@ -372,8 +372,8 @@ function render() {
   card.innerHTML = h;
 
   const finished = !s.flow || !!(s.flow[node] && s.flow[node].text);
-  backBtn.style.visibility = idx === 0 ? 'hidden' : 'visible';
-  nextBtn.style.visibility = idx === STEPS.length - 1 ? 'hidden' : 'visible';
+  backBtn.style.display = idx === 0 ? 'none' : '';
+  nextBtn.style.display = idx === STEPS.length - 1 ? 'none' : '';
   nextBtn.textContent = idx === 0 ? 'Start' : finished ? 'Next' : 'Skip this step';
   nextBtn.classList.toggle('skip', !finished);
   store.set('step', idx);
