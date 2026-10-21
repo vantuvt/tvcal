@@ -97,6 +97,10 @@
   </header>
   <div class="status"><span class="dot" id="dot"></span><span id="statusText">Loading Cast support…</span></div>
   <button id="connect" class="wide" style="display:none;margin:-4px 0 14px">Connect to TV</button>
+  <div id="lnaBox" style="display:none;margin:-4px 0 14px">
+    <button id="lnaBtn" class="wide">Allow access to devices on your network</button>
+    <div id="lnaStatus" style="font-size:13px;color:var(--dim);margin-top:6px"></div>
+  </div>
   <details id="castHelp" style="display:none"><summary>TV not found?</summary><div class="inner">
     <p>Make sure the phone and the Chromecast are on the <b>same Wi-Fi network</b> (not a guest network, and not mobile data).</p>
     <p>On Android 12 or later, Chrome needs the <b>Nearby devices</b> permission: Settings → Apps → Chrome → Permissions → Nearby devices → Allow. Then reload this page.</p>
@@ -365,15 +369,15 @@ window['__onGCastApiAvailable'] = function (available) {
       if (err === 'cancel') return;
       setStatus(err === chrome.cast.ErrorCode.RECEIVER_UNAVAILABLE || err === 'receiver_unavailable'
         ? 'No TV found. See “TV not found?” below.' : 'Couldn’t connect (' + err + ').');
-      help.style.display = 'block';
+      help.style.display = 'block'; showLna();
     });
   };
   const CS = cast.framework.CastState;
   const onCastState = st => {
     connectBtn.textContent = st === CS.CONNECTED ? 'Disconnect from TV' : 'Connect to TV';
     connectBtn.classList.toggle('primary', st === CS.NOT_CONNECTED);
-    if (st === CS.NO_DEVICES_AVAILABLE) { setStatus('Looking for your TV… none found yet.'); help.style.display = 'block'; }
-    else if (st === CS.NOT_CONNECTED) { setStatus('TV found. Tap “Connect to TV”.'); help.style.display = 'none'; }
+    if (st === CS.NO_DEVICES_AVAILABLE) { setStatus('Looking for your TV… none found yet.'); help.style.display = 'block'; showLna(); }
+    else if (st === CS.NOT_CONNECTED) { setStatus('TV found. Tap “Connect to TV”.'); help.style.display = 'none'; lnaBox.style.display = 'none'; }
     else if (st === CS.CONNECTING) setStatus('Connecting…', true);
   };
   ctx.addEventListener(cast.framework.CastContextEventType.CAST_STATE_CHANGED, e => onCastState(e.castState));
@@ -393,6 +397,42 @@ setTimeout(() => {
   if (!castReady && statusText.textContent.startsWith('Loading'))
     setStatus('Cast support didn’t load. Casting needs Chrome on Android or a computer, and an internet connection.');
 }, 6000);
+
+/* ---------- Chrome "Local network access" site permission ----------
+   Chrome (142+) asks per site before a page may contact devices on the home
+   network. Making a request to a private address is what triggers the prompt. */
+const lnaBox = document.getElementById('lnaBox'), lnaBtn = document.getElementById('lnaBtn'), lnaStatus = document.getElementById('lnaStatus');
+const LNA_NAMES = ['local-network-access', 'local-network'];
+async function lnaState() {
+  if (!navigator.permissions) return 'unsupported';
+  for (const name of LNA_NAMES) {
+    try { return (await navigator.permissions.query({ name })).state; } catch (e) {}
+  }
+  return 'unsupported';
+}
+async function showLna() {
+  const st = await lnaState();
+  lnaBox.style.display = 'block';
+  lnaBtn.style.display = st === 'granted' ? 'none' : 'block';
+  lnaStatus.textContent = {
+    granted: 'Local network access: allowed for this site.',
+    denied: 'Local network access is blocked for this site. Tap the icon left of the address → Site settings → Local network access → Allow, then reload.',
+    prompt: 'Chrome will ask you to allow this site to find devices on your network.',
+    unsupported: 'This browser doesn’t use a per-site local network permission.'
+  }[st] || ('Local network access: ' + st);
+  return st;
+}
+lnaBtn.onclick = async () => {
+  lnaStatus.textContent = 'Asking Chrome… answer the prompt if one appears.';
+  try {
+    // Any private address triggers the permission check. 192.168.0.1 is a common
+    // router address; whether it answers doesn't matter.
+    await fetch('http://192.168.0.1/', { mode: 'no-cors', cache: 'no-store',
+      targetAddressSpace: 'local', signal: AbortSignal.timeout(15000) });
+  } catch (e) { /* unreachable or refused is fine; we only need the prompt */ }
+  const st = await showLna();
+  if (st === 'granted') lnaStatus.textContent = 'Allowed. Reloading to look for your TV again…', setTimeout(() => location.reload(), 1200);
+};
 
 /* ---------- Pattern on this screen ---------- */
 const localView = document.getElementById('localView'), localVideo = document.getElementById('localVideo');
