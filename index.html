@@ -130,6 +130,12 @@ const LOOK_TIPS = `
   <p>When a pattern first appears, the TV shows a title and progress bar for a few seconds. Wait for it to fade.</p>
   <p>"Faint" really means faint: a slightly-less-black square on black. The corner marks show where each box is.</p>`;
 
+const DIMMING_HELP = `<details><summary>Does your TV have local dimming?</summary><div class="inner">
+  <p>Many LCD TVs dim parts of the backlight in dark areas (called <b>Local dimming</b>, <b>Local contrast</b>, <b>Precision dimming</b> or <b>Full array dimming</b>). OLED TVs don’t have it.</p>
+  <p>The grey frames around the boxes are there to keep the backlight on, like in a real dark scene. Judge the boxes inside the frames, not the black edges of the screen.</p>
+  <p>If box B still never appears, even after raising Brightness a lot, local dimming is hiding it. Set local dimming one level lower (for example from High to Medium) and try again. Don’t keep raising Brightness: that makes every dark scene grey.</p>
+</div></details>`;
+
 const STEPS = [
   {
     id: 'start', title: 'Let’s set up your TV picture', pattern: null,
@@ -162,7 +168,7 @@ const STEPS = [
       <p>Usually Settings → <b>Picture</b>, then <b>Expert</b> or <b>Advanced</b> settings. Make the changes on the HDMI input the Chromecast is plugged into; most TVs remember settings per input.</p></div></details>`
   },
   {
-    id: 'fit', title: 'Fit to screen', pattern: '01-fit', record: 'Picture size',
+    id: 'fit', title: 'Fit to screen', pattern: '01-fit', record: 'Picture size', ph: 'Just Scan',
     lead: 'Look at the edges of your TV.',
     caption: 'There’s a thin white border around the very edge, with arrows in each corner.',
     flow: {
@@ -176,9 +182,10 @@ const STEPS = [
   {
     id: 'brightness', title: 'Brightness', pattern: '02-brightness', record: 'Brightness',
     lead: 'This makes dark scenes look right: true black, with shadow detail still visible.',
-    caption: 'When it’s right, box A is completely gone and box B is a very faint grey square. (Brightened here so you can see it.)',
+    caption: 'Look inside the grey frames. When it’s right, box A is completely gone and box B is a very faint grey square. (Brightened here so you can see it.)',
     where: `<p>Use the setting called <b>Brightness</b>. On some TVs, Brightness changes the backlight (the whole screen gets lighter or dimmer but the boxes don’t change). If so, use <b>Black level</b> or <b>Shadow detail</b> instead.</p>`,
-    stuck: 'Not changing? Your TV may call this setting Black level or Shadow detail. “Brightness” on some TVs only changes the backlight.',
+    dimming: true,
+    stuck: 'Not changing? Your TV may call this setting Black level or Shadow detail. “Brightness” on some TVs only changes the backlight. If box B never appears however high you go, see “Does your TV have local dimming?” below.',
     flow: {
       start: 'qa',
       qa: { ask: 'Can you see box A (on the left) at all?', answers: [['Yes, I can see it', 'down'], ['No, it’s gone', 'qb']] },
@@ -223,7 +230,74 @@ const STEPS = [
       q: { ask: 'Do the grey squares look plain grey?', answers: [['Yes', 'ok'], ['They look bluish', 'blue'], ['Another tint', 'other']] },
       blue: { do: 'Choose a warmer Colour temperature', sub: 'Try Warm 2, or a higher “Warm” number. Then look at the squares again.', then: 'q' },
       other: { do: 'That’s OK to leave.', text: 'Fixing a green or pink tint precisely needs a measuring instrument, and the effect is usually small. Make sure Colour and Tint are at the defaults for this picture mode.' },
-      ok: { do: 'All done.', text: 'Your TV is set up.' }
+      ok: { do: 'SDR is done.', text: 'That covers everyday TV and most streaming. Next: an optional check for HDR.' }
+    }
+  },
+  {
+    id: 'hdr', title: 'HDR (optional)', pattern: null,
+    lead: 'Movies and shows in HDR or Dolby Vision use separate picture settings on most TVs. This checks them in a few minutes.',
+    flow: {
+      start: 'q',
+      q: { ask: 'Do you watch HDR content? For example 4K HDR or Dolby Vision on Netflix, Disney+, Prime Video or Apple TV.', answers: [['Yes', 'ok'], ['Not sure', 'ok'], ['No, skip HDR', '@done']] },
+      ok: { do: 'Let’s check HDR.', text: 'Tap Next. The TV will switch into HDR for the next few patterns.' }
+    }
+  },
+  {
+    id: 'hdrmode', title: 'Is HDR on?', pattern: 'h1-black', record: 'HDR picture mode', ph: 'HDR Filmmaker',
+    lead: 'Look at the TV just after the pattern starts.',
+    caption: 'This is the next pattern. First, check the TV switched into HDR.',
+    where: `<p>Press the <b>Info</b> or <b>Settings</b> button while the pattern plays: the picture mode name usually shows “HDR” (for example HDR Filmmaker, HDR Movie or HDR Cinema).</p>`,
+    flow: {
+      start: 'q',
+      q: { ask: 'Did the TV switch into HDR? Look for an “HDR” badge, or a picture mode name that includes HDR.', answers: [['Yes', 'mode'], ['No', 'fix'], ['Can’t tell', 'unsure']] },
+      fix: { do: 'Turn on HDR for this input',
+             sub: 'If your Chromecast plugs into HDMI: turn on the TV’s enhanced format for that HDMI port (called HDMI UHD Color, Input Signal Plus or HDMI Enhanced Format, depending on brand). On the Chromecast, set Display & Sound → Dynamic range → match content. Then go Back one step and Next again to restart the pattern.', then: 'q' },
+      mode: { do: 'Choose the HDR picture mode: Filmmaker, Movie or Cinema', sub: 'HDR has its own picture mode and settings. Turn off dynamic contrast and energy saving here too.', then: 'ok' },
+      unsure: { do: 'Carry on.', text: 'If the next pattern looks washed out, with grey instead of black, HDR is probably off. Come back here and tap No.' },
+      ok: { do: 'HDR is on.', text: 'The next steps adjust the HDR settings.' }
+    }
+  },
+  {
+    id: 'hdrbright', title: 'HDR brightness', pattern: 'h1-black', record: 'HDR brightness',
+    lead: 'Same as before, but for HDR. Most TVs keep a separate Brightness setting for HDR.',
+    caption: 'Look inside the grey frames. When it’s right, box A is gone and box B is a very faint grey square. (Brightened here so you can see it.)',
+    where: `<p>Use <b>Brightness</b> (or <b>Black level</b> / <b>Shadow detail</b>) while HDR is playing. Changes here usually only affect HDR.</p>`,
+    dimming: true,
+    stuck: 'Not changing? Your TV may call this setting Black level or Shadow detail. If box B never appears, see “Does your TV have local dimming?” below.',
+    flow: {
+      start: 'qa',
+      qa: { ask: 'Can you see box A (on the left) at all?', answers: [['Yes, I can see it', 'down'], ['No, it’s gone', 'qb']] },
+      down: { do: 'Press Brightness down by 1', sub: 'Then look at box A again.', then: 'qa' },
+      qb: { ask: 'Can you see box B (on the right), even faintly?', answers: [['Yes, just', 'ok'], ['No', 'up']] },
+      up: { do: 'Press Brightness up by 1', sub: 'Then look at the boxes again.', then: 'qa' },
+      ok: { do: 'HDR brightness is set.', text: 'Dark HDR scenes will keep their shadow detail.' }
+    }
+  },
+  {
+    id: 'hdrhigh', title: 'HDR highlights', pattern: 'h2-highlights', record: 'HDR tone mapping', ph: 'On',
+    lead: 'Four bright boxes, from bright (A) to very bright (D). Most TVs can’t reach the brightest levels, so they compress them. This checks they do it gracefully.',
+    caption: 'When it’s right, you can tell all four boxes apart, each a little brighter than the last.',
+    where: `<p>Look for <b>Dynamic Tone Mapping</b>, <b>HDR Tone Mapping</b>, <b>Dynamic HDR</b> or <b>HDR Brightness</b> in the picture menu. Names vary a lot by brand.</p>
+      <p>Leave <b>Contrast</b> at the HDR mode’s default (often the maximum). Turning it down dims all HDR.</p>`,
+    flow: {
+      start: 'q',
+      q: { ask: 'Can you tell all four boxes A, B, C and D apart?', answers: [['Yes', 'ok'], ['No, some look the same', 'tm']] },
+      tm: { do: 'Turn on HDR tone mapping', sub: 'Look for Dynamic Tone Mapping, HDR Tone Mapping or Dynamic HDR. If it’s already on, try its other options. Then look at the boxes again.', then: 'q2' },
+      q2: { ask: 'Can you tell all four apart now?', answers: [['Yes', 'ok'], ['Still no', 'limit']] },
+      limit: { do: 'That’s a limit of your TV.', text: 'Many TVs can’t separate the very brightest highlights. Use whichever tone mapping setting looked best and move on.' },
+      ok: { do: 'Highlights look right.', text: 'Bright HDR details like sunlight and reflections keep their detail.' }
+    }
+  },
+  {
+    id: 'hdrfinal', title: 'HDR final check', pattern: 'h3-steps',
+    lead: 'A row of grey bars, from nearly black on the left to very bright on the right.',
+    caption: 'Each bar should be a little brighter than the one before.',
+    flow: {
+      start: 'q',
+      q: { ask: 'Does every bar look different from the one next to it?', answers: [['Yes', 'ok'], ['Dark end merges', 'dark'], ['Bright end merges', 'bright']] },
+      dark: { do: 'Press Brightness up by 1', sub: 'Then look at the darkest bars again. If box A from the earlier step would come back, stop and leave it.', then: 'q' },
+      bright: { do: 'That’s normal on most TVs.', text: 'The brightest bars are beyond what most TVs can show. As long as the rest step up evenly, you’re done.' },
+      ok: { do: 'All done.', text: 'Your TV is set up for SDR and HDR.' }
     }
   },
   { id: 'done', title: 'Your settings', pattern: null, summary: true,
@@ -261,7 +335,7 @@ function flowHtml(s) {
       <button class="primary wide" data-go="${n.then}" data-loop="1">Done</button></div>`;
   }
   const rec = s.record ? `<label class="rec">Write down the setting? (optional)
-      <input type="text" data-record="${s.id}" value="${esc(values[s.id] || '')}" placeholder="e.g. ${s.id === 'fit' ? 'Just Scan' : '48'}"></label>` : '';
+      <input type="text" data-record="${s.id}" value="${esc(values[s.id] || '')}" placeholder="e.g. ${s.ph || '48'}"></label>` : '';
   return `<div class="box ok"><p class="do">✓ ${n.do}</p><p>${n.text}</p>${rec}</div>`;
 }
 
@@ -287,6 +361,7 @@ function render() {
   }
   if (s.flow) h += flowHtml(s);
   if (s.where) h += `<details><summary>Where is this setting?</summary><div class="inner">${s.where}</div></details>`;
+  if (s.dimming) h += DIMMING_HELP;
   if (s.pattern && !s.compare) h += `<button class="linkish" data-local>See the pattern on this phone</button>`;
   if (s.summary) {
     h += `<table>${STEPS.filter(x => x.record).map(x => `<tr><td>${x.record}</td><td>${esc(values[x.id] || '—')}</td></tr>`).join('')}</table>
@@ -303,11 +378,20 @@ function render() {
   showPattern(s.pattern);
 }
 
-function go(i) { idx = i; node = null; render(); window.scrollTo(0, 0); }
+// Back retraces the steps actually visited (so skipping HDR and pressing Back
+// returns to the HDR question, not the last HDR step).
+const trail = store.get('trail') || [];
+function go(i, back) {
+  if (!back && i !== idx) trail.push(idx);
+  idx = i; node = null; store.set('trail', trail); render(); window.scrollTo(0, 0);
+}
 
 card.addEventListener('click', e => {
   const t = e.target.closest('button, li[data-check]');
   if (!t) return;
+  if (t.dataset.go && t.dataset.go[0] === '@') {
+    go(STEPS.findIndex(x => x.id === t.dataset.go.slice(1))); return;
+  }
   if (t.dataset.go) {
     if (t.dataset.loop) loops++;
     node = t.dataset.go; render();
@@ -320,13 +404,13 @@ card.addEventListener('click', e => {
     (navigator.clipboard ? navigator.clipboard.writeText(text) : Promise.reject())
       .then(() => { t.textContent = 'Copied'; }, () => { t.textContent = 'Copy failed'; });
   }
-  if (t.id === 'restart') { for (const k in checks) delete checks[k]; store.set('checks', checks); go(0); }
+  if (t.id === 'restart') { for (const k in checks) delete checks[k]; store.set('checks', checks); trail.length = 0; go(0, true); }
 });
 card.addEventListener('input', e => {
   const k = e.target.dataset && e.target.dataset.record;
   if (k) { values[k] = e.target.value.trim(); store.set('values', values); }
 });
-backBtn.onclick = () => { if (idx > 0) go(idx - 1); };
+backBtn.onclick = () => { if (idx > 0) go(trail.length ? trail.pop() : idx - 1, true); };
 nextBtn.onclick = () => { if (idx < STEPS.length - 1) go(idx + 1); };
 
 /* ---------- Casting (Google's Default Media Receiver) ---------- */

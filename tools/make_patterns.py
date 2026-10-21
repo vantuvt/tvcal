@@ -128,11 +128,19 @@ def p_black(guide=False):
     c = Canvas(16)
     A = (12 if not guide else 16)          # below black: should be invisible
     B = (20 if not guide else level(22))   # just above black: should be faintly visible
+    # Each box sits inside a grey frame (with a black gap). On TVs with local
+    # dimming, the frame keeps the backlight zones behind the box switched on,
+    # like in a real dark scene, so box B isn't hidden by the backlight turning off.
+    ring, gap, th = level(40), 40, 36
     for name, x0, val in (("A", 300, A), ("B", 1140, B)):
         x1, y0, y1 = x0 + 480, 220, 700
+        fx0, fy0, fx1, fy1 = x0 - gap - th, y0 - gap - th, x1 + gap + th, y1 + gap + th
+        c.rect(fx0, fy0, fx1, fy0 + th, ring); c.rect(fx0, fy1 - th, fx1, fy1, ring)
+        c.rect(fx0, fy0, fx0 + th, fy1, ring); c.rect(fx1 - th, fy0, fx1, fy1, ring)
         c.rect(x0, y0, x1, y1, val, check=None if guide else f"black_{name}")
-        brackets(c, x0, y0, x1, y1, level(28))
-        c.text(((x0 + x1) / 2, 820), name, 110, level(45), bold=True)
+        c.text(((x0 + x1) / 2, 870), name, 110, level(45), bold=True)
+    if not guide:
+        c.checks.append(("black_gap", x0 - gap + 4, y0 + 40, x0 - 4, y1 - 40, 16.0))
     c.text((W / 2, 975), "BRIGHTNESS", 44, level(30), bold=True)
     if not guide:
         c.checks.append(("black_bg", 40, 40, 200, 200, 16.0))

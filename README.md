@@ -9,11 +9,22 @@ Default Media Receiver (no Cast app registration needed).
 - `index.html` — the phone wizard (Cast sender). Self-contained.
 - `patterns/*.mp4` — 1920x1080 H.264 High@4.1, 30 fps, 60 s, limited range, BT.709 tagged. Loop on the TV.
 - `patterns/*.png` — "where to look" guides shown on the phone (faint boxes exaggerated), plus clean/halo sharpness examples.
-- `tools/make_patterns.py` — regenerates the videos (Python 3, numpy, Pillow, ffmpeg).
+- `patterns/h*.mp4` — optional HDR10 set: 1920x1080 HEVC Main10 (`hvc1`), PQ / BT.2020, HDR10 metadata
+  (mastering display P3-D65, 1000 nits; MaxCLL 1000, MaxFALL 400). Greyscale only.
+- `tools/make_patterns.py` — regenerates the SDR videos (Python 3, numpy, Pillow, ffmpeg).
+- `tools/make_hdr_patterns.py` — regenerates the HDR videos (needs ffmpeg with libx265). `ONLY=<name>` re-encodes one pattern.
 
 TV patterns use big labelled boxes with corner marks instead of numbered bars:
 brightness box A = 12 (below black, should vanish), B = 20 (should be faintly visible);
 contrast boxes A/B/C = 216/224/231 (all should be visible).
+Brightness boxes sit inside 40% grey frames so local-dimming LCDs keep the backlight
+on behind them, as in a real dark scene; the phone explains what to do if local
+dimming still hides box B.
+
+HDR set (10-bit PQ code values): black A = 56 (below black), B = 80 (≈0.007 nits);
+highlights A–D = 400/600/800/1000 nits on a 100-nit background (tests tone mapping);
+final check = 12 grey steps from 0.05 to 1000 nits. The HDR pass is optional and
+comes after the SDR steps.
 
 Pattern levels are written directly as video code values (16 = black, 235 = white),
 so the below-black box (12) survives instead of being clipped. Decoded test patches
@@ -44,6 +55,7 @@ page explains how to re-enable it in Site settings → Local network access.
 - iPhone: casting isn't possible from a web page; the steps and "View on this screen" still work.
 
 ## Known limits / next ideas
-- SDR only. HDR10 versions (HEVC 10-bit PQ) would be a separate set and only some Cast devices play them.
+- HDR10 only (no Dolby Vision). Needs a Cast device that plays HEVC HDR10; if it can't, the phone shows a playback error.
+- HDR patterns are 1080p; some devices only switch into HDR for 4K output.
 - By-eye only; no camera measurement.
 - A custom Cast receiver would remove the player overlay and allow instant pattern switching.
