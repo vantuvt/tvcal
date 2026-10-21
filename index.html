@@ -161,7 +161,8 @@ const STEPS = [
     lead: 'About 10 minutes. You’ll answer simple questions about what you see, and change settings with your TV remote.',
     custom: () => `
       <ol class="check" style="counter-reset:n">
-        ${['Turn the lights down to how you normally watch.',
+        ${['Update your TV’s software first (usually Settings → System or Support → Software update). Updates can change picture processing or reset settings, so do it before you start.',
+           'Turn the lights down to how you normally watch.',
            'At the top, tap “Connect to TV” and choose your TV. If you see “Let this page find my TV”, tap that first and choose Allow.',
            'Open your TV’s picture settings menu with the remote. You’ll use it throughout.']
           .map((t, i) => `<li style="cursor:default"><span class="tick" style="border-color:var(--accent);color:var(--accent);font-size:14px;font-weight:700">${i + 1}</span><span>${t}</span></li>`).join('')}
@@ -333,7 +334,6 @@ const STEPS = [
       ['Film motion: natural 24p', 'If your TV has Real Cinema, Cinematic Movement or a 24p setting, turn it on. It smooths camera pans without the “soap opera” look.'],
       ['Game console: Game mode and HDR calibration', 'Use Game mode (and HGIG if offered) on the console’s input, then run the console’s own HDR calibration screen. PS5 and Xbox both have one in their display settings.'],
       ['Copy settings to other inputs', 'Look for “Apply to all inputs” or “Apply picture settings: All sources”. Otherwise, repeat the values from your summary on each input you use.'],
-      ['Update the TV’s software', 'Usually under Settings → Support or System → Software update. Updates often improve HDR.'],
       ['Streaming quality: High', 'In Netflix, YouTube and other apps, set playback or data usage to High or Best.'],
       ['#', 'Your room'],
       ['Backlight: set for your room', 'Brighter for daytime, dimmer at night. If your TV lets you save two custom modes, keep a Day and a Night version with only the backlight different.'],
