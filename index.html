@@ -1,0 +1,392 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#111113">
+<title>TV Picture Setup</title>
+<style>
+  :root {
+    --bg: #111113; --panel: #1b1b1f; --panel2: #232329; --line: #2e2e36; --text: #ececf1; --dim: #9a9aa6;
+    --accent: #7db3ff; --accent-ink: #0b1a2e; --ok: #6fd39a; --ok-bg: #12291d; --act-bg: #14243a; --act-line: #23406a;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--bg); color: var(--text);
+    font: 17px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; -webkit-text-size-adjust: 100%; }
+  main { max-width: 520px; margin: 0 auto; padding: 12px 16px 130px; }
+  header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 4px 0 6px; }
+  h1 { font-size: 16px; margin: 0; color: var(--dim); font-weight: 600; }
+  google-cast-launcher { width: 40px; height: 40px; display: inline-block; cursor: pointer;
+    --connected-color: var(--accent); --disconnected-color: var(--text); }
+  .status { font-size: 13px; color: var(--dim); margin: 0 0 12px; display: flex; gap: 8px; align-items: center; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: #555; flex: none; }
+  .dot.on { background: var(--ok); }
+  .progress { display: flex; gap: 4px; margin-bottom: 16px; }
+  .progress span { flex: 1; height: 4px; border-radius: 2px; background: var(--line); }
+  .progress span.done { background: var(--accent); }
+  h2 { font-size: 26px; line-height: 1.2; margin: 0 0 6px; }
+  .lead { color: var(--dim); margin: 0 0 14px; }
+  figure { margin: 0 0 16px; }
+  figure img { width: 100%; display: block; border-radius: 10px; border: 1px solid var(--line); background: #000; }
+  figcaption { font-size: 14px; color: var(--dim); margin-top: 6px; }
+  .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .pair figcaption { text-align: center; color: var(--text); }
+
+  .box { border-radius: 14px; padding: 18px; margin-bottom: 12px; }
+  .q { background: var(--panel); border: 1px solid var(--line); }
+  .q .ask { font-size: 21px; line-height: 1.3; font-weight: 600; margin: 0 0 16px; }
+  .answers { display: grid; gap: 10px; }
+  .answers.two { grid-template-columns: 1fr 1fr; }
+  .act { background: var(--act-bg); border: 1px solid var(--act-line); }
+  .act .label { font-size: 13px; text-transform: uppercase; letter-spacing: 1px; color: var(--accent); margin-bottom: 4px; }
+  .act .do { font-size: 21px; line-height: 1.3; font-weight: 600; margin: 0 0 6px; }
+  .act .sub { color: var(--dim); font-size: 15px; margin: 0 0 16px; }
+  .ok { background: var(--ok-bg); border: 1px solid #245a3c; }
+  .ok .do { font-size: 21px; font-weight: 600; margin: 0 0 4px; color: var(--ok); }
+  .ok p { margin: 0; color: var(--text); }
+
+  button { font: inherit; border-radius: 12px; padding: 15px 16px; border: 1px solid var(--line);
+    background: var(--panel2); color: var(--text); cursor: pointer; font-weight: 600; touch-action: manipulation; }
+  button:active { transform: scale(.98); }
+  button.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  button.wide { width: 100%; }
+  .linkish { background: none; border: none; color: var(--accent); padding: 4px 0; font-weight: 500; font-size: 15px; text-decoration: underline; }
+
+  details { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 0 16px; margin-bottom: 10px; }
+  summary { padding: 14px 0; cursor: pointer; font-size: 15px; color: var(--text); list-style: none; display: flex; justify-content: space-between; }
+  summary::-webkit-details-marker { display: none; }
+  summary::after { content: "+"; color: var(--dim); font-size: 20px; line-height: 1; }
+  details[open] summary::after { content: "–"; }
+  details .inner { padding-bottom: 14px; font-size: 15px; color: var(--dim); }
+  details .inner p { margin: 0 0 8px; }
+  details b, .tip b { color: var(--text); }
+  .tip { background: #2a2214; border: 1px solid #5a4620; color: #f0d9a8; border-radius: 12px; padding: 12px 14px; font-size: 15px; margin-bottom: 12px; }
+
+  .check { list-style: none; padding: 0; margin: 0 0 14px; }
+  .check li { display: flex; gap: 12px; align-items: flex-start; background: var(--panel); border: 1px solid var(--line);
+    border-radius: 12px; padding: 14px; margin-bottom: 8px; cursor: pointer; }
+  .check li .tick { flex: none; width: 26px; height: 26px; border-radius: 50%; border: 2px solid var(--dim); display: grid; place-items: center; margin-top: 1px; }
+  .check li.on .tick { background: var(--ok); border-color: var(--ok); }
+  .check li.on .tick::after { content: ""; width: 10px; height: 6px; border-left: 3px solid #0d2418; border-bottom: 3px solid #0d2418; transform: rotate(-45deg) translate(1px, -1px); }
+  .check .t { font-weight: 600; }
+  .check .d { font-size: 14px; color: var(--dim); }
+
+  label.rec { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 14px; font-size: 15px; }
+  input[type=text] { width: 120px; background: var(--bg); border: 1px solid var(--line); color: var(--text);
+    border-radius: 8px; padding: 9px 10px; font: inherit; font-size: 16px; }
+  table { width: 100%; border-collapse: collapse; margin-bottom: 14px; }
+  td { padding: 10px 0; border-bottom: 1px solid var(--line); }
+  td:last-child { text-align: right; color: var(--dim); }
+
+  .bar { position: fixed; left: 0; right: 0; bottom: 0; background: linear-gradient(rgba(17,17,19,0), var(--bg) 35%);
+    padding: 26px 16px calc(14px + env(safe-area-inset-bottom)); }
+  .bar .inner { max-width: 520px; margin: 0 auto; display: flex; gap: 10px; }
+  .bar #next { flex: 1; }
+  .bar #next.skip { background: var(--panel2); color: var(--dim); border-color: var(--line); }
+
+  #localView { position: fixed; inset: 0; background: #000; display: none; z-index: 10; }
+  #localView video { width: 100%; height: 100%; object-fit: contain; }
+  #localView button { position: absolute; top: 12px; right: 12px; opacity: .7; }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>TV Picture Setup</h1>
+    <google-cast-launcher title="Cast to your TV"></google-cast-launcher>
+  </header>
+  <div class="status"><span class="dot" id="dot"></span><span id="statusText">Checking for Cast…</span></div>
+  <div class="progress" id="progress"></div>
+  <section id="card"></section>
+</main>
+
+<div class="bar"><div class="inner">
+  <button id="back">Back</button>
+  <button class="primary" id="next">Next</button>
+</div></div>
+
+<div id="localView"><video id="localVideo" muted loop playsinline></video><button id="closeLocal">Close</button></div>
+
+<script>
+const PATTERN_BASE = new URL('patterns/', location.href).href;
+
+/* A step is either a checklist, info, or a small question flow:
+     q:   { ask, answers: [[label, nextNode], ...] }
+     act: { do, sub, then }        -> one thing to change on the TV remote, then ask again
+     ok:  { do, text }              -> this step is finished                              */
+const LOOK_TIPS = `
+  <p>Sit where you normally watch, with the lights as they usually are.</p>
+  <p>When a pattern first appears, the TV shows a title and progress bar for a few seconds. Wait for it to fade.</p>
+  <p>"Faint" really means faint: a slightly-less-black square on black. The corner marks show where each box is.</p>`;
+
+const STEPS = [
+  {
+    id: 'start', title: 'Let’s set up your TV picture', pattern: null,
+    lead: 'About 10 minutes. You’ll answer simple questions about what you see, and change settings with your TV remote.',
+    custom: () => `
+      <ol class="check" style="counter-reset:n">
+        ${['Turn the lights down to how you normally watch.',
+           'Tap the Cast icon at the top right and choose your TV.',
+           'Open your TV’s picture settings menu with the remote. You’ll use it throughout.']
+          .map((t, i) => `<li style="cursor:default"><span class="tick" style="border-color:var(--accent);color:var(--accent);font-size:14px;font-weight:700">${i + 1}</span><span>${t}</span></li>`).join('')}
+      </ol>
+      <details><summary>No Cast icon, or using an iPhone?</summary><div class="inner">
+        <p>Casting from a web page works in Chrome on Android or on a computer. On an iPhone, the Cast icon won’t appear.</p>
+        <p>You can still follow along and <button class="linkish" data-local>see each pattern on this phone</button>, but the TV steps need the pattern shown on the TV.</p>
+      </div></details>`
+  },
+  {
+    id: 'mode', title: 'Quick settings first', pattern: null, record: 'Picture mode',
+    lead: 'These make the biggest difference. Tap each one when it’s done.',
+    checklist: [
+      ['Picture mode: Filmmaker, Movie or Cinema', 'If you have Filmmaker Mode, use it. Otherwise Movie, Cinema or Calibrated.'],
+      ['Motion smoothing: Off', 'Also called TruMotion, Auto Motion Plus, MotionFlow or Motion Interpolation.'],
+      ['Energy saving and light sensor: Off', 'Also called Eco, Power saving, Ambient light detection or Adaptive brightness.'],
+      ['Colour temperature: Warm', 'Pick Warm or Warm 2. It looks a little yellow at first; your eyes adjust in a minute.'],
+    ],
+    extra: `<details><summary>Using a Chromecast with Google TV?</summary><div class="inner">
+      <p>On the Chromecast: Settings → Display &amp; Sound → Advanced display settings → <b>Dynamic range</b> → turn on <b>match content</b>.
+      Otherwise the patterns may be shown in HDR and look washed out.</p></div></details>
+      <details><summary>Where are these settings?</summary><div class="inner">
+      <p>Usually Settings → <b>Picture</b>, then <b>Expert</b> or <b>Advanced</b> settings. Make the changes on the HDMI input the Chromecast is plugged into; most TVs remember settings per input.</p></div></details>`
+  },
+  {
+    id: 'fit', title: 'Fit to screen', pattern: '01-fit', record: 'Picture size',
+    lead: 'Look at the edges of your TV.',
+    caption: 'There’s a thin white border around the very edge, with arrows in each corner.',
+    flow: {
+      start: 'q',
+      q: { ask: 'Can you see the white border on all four edges, with arrows touching the corners?', answers: [['Yes', 'ok'], ['No', 'fix']] },
+      fix: { do: 'Change Picture size to the option that shows the whole picture',
+             sub: 'It’s called Just Scan, Screen Fit, Fit to Screen, Full Pixel or Original, depending on the brand. It may be under Picture → Aspect ratio.', then: 'q' },
+      ok: { do: 'The picture fits.', text: 'Nothing is being cut off or stretched.' }
+    }
+  },
+  {
+    id: 'brightness', title: 'Brightness', pattern: '02-brightness', record: 'Brightness',
+    lead: 'This makes dark scenes look right: true black, with shadow detail still visible.',
+    caption: 'When it’s right, box A is completely gone and box B is a very faint grey square. (Brightened here so you can see it.)',
+    where: `<p>Use the setting called <b>Brightness</b>. On some TVs, Brightness changes the backlight (the whole screen gets lighter or dimmer but the boxes don’t change). If so, use <b>Black level</b> or <b>Shadow detail</b> instead.</p>`,
+    stuck: 'Not changing? Your TV may call this setting Black level or Shadow detail. “Brightness” on some TVs only changes the backlight.',
+    flow: {
+      start: 'qa',
+      qa: { ask: 'Can you see box A (on the left) at all?', answers: [['Yes, I can see it', 'down'], ['No, it’s gone', 'qb']] },
+      down: { do: 'Press Brightness down by 1', sub: 'Then look at box A again.', then: 'qa' },
+      qb: { ask: 'Can you see box B (on the right), even faintly?', answers: [['Yes, just', 'ok'], ['No', 'up']] },
+      up: { do: 'Press Brightness up by 1', sub: 'Then look at the boxes again.', then: 'qa' },
+      ok: { do: 'Brightness is set.', text: 'Blacks are black, and shadow detail is still visible.' }
+    }
+  },
+  {
+    id: 'contrast', title: 'Contrast', pattern: '03-contrast', record: 'Contrast',
+    lead: 'This makes bright scenes look right, without losing detail in clouds, snow or white shirts.',
+    caption: 'When it’s right, you can see all three boxes. A is easy, B is lighter, C is very faint. (Darkened here so you can see them.)',
+    where: `<p>Use the setting called <b>Contrast</b>. Don’t confuse it with <b>Dynamic contrast</b> or <b>Contrast enhancer</b>, which should be off.</p>`,
+    stuck: 'If box C never appears, also check that Dynamic contrast and any “HDR effect” or “Peak brightness” boost are off.',
+    flow: {
+      start: 'q',
+      q: { ask: 'Can you see box C (on the right), even faintly?', answers: [['Yes', 'ok'], ['No', 'down']] },
+      down: { do: 'Press Contrast down by 1', sub: 'Then look for box C again.', then: 'q' },
+      ok: { do: 'Contrast is set.', text: 'Bright areas keep their detail. If you changed contrast, go back one step and check Brightness again.' }
+    }
+  },
+  {
+    id: 'sharpness', title: 'Sharpness', pattern: '04-sharpness', record: 'Sharpness',
+    lead: 'Most TVs add fake outlines to make the picture look crisper. Here’s the difference:',
+    compare: true,
+    where: `<p>Use the setting called <b>Sharpness</b>. Also turn off <b>Edge enhancement</b>, <b>Super resolution</b> or <b>Reality creation</b> if you have them.</p>
+      <p>On some TVs (often Sony), the neutral point is in the middle of the range. Going below it softens the picture, so stop as soon as the outlines disappear.</p>`,
+    flow: {
+      start: 'q',
+      q: { ask: 'Walk up close to the TV. Do the black lines have bright outlines beside them, like the “Halos” example?', answers: [['Yes', 'down'], ['No, they look clean', 'ok']] },
+      down: { do: 'Press Sharpness down a few steps', sub: 'Then look closely at the lines again.', then: 'q' },
+      ok: { do: 'Sharpness is set.', text: 'No artificial outlines.' }
+    }
+  },
+  {
+    id: 'final', title: 'Final check', pattern: '05-final',
+    lead: 'Look at the row of grey squares at the top.',
+    caption: 'The squares go from dark grey to white. Each should look plain grey, with no colour.',
+    flow: {
+      start: 'q',
+      q: { ask: 'Do the grey squares look plain grey?', answers: [['Yes', 'ok'], ['They look bluish', 'blue'], ['Another tint', 'other']] },
+      blue: { do: 'Choose a warmer Colour temperature', sub: 'Try Warm 2, or a higher “Warm” number. Then look at the squares again.', then: 'q' },
+      other: { do: 'That’s OK to leave.', text: 'Fixing a green or pink tint precisely needs a measuring instrument, and the effect is usually small. Make sure Colour and Tint are at the defaults for this picture mode.' },
+      ok: { do: 'All done.', text: 'Your TV is set up.' }
+    }
+  },
+  { id: 'done', title: 'Your settings', pattern: null, summary: true,
+    lead: 'Take a screenshot or copy these. If you also watch through another input (like a game console), set the same values there.' }
+];
+
+const store = {
+  get(k) { try { return JSON.parse(localStorage.getItem('tvcal2.' + k)); } catch (e) { return null; } },
+  set(k, v) { try { localStorage.setItem('tvcal2.' + k, JSON.stringify(v)); } catch (e) {} }
+};
+let idx = Math.min(store.get('step') || 0, STEPS.length - 1);
+const values = store.get('values') || {};
+const checks = store.get('checks') || {};
+let node = null, loops = 0;
+
+const card = document.getElementById('card');
+const progress = document.getElementById('progress');
+const backBtn = document.getElementById('back');
+const nextBtn = document.getElementById('next');
+STEPS.forEach(() => progress.appendChild(document.createElement('span')));
+
+function esc(s) { return String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+function flowHtml(s) {
+  const n = s.flow[node];
+  if (n.ask) {
+    const two = n.answers.length === 2 ? ' two' : '';
+    return `<div class="box q"><p class="ask">${n.ask}</p><div class="answers${two}">
+      ${n.answers.map(([label, to]) => `<button data-go="${to}">${label}</button>`).join('')}</div></div>
+      ${loops >= 6 && s.stuck ? `<div class="tip">${s.stuck}</div>` : ''}
+      <details><summary>Not sure what to look for?</summary><div class="inner">${LOOK_TIPS}</div></details>`;
+  }
+  if (n.then) {
+    return `<div class="box act"><div class="label">On your TV remote</div><p class="do">${n.do}</p><p class="sub">${n.sub}</p>
+      <button class="primary wide" data-go="${n.then}" data-loop="1">Done</button></div>`;
+  }
+  const rec = s.record ? `<label class="rec">Write down the setting? (optional)
+      <input type="text" data-record="${s.id}" value="${esc(values[s.id] || '')}" placeholder="e.g. ${s.id === 'fit' ? 'Just Scan' : '48'}"></label>` : '';
+  return `<div class="box ok"><p class="do">✓ ${n.do}</p><p>${n.text}</p>${rec}</div>`;
+}
+
+function render() {
+  const s = STEPS[idx];
+  if (node === null) { node = s.flow ? s.flow.start : null; loops = 0; }
+  [...progress.children].forEach((el, i) => el.classList.toggle('done', i <= idx));
+
+  let h = `<h2>${s.title}</h2><p class="lead">${s.lead}</p>`;
+  if (s.compare) {
+    h += `<div class="pair"><figure><img src="patterns/sharpness-clean.png" alt="Clean lines"><figcaption>✓ Clean</figcaption></figure>
+      <figure><img src="patterns/sharpness-halo.png" alt="Lines with bright halos"><figcaption>✗ Halos</figcaption></figure></div>`;
+  } else if (s.pattern) {
+    h += `<figure><img src="patterns/${s.pattern}.png" alt=""><figcaption>${s.caption}</figcaption></figure>`;
+  }
+  if (s.custom) h += s.custom();
+  if (s.checklist) {
+    h += `<ul class="check">${s.checklist.map(([t, d], i) =>
+      `<li data-check="${i}" class="${checks[i] ? 'on' : ''}"><span class="tick"></span><span><div class="t">${t}</div><div class="d">${d}</div></span></li>`).join('')}</ul>`;
+    h += `<label class="rec" style="margin:0 0 14px">Picture mode you chose (optional)
+      <input type="text" data-record="mode" value="${esc(values.mode || '')}" placeholder="e.g. Filmmaker"></label>`;
+    h += s.extra || '';
+  }
+  if (s.flow) h += flowHtml(s);
+  if (s.where) h += `<details><summary>Where is this setting?</summary><div class="inner">${s.where}</div></details>`;
+  if (s.pattern && !s.compare) h += `<button class="linkish" data-local>See the pattern on this phone</button>`;
+  if (s.summary) {
+    h += `<table>${STEPS.filter(x => x.record).map(x => `<tr><td>${x.record}</td><td>${esc(values[x.id] || '—')}</td></tr>`).join('')}</table>
+      <div class="answers two"><button id="copy">Copy</button><button id="restart">Start over</button></div>`;
+  }
+  card.innerHTML = h;
+
+  const finished = !s.flow || !!(s.flow[node] && s.flow[node].text);
+  backBtn.style.visibility = idx === 0 ? 'hidden' : 'visible';
+  nextBtn.style.visibility = idx === STEPS.length - 1 ? 'hidden' : 'visible';
+  nextBtn.textContent = idx === 0 ? 'Start' : finished ? 'Next' : 'Skip this step';
+  nextBtn.classList.toggle('skip', !finished);
+  store.set('step', idx);
+  showPattern(s.pattern);
+}
+
+function go(i) { idx = i; node = null; render(); window.scrollTo(0, 0); }
+
+card.addEventListener('click', e => {
+  const t = e.target.closest('button, li[data-check]');
+  if (!t) return;
+  if (t.dataset.go) {
+    if (t.dataset.loop) loops++;
+    node = t.dataset.go; render();
+    const box = card.querySelector('.box'); if (box) box.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+  }
+  if (t.dataset.check !== undefined) { checks[t.dataset.check] = !checks[t.dataset.check]; store.set('checks', checks); t.classList.toggle('on'); }
+  if (t.hasAttribute('data-local')) openLocal();
+  if (t.id === 'copy') {
+    const text = 'My TV picture settings\n' + STEPS.filter(x => x.record).map(x => `${x.record}: ${values[x.id] || '-'}`).join('\n');
+    (navigator.clipboard ? navigator.clipboard.writeText(text) : Promise.reject())
+      .then(() => { t.textContent = 'Copied'; }, () => { t.textContent = 'Copy failed'; });
+  }
+  if (t.id === 'restart') { for (const k in checks) delete checks[k]; store.set('checks', checks); go(0); }
+});
+card.addEventListener('input', e => {
+  const k = e.target.dataset && e.target.dataset.record;
+  if (k) { values[k] = e.target.value.trim(); store.set('values', values); }
+});
+backBtn.onclick = () => { if (idx > 0) go(idx - 1); };
+nextBtn.onclick = () => { if (idx < STEPS.length - 1) go(idx + 1); };
+
+/* ---------- Casting (Google's Default Media Receiver) ---------- */
+let castReady = false, lastCast;
+const dot = document.getElementById('dot'), statusText = document.getElementById('statusText');
+function setStatus(text, on) { statusText.textContent = text; dot.classList.toggle('on', !!on); }
+function session() { return castReady ? cast.framework.CastContext.getInstance().getCurrentSession() : null; }
+
+function showPattern(name, force) {
+  if (localOpen()) playLocal(name);
+  const sess = session();
+  if (!sess || (name === lastCast && !force)) return;
+  lastCast = name;
+  if (!name) { const m = sess.getMediaSession(); if (m) m.stop(null, () => {}, () => {}); return; }
+  const s = STEPS.find(x => x.pattern === name);
+  const info = new chrome.cast.media.MediaInfo(PATTERN_BASE + name + '.mp4', 'video/mp4');
+  info.streamType = chrome.cast.media.StreamType.BUFFERED;
+  info.metadata = new chrome.cast.media.GenericMediaMetadata();
+  info.metadata.title = s ? s.title : 'Test pattern';
+  const item = new chrome.cast.media.QueueItem(info);
+  item.autoplay = true;
+  const req = new chrome.cast.media.QueueLoadRequest([item]);
+  req.repeatMode = chrome.cast.media.RepeatMode.SINGLE;
+  setStatus('Loading pattern on the TV…', true);
+  sess.getSessionObj().queueLoad(req,
+    () => setStatus('Showing on ' + sess.getCastDevice().friendlyName, true),
+    err => { lastCast = undefined; setStatus('The TV couldn’t play the pattern (' + (err && err.code) + '). Go back and forward to retry.', true); });
+}
+
+window['__onGCastApiAvailable'] = function (available) {
+  if (!available) { setStatus('Casting isn’t available in this browser. You can still follow the steps.'); return; }
+  const ctx = cast.framework.CastContext.getInstance();
+  ctx.setOptions({ receiverApplicationId: chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID,
+                   autoJoinPolicy: chrome.cast.AutoJoinPolicy.ORIGIN_SCOPED });
+  castReady = true;
+  ctx.addEventListener(cast.framework.CastContextEventType.SESSION_STATE_CHANGED, e => {
+    const S = cast.framework.SessionState;
+    if (e.sessionState === S.SESSION_STARTED || e.sessionState === S.SESSION_RESUMED) {
+      lastCast = undefined;
+      setStatus('Connected to ' + ctx.getCurrentSession().getCastDevice().friendlyName, true);
+      showPattern(STEPS[idx].pattern, true);
+    } else if (e.sessionState === S.SESSION_ENDED) {
+      lastCast = undefined; setStatus('Not connected. Tap the Cast icon to choose your TV.');
+    }
+  });
+  setStatus('Not connected. Tap the Cast icon to choose your TV.');
+};
+setTimeout(() => {
+  if (!castReady && statusText.textContent.startsWith('Checking'))
+    setStatus('Casting isn’t available here. It needs Chrome on Android or a computer.');
+}, 4000);
+
+/* ---------- Pattern on this screen ---------- */
+const localView = document.getElementById('localView'), localVideo = document.getElementById('localVideo');
+function localOpen() { return localView.style.display === 'block'; }
+function playLocal(name) { if (!name) { closeLocal(); return; } localVideo.src = 'patterns/' + name + '.mp4'; localVideo.play().catch(() => {}); }
+function openLocal() {
+  localView.style.display = 'block';
+  playLocal(STEPS[idx].pattern || '01-fit');
+  if (localView.requestFullscreen) localView.requestFullscreen().catch(() => {});
+}
+function closeLocal() {
+  localView.style.display = 'none';
+  localVideo.pause(); localVideo.removeAttribute('src'); localVideo.load();
+  if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+}
+document.getElementById('closeLocal').onclick = closeLocal;
+document.addEventListener('fullscreenchange', () => { if (!document.fullscreenElement && localOpen()) closeLocal(); });
+
+render();
+</script>
+<script src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1"></script>
+</body>
+</html>
