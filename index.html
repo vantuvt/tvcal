@@ -285,6 +285,230 @@ const BRANDS = {
   }
 };
 
+/* Builds the overrides for a brand from a short description of its menus.
+   Used for Samsung, LG, Sony and Hisense (TCL above is written out in full). */
+function dimmingHelpFor(dimName, ctrl, extra) {
+  const label = /local dimming/i.test(dimName) ? dimName : `${dimName} (local dimming)`;
+  return `<details><summary>About ${label}</summary><div class="inner">
+    ${extra ? `<p>${extra}</p>` : ''}
+    <p>Many LCD TVs dim parts of the backlight in dark areas. On this TV it’s called <b>${dimName}</b>.</p>
+    <p>The grey frames around the boxes keep the backlight on, like in a real dark scene. Judge the boxes inside the frames, not the black edges of the screen.</p>
+    <p>If box B still never appears, even after raising ${ctrl} a lot, ${dimName} is hiding it. Set it one level lower (for example from High to Medium) and try again. Don’t keep raising ${ctrl}: that makes every dark scene grey.</p>
+  </div></details>`;
+}
+function brandFrom(t) {
+  const blkFlow = {
+    down: { do: `Press ${t.blk} down by 1` },
+    up: { do: `Press ${t.blk} up by 1` }
+  };
+  return {
+    name: t.name, note: t.note,
+    dimmingHelp: dimmingHelpFor(t.dim, t.blk, t.dimExtra),
+    steps: {
+      start: { items: [
+        `Update your TV’s software first: ${t.update}. Updates can change picture processing or reset settings, so do it before you start.`,
+        'Turn the lights down to how you normally watch.',
+        'At the top, tap “Connect to TV” and choose your TV. If you see “Let this page find my TV”, tap that first and choose Allow.',
+        `Open the picture menu with the remote: ${t.menu}. You’ll use it throughout.`
+      ] },
+      mode: { checklist: t.modeItems, extra: `<details><summary>Where are these settings?</summary><div class="inner">${t.modeWhere}</div></details>` },
+      temp: { ph: t.tempPh, where: t.tempWhere, flow: { set: t.tempSet, cooler: t.tempCooler } },
+      fit: { ph: t.fitPh, flow: { fix: t.fitFix } },
+      brightness: Object.assign({ record: t.blkTitle, where: t.blkWhere, stuck: t.blkStuck,
+        flow: Object.assign({ ok: { do: `${t.blkTitle} is set.` } }, blkFlow) },
+        t.blkTitle !== 'Brightness' ? { title: t.blkTitle, lead: `This makes dark scenes look right: true black, with shadow detail still visible. ${t.blkLead}` } : {}),
+      contrast: { where: t.contrastWhere },
+      sharpness: Object.assign({ where: t.sharpWhere }, t.sharpFlow ? { flow: t.sharpFlow } : {}),
+      hdrmode: { ph: t.hdrPh, flow: {
+        fix: { sub: `If you’re casting to the TV’s own built-in Cast, HDR switches on by itself, so check the pattern is still playing. If you use a separate Chromecast in an HDMI port: ${t.hdrHdmi}, and on the Chromecast set Dynamic range to match content. Then go Back one step and Next again.` },
+        mode: { do: t.hdrModeDo, sub: t.hdrModeSub } } },
+      hdrbright: Object.assign({ record: 'HDR ' + t.blkTitle, where: `<p>Use <b>${t.blk}</b> while HDR is playing; changes usually only affect HDR. ${t.hdrBlkNote || ''}</p>`, stuck: t.blkStuck,
+        flow: Object.assign({ ok: { do: `HDR ${t.blkTitle} is set.` } }, blkFlow) },
+        t.blkTitle !== 'Brightness' ? { title: 'HDR ' + t.blkTitle } : {}),
+      hdrhigh: { record: t.tm, ph: 'On', where: t.tmWhere, flow: { tm: { do: t.tmDo, sub: t.tmSub } } },
+      hdrfinal: { flow: { dark: { do: `Press ${t.blk} up by 1` } } },
+      extras: { checklist: [
+        ['#', 'Your devices'],
+        ['HDMI black level: Auto', t.hdmi],
+        ['Streaming device: match content', 'On a separate Chromecast, Apple TV or Fire TV, turn on match dynamic range and match frame rate, so films play at their natural speed without judder.'],
+        ['Film motion: natural cadence', t.motion],
+        ['Game console: game mode and HDR calibration', t.game],
+        ['Copy settings to other inputs', t.copy],
+        ['Streaming quality: High', 'In Netflix, YouTube and other apps, set playback or data usage to High or Best.'],
+        ['#', 'Your room'],
+        [`${t.light}: set for your room`, `${t.lightNote} Brighter for daytime, dimmer at night.`],
+        ['Reduce reflections', 'Close blinds or move lamps that reflect in the screen. Glare lowers contrast more than any setting.'],
+        ['Bias lighting (optional)', 'A dim, neutral-white light behind the TV (6500 K, about a tenth as bright as the screen) makes blacks look deeper and eases eye strain in a dark room.'],
+        ['Seating', 'Eyes level with about the middle of the screen, sitting straight on. LCD colour and contrast fade when viewed from an angle.'],
+      ] }
+    }
+  };
+}
+
+BRANDS.samsung = brandFrom({
+  name: 'Samsung',
+  note: 'Using Samsung menu names (2022 and later, with notes for older models). If a name doesn’t match, look for the closest one.',
+  update: 'Settings → All Settings → Support → Software Update → Update Now',
+  menu: 'Settings → All Settings → Picture',
+  modeItems: [
+    ['Picture Mode: Filmmaker Mode or Movie', 'Picture → Picture Mode.'],
+    ['Picture Clarity: Off', 'Picture → Expert Settings → Picture Clarity Settings (Auto Motion Plus on older models). LED Clear Motion is a personal choice: sharper motion, but a dimmer picture. Leave it off if unsure.'],
+    ['Brightness Optimization and energy saving: Off', 'Settings → All Settings → General &amp; Privacy → Power and Energy Saving.'],
+    ['Colour Space Settings: Auto', 'Picture → Expert Settings → Colour Space Settings. Avoid Native.'],
+    ['Colour and Tint: default; Colour Booster Off', 'Also turn off Contrast Enhancer and Auto HDR Remastering if your model has them.'],
+    ['Gamma: BT.1886 in a dark room, 2.2 in a bright one', 'Picture → Expert Settings → Gamma. BT.1886 is similar to 2.4.'],
+    ['Noise reduction: Off', 'Look for Noise Reduction in Picture Clarity Settings, or Digital Clean View on older models.'],
+  ],
+  modeWhere: '<p>Settings → All Settings → <b>Picture</b> → <b>Expert Settings</b> (on 2021 and older models: Settings → Picture → Expert Settings).</p><p>Samsung keeps separate settings for HDR content, so the HDR steps later will check those.</p>',
+  tempPh: 'Warm2',
+  tempWhere: '<p>Picture → Expert Settings → <b>Colour Tone</b>. The options are Cool, Standard, Warm1 and Warm2.</p>',
+  tempSet: { do: 'Set Colour Tone to Warm2', sub: 'Picture → Expert Settings → Colour Tone. Flick to Standard and Cool to see the difference on the white and greys, then come back.' },
+  tempCooler: { do: 'Try Warm1', sub: 'It’s one step cooler. Wait a moment and look again.' },
+  fitPh: 'Fit to Screen On',
+  fitFix: { do: 'Turn on Fit to Screen', sub: 'Picture → Picture Size Settings: set Picture Size to 16:9 Standard and turn on Fit to Screen.' },
+  blk: 'Shadow Detail', blkTitle: 'Shadow Detail',
+  blkLead: 'On Samsung TVs from 2022 on, this is Shadow Detail. On older models, use Brightness.',
+  blkWhere: '<p>Picture → Expert Settings → <b>Shadow Detail</b>. On these models, <b>Brightness</b> sets the overall light output: set it for comfort.</p><p>On 2021 and older models there’s a separate <b>Backlight</b> for light output, and <b>Brightness</b> is the control for this step.</p>',
+  blkStuck: 'Not changing? On 2022 and later models use Shadow Detail (Brightness only changes the light output). On older models use Brightness. If box B never appears, see “About Local Dimming” below.',
+  dim: 'Local Dimming', dimExtra: 'Samsung OLED TVs don’t have this, so it only applies to LCD (QLED and Neo QLED) models.',
+  contrastWhere: '<p>Picture → Expert Settings → <b>Contrast</b>. Turn off <b>Contrast Enhancer</b> as well.</p>',
+  sharpWhere: '<p>Picture → Expert Settings → <b>Sharpness</b>. 0 adds no artificial sharpening on most models.</p>',
+  hdrPh: 'Filmmaker Mode',
+  hdrHdmi: 'turn on Input Signal Plus for that port (Settings → All Settings → Connection → External Device Manager)',
+  hdrModeDo: 'Choose Filmmaker Mode or Movie for HDR', hdrModeSub: 'Samsung keeps separate HDR picture settings. Check Contrast Enhancer is off here too.',
+  hdrBlkNote: 'For HDR, set Brightness (the light output) to its maximum.',
+  tm: 'HDR Tone Mapping', tmDo: 'Change HDR Tone Mapping', tmSub: 'Picture → Expert Settings → HDR Tone Mapping. Try the other option (Active or Static), then look at the boxes again.',
+  tmWhere: '<p><b>HDR Tone Mapping</b> and <b>Peak Brightness</b> are in Picture → Expert Settings (not on every model). Leave <b>Contrast</b> at the HDR mode’s default.</p>',
+  hdmi: 'For anything plugged in by HDMI: set the device’s output range to Auto, and HDMI Black Level on the TV to Auto if your model shows it (Expert Settings, HDMI inputs only). A mismatch crushes or washes out blacks.',
+  motion: 'Picture Clarity Off plays films as they were shot. If slow camera pans look jerky to you, try Picture Clarity → Custom with a little Judder Reduction.',
+  game: 'Turn on Game Mode for the console’s input (Settings → All Settings → Connection → Game Mode Settings), then run the console’s own HDR calibration screen.',
+  copy: 'Picture → Expert Settings → Apply Picture Settings → All Sources.',
+  light: 'Brightness', lightNote: 'On Samsung (2022 and later), Brightness is the light output; on older models it’s Backlight.'
+});
+
+BRANDS.lg = brandFrom({
+  name: 'LG',
+  note: 'Using LG webOS menu names (2021 and later, with notes for older models). If a name doesn’t match, look for the closest one.',
+  update: 'Settings → All Settings → Support → Software Update',
+  menu: 'Settings → All Settings → Picture',
+  modeItems: [
+    ['Picture Mode: Filmmaker Mode', 'Picture → Picture Mode. Cinema is a good second choice.'],
+    ['TruMotion: Off', 'Picture → Advanced Settings → Clarity. OLED Motion Pro (or Motion Pro) is a personal choice: sharper motion, but a dimmer picture. Leave it off if unsure.'],
+    ['Energy Saving Step and AI Brightness: Off', 'Turn off Energy Saving Step, and AI Brightness or AI Picture Pro if your model has them.'],
+    ['Color Gamut: Auto Detect', 'Picture → Advanced Settings → Color. If there’s no Auto option, leave it at the mode’s default. Avoid Native or Extended.'],
+    ['Color Depth and Tint: default; Auto Dynamic Contrast Off', 'Leave Color Depth and Tint at the picture mode’s defaults.'],
+    ['Gamma: BT.1886 or 2.4 in a dark room, 2.2 in a bright one', 'Picture → Advanced Settings → Brightness → Gamma.'],
+    ['Noise Reduction and MPEG Noise Reduction: Off', 'Picture → Advanced Settings → Clarity. Smooth Gradation can stay at its default.'],
+  ],
+  modeWhere: '<p>Settings → All Settings → <b>Picture</b> → <b>Advanced Settings</b>, which is grouped into <b>Brightness</b>, <b>Color</b> and <b>Clarity</b>.</p><p>LG keeps separate settings for HDR content, so the HDR steps later will check those.</p>',
+  tempPh: 'Warm 50',
+  tempWhere: '<p>Picture → Advanced Settings → Color → <b>Color Temperature</b>. Newer models use a scale up to <b>Warm 50</b>; older models have presets ending in <b>Warm2</b>.</p>',
+  tempSet: { do: 'Set Color Temperature to Warm 50', sub: 'Picture → Advanced Settings → Color → Color Temperature (Warm2 on older models). Slide toward the cooler end to see the difference on the white and greys, then come back.' },
+  tempCooler: { do: 'Move a few steps cooler', sub: 'For example Warm 40, or Warm1 on older models. Wait a moment and look again.' },
+  fitPh: 'Just Scan On',
+  fitFix: { do: 'Turn on Just Scan', sub: 'Picture → Aspect Ratio Settings: set Aspect Ratio to Original and turn Just Scan on.' },
+  blk: 'Screen Brightness', blkTitle: 'Screen Brightness',
+  blkLead: 'On LG this is Screen Brightness (just “Brightness” on older models).',
+  blkWhere: '<p>Picture → Advanced Settings → Brightness → <b>Screen Brightness</b> (“Brightness” on older models). <b>OLED Pixel Brightness</b> (<b>Backlight</b> on LCD models) sets the overall light output: set it for comfort.</p><p>Don’t confuse this with the setting called <b>Black Level</b>: that’s the HDMI range and should stay on Auto.</p>',
+  blkStuck: 'Not changing? Make sure you’re adjusting Screen Brightness, not OLED Pixel Brightness or Black Level. If box B never appears on an LCD model, see “About Local Dimming” below.',
+  dim: 'Local Dimming', dimExtra: 'LG OLED TVs don’t dim zones, so this only applies to LG LCD (QNED, NanoCell) models.',
+  contrastWhere: '<p>Picture → Advanced Settings → Brightness → <b>Adjust Contrast</b> (“Contrast” on older models). Turn off <b>Auto Dynamic Contrast</b> as well.</p>',
+  sharpWhere: '<p>Picture → Advanced Settings → Clarity → <b>Sharpness</b>. The default is often 10; 0 adds no artificial sharpening. Turn off <b>Super Resolution</b> too.</p>',
+  hdrPh: 'Filmmaker Mode',
+  hdrHdmi: 'turn on HDMI Deep Colour for that port (Settings → All Settings → General → Devices → HDMI Settings)',
+  hdrModeDo: 'Choose Filmmaker Mode or Cinema for HDR', hdrModeSub: 'LG keeps separate HDR picture settings. Check Auto Dynamic Contrast is off here too.',
+  hdrBlkNote: 'For HDR, OLED Pixel Brightness (Backlight on LCD) is usually best at its maximum.',
+  tm: 'Dynamic Tone Mapping', tmDo: 'Turn on Dynamic Tone Mapping', tmSub: 'Picture → Advanced Settings → Brightness → Dynamic Tone Mapping. If it’s already on, try Off. Then look at the boxes again.',
+  tmWhere: '<p><b>Dynamic Tone Mapping</b> and <b>Peak Brightness</b> are in Picture → Advanced Settings → Brightness. Leave <b>Adjust Contrast</b> at the HDR mode’s default.</p>',
+  hdmi: 'For anything plugged in by HDMI: set the device’s output range to Auto, and the TV’s Black Level setting (Picture → Advanced Settings → Brightness) to Auto. A mismatch crushes or washes out blacks.',
+  motion: 'TruMotion Off plays films as they were shot. If slow camera pans look jerky to you, try TruMotion → Cinematic Movement.',
+  game: 'Use Game Optimizer (or the Game picture mode) on the console’s input, then run the console’s own HDR calibration screen.',
+  copy: 'Look for “Apply to All Inputs” in the picture mode settings, or repeat the values from your summary on each input you use.',
+  light: 'OLED Pixel Brightness (Backlight on LCD)', lightNote: 'This is the light output on LG.'
+});
+
+BRANDS.sony = brandFrom({
+  name: 'Sony',
+  note: 'Using Sony BRAVIA Google TV menu names. Older Android TV models are similar but some names differ; look for the closest one.',
+  update: 'Settings → System → About → System software update',
+  menu: 'Settings → Display &amp; Sound → Picture',
+  modeItems: [
+    ['Picture mode: Professional, Custom or Cinema', 'Display &amp; Sound → Picture → Picture mode. Professional (on newer models) and Custom are the most accurate.'],
+    ['Motionflow: Off', 'Picture → Motion. Leave CineMotion on Auto: it helps films play smoothly.'],
+    ['Light sensor and power saving: Off', 'Light sensor is in the picture settings (with Auto luminance level on some models). Turn off power saving in the power or eco settings.'],
+    ['Color space: Auto', 'Most Sony picture modes set this automatically. If you see a Color space option, choose Auto.'],
+    ['Color and Hue: default; Live Color Off', 'Also turn off Adv. contrast enhancer and Black adjust.'],
+    ['Gamma: leave at the default', 'Sony uses numbers (−3 to +3) instead of 2.2 or 2.4. If shadows look too dark in a bright room, try one step lower.'],
+    ['Noise reduction: Off', 'Picture → Clarity: turn off Random noise reduction and Digital noise reduction. Turn Reality Creation off too.'],
+  ],
+  modeWhere: '<p>Settings → <b>Display &amp; Sound</b> → <b>Picture</b>, grouped into <b>Brightness</b>, <b>Color</b>, <b>Clarity</b> and <b>Motion</b>.</p><p>Sony keeps separate settings for HDR content, so the HDR steps later will check those.</p>',
+  tempPh: 'Expert1',
+  tempWhere: '<p>Picture → Color → <b>Color temperature</b>. The options are Cool, Natural, Warm, Expert1 and Expert2. Expert1 is the one designed to match the film standard.</p>',
+  tempSet: { do: 'Set Color temperature to Expert1', sub: 'Picture → Color → Color temperature. Flick to Natural and Cool to see the difference on the white and greys, then come back.' },
+  tempCooler: { do: 'Try Expert2', sub: 'Then wait a moment and look again. If it still looks yellow, try Natural.' },
+  fitPh: 'Full pixel',
+  fitFix: { do: 'Set Display area to Full pixel', sub: 'Look in Settings → Display &amp; Sound → Screen for Display area → Full pixel. If you see Wide mode, set it to Full.' },
+  blk: 'Black level', blkTitle: 'Black level',
+  blkLead: 'On Sony this is the Black level setting.',
+  blkWhere: '<p>Picture → Brightness → <b>Black level</b> (the default is 50). On Sony, <b>Brightness</b> sets the screen’s light output: set it for comfort.</p>',
+  blkStuck: 'Not changing? Make sure you’re adjusting Black level, not Brightness. If box B never appears, see “About Auto local dimming” below.',
+  dim: 'Auto local dimming', dimExtra: 'Sony OLED TVs don’t have this, so it only applies to LCD models.',
+  contrastWhere: '<p>Picture → Brightness → <b>Contrast</b>. Turn off <b>Adv. contrast enhancer</b> as well.</p>',
+  sharpWhere: '<p>Picture → Clarity → <b>Sharpness</b>. On Sony, <b>50 is neutral</b>: going below it softens the picture. Turn off <b>Reality Creation</b> too.</p>',
+  sharpFlow: { down: { do: 'Press Sharpness down a few steps', sub: 'But don’t go below 50, which is neutral on Sony. Then look closely at the lines again.' } },
+  hdrPh: 'Professional',
+  hdrHdmi: 'set that port’s HDMI signal format to Enhanced format (Settings → Channels &amp; Inputs → External inputs)',
+  hdrModeDo: 'Choose Professional, Custom or Cinema for HDR', hdrModeSub: 'Sony keeps separate HDR picture settings. Check Adv. contrast enhancer and Live Color are off here too.',
+  hdrBlkNote: 'For HDR, Brightness (the light output) is usually best at its maximum.',
+  tm: 'HDR tone mapping', tmDo: 'Change HDR tone mapping', tmSub: 'Picture → Brightness → HDR tone mapping. Try its other options, then look at the boxes again.',
+  tmWhere: '<p><b>HDR tone mapping</b> and <b>Peak luminance</b> are in Picture → Brightness (not on every model). Leave <b>Contrast</b> at the HDR mode’s default.</p>',
+  hdmi: 'For anything plugged in by HDMI: set the device’s output range to Auto, and HDMI video range on the TV (Picture → Video options) to Auto. A mismatch crushes or washes out blacks.',
+  motion: 'Motionflow Off with CineMotion on Auto plays films smoothly at their natural cadence.',
+  game: 'Use the Game picture mode on the console’s input, then run the console’s own HDR calibration screen.',
+  copy: 'Repeat the values from your summary on each input you use; Sony keeps picture settings per input.',
+  light: 'Brightness', lightNote: 'On Sony, Brightness is the light output.'
+});
+
+BRANDS.hisense = brandFrom({
+  name: 'Hisense',
+  note: 'Hisense TVs use either VIDAA or Google TV, and menus differ a little between them and between years. If a name doesn’t match, look for the closest one.',
+  update: 'Settings → Support → System Update on VIDAA models, or Settings → System → About → System update on Google TV models',
+  menu: 'Settings → Picture (VIDAA) or Settings → Display &amp; Sound → Picture (Google TV)',
+  modeItems: [
+    ['Picture Mode: Filmmaker Mode or Theater Night', 'Some models call it Cinema Night. Avoid the Energy Saving mode, which limits the backlight.'],
+    ['Motion Enhancement: Off', 'Under Clarity or Motion settings (Motion Smoothing on some Google TV models). Motion Clearness (sharper motion, but can flicker) is a personal choice; leave it off if unsure.'],
+    ['Automatic Light Sensor: Off', 'Often under Picture → General. Also avoid the Energy Saving picture mode.'],
+    ['Color Space: Auto', 'Under Color settings. Avoid Native.'],
+    ['Color and Tint: default; Active Contrast Off', 'Also turn off any other “dynamic” or “enhanced” picture options.'],
+    ['Gamma: 2.4 or BT1886 in a dark room, 2.2 in a bright one', 'Under Brightness settings.'],
+    ['Noise Reduction and MPEG / Digital Noise Reduction: Off', 'Under Clarity settings.'],
+  ],
+  modeWhere: '<p>VIDAA: Settings → <b>Picture</b>. Google TV: Settings → <b>Display &amp; Sound</b> → <b>Picture</b>. The detailed controls are grouped as <b>Brightness</b>, <b>Color</b>, <b>Clarity</b> and <b>Motion</b> (some under <b>Advanced Settings</b>).</p><p>Hisense keeps separate settings for HDR content, so the HDR steps later will check those.</p>',
+  tempPh: 'Warm2',
+  tempWhere: '<p>Picture → Color (or Advanced Settings) → <b>Color Temperature</b>. The options are usually Cool, Standard or Medium, Warm1 and Warm2.</p>',
+  tempSet: { do: 'Set Color Temperature to Warm2', sub: 'Picture → Color → Color Temperature. Flick to the cooler options to see the difference on the white and greys, then come back.' },
+  tempCooler: { do: 'Try Warm1', sub: 'It’s one step cooler. Wait a moment and look again.' },
+  fitPh: 'Overscan Off',
+  fitFix: { do: 'Turn Overscan off', sub: 'Look for Overscan in the Picture or Advanced settings (on some models under Picture Size or Aspect Ratio) and set it to Off.' },
+  blk: 'Brightness', blkTitle: 'Brightness',
+  blkWhere: '<p>Most Hisense TVs have both <b>Backlight</b> (overall light output) and <b>Brightness</b> (black level): use <b>Brightness</b> for this step and set Backlight for comfort.</p><p>If yours has <b>no Backlight</b> setting, Brightness is the light output instead: look for a <b>Black Level</b> setting for this step.</p>',
+  blkStuck: 'Not changing? If your Hisense has no separate Backlight setting, Brightness may be changing the light output; look for Black Level instead. If box B never appears, see “About Local Dimming” below.',
+  dim: 'Local Dimming',
+  contrastWhere: '<p>Picture → Brightness → <b>Contrast</b>. Turn off <b>Active Contrast</b> as well.</p>',
+  sharpWhere: '<p>Picture → Clarity → <b>Sharpness</b>.</p>',
+  hdrPh: 'Filmmaker Mode',
+  hdrHdmi: 'set that port’s HDMI Format to Enhanced (Settings → Channels &amp; Inputs → Inputs)',
+  hdrModeDo: 'Choose Filmmaker Mode or HDR Theater for HDR', hdrModeSub: 'Hisense keeps separate HDR picture settings. Check Active Contrast is off here too.',
+  hdrBlkNote: 'For HDR, Backlight is usually best at its maximum.',
+  tm: 'Dynamic Tone Mapping', tmDo: 'Turn on Dynamic Tone Mapping', tmSub: 'Usually under Picture → Advanced Settings. If it’s already on, try Off. Then look at the boxes again.',
+  tmWhere: '<p><b>Dynamic Tone Mapping</b> is usually in Picture → Advanced Settings, and <b>Peak Brightness</b> in Picture → Brightness. Leave <b>Contrast</b> at the HDR mode’s default.</p>',
+  hdmi: 'For anything plugged in by HDMI: set the device’s output range to Auto, and HDMI Dynamic Range on the TV to Auto. A mismatch crushes or washes out blacks.',
+  motion: 'Motion Enhancement Off plays films as they were shot. If slow camera pans look jerky to you, try Motion Enhancement → Film.',
+  game: 'Use the Game picture mode on the console’s input, then run the console’s own HDR calibration screen.',
+  copy: 'Repeat the values from your summary on each input you use.',
+  light: 'Backlight', lightNote: 'On most Hisense TVs, Backlight is the light output.'
+});
+
 const STEPS = [
   {
     id: 'start', title: 'Let’s set up your TV picture', pattern: null,
@@ -556,7 +780,7 @@ function brandPicker() {
   const note = brandInfo() ? `<p class="brand-note">${brandInfo().note}</p>`
     : brand === 'other' ? `<p class="brand-note">Using general names that work on most TVs. Your TV may use slightly different words.</p>` : '';
   return `<div class="box q brand" id="brandBox"><p class="ask">What brand is your TV?</p>
-    <div class="answers two">${opt('tcl', 'TCL')}${opt('other', 'Another brand')}</div>${note}</div>`;
+    <div class="answers two">${opt('samsung', 'Samsung')}${opt('lg', 'LG')}${opt('sony', 'Sony')}${opt('tcl', 'TCL')}${opt('hisense', 'Hisense')}${opt('other', 'Another brand')}</div>${note}</div>`;
 }
 function updateBrandChip() {
   const chip = document.getElementById('brandChip');

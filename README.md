@@ -36,8 +36,12 @@ were checked to match their intended values exactly.
 The start screen asks for the TV brand. `BRANDS` in `index.html` holds per-brand
 overrides for any part of a step (wording, checklist items, flow nodes, summary
 labels); anything not overridden falls back to the generic text in `STEPS`.
-Currently: **TCL** (Google TV menu names, e.g. Black Level instead of Brightness,
-Local Contrast, Dynamic Tone Mapping) and **Another brand** (generic wording).
+Currently: **Samsung**, **LG**, **Sony**, **TCL**, **Hisense** and **Another brand**
+(generic wording). TCL is written out in full; the other four are built with
+`brandFrom()` from a short description of each brand's menus. Key differences:
+the black-level control is Shadow Detail (Samsung 2022+), Screen Brightness (LG),
+Black level (Sony), Black Level (TCL) or Brightness (Hisense with a separate
+Backlight). Where a name couldn't be confirmed, the wording stays general.
 Only add a brand once its menu names are checked against the manufacturer's docs.
 
 ## Hosting (GitHub Pages, ~5 minutes)
