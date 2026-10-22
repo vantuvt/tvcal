@@ -61,6 +61,15 @@ Only add a brand once its menu names are checked against the manufacturer's docs
 Casting requires HTTPS — it won't work from a local file. GitHub Pages serves MP4s
 with CORS enabled, which the Cast receiver needs.
 
+## AirPlay (iPhone, iPad, Mac Safari)
+Safari can't use Google Cast, so when the page runs in Safari it hides the Cast
+controls and shows **AirPlay to TV** instead. A small preview `<video>` is sent
+to the AirPlay receiver with `webkitShowPlaybackTargetPicker()`, and each step
+swaps its source; the page stays usable on the phone. It works with Apple TV and
+TVs with AirPlay 2 built in, but not with Chromecast or Google TV. Over AirPlay the
+1080p files are always used (no 4K sharpness file). HDR patterns need an Apple TV
+4K or a TV that plays HEVC HDR10; if playback fails, the phone says so.
+
 ## Local network permission (Chrome 142+)
 Chrome now asks, per site, before a page can find devices on the home network.
 Without it, Cast discovery finds nothing ("no devices"), even though YouTube and
@@ -74,7 +83,8 @@ page explains how to re-enable it in Site settings → Local network access.
 - Tap "Let this page find my TV" (first visit) and Allow, then "Connect to TV", pick the TV, then Start → Next. Each pattern step should load on the TV and loop.
 - The player shows a title/progress overlay for a few seconds after loading; judge the pattern after it fades.
 - Chromecast with Google TV / Google TV Streamer: set Dynamic range to match content, or the SDR patterns may be shown in HDR.
-- iPhone: casting isn't possible from a web page; the steps and "View on this screen" still work.
+- iPhone/iPad (Safari): tap "AirPlay to TV", pick an Apple TV or AirPlay 2 TV, then Start → Next. Each pattern should switch on the TV without reconnecting. Steps without a pattern pause the last one rather than disconnecting.
+- Apple TV: turn on Match Content → Match Dynamic Range, or the SDR patterns may be shown in HDR.
 
 ## Known limits / next ideas
 - HDR10 only (no Dolby Vision). Needs a Cast device that plays HEVC HDR10; if it can't, the phone shows a playback error.
