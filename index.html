@@ -270,6 +270,7 @@ const BRANDS = {
           ['#', 'Your devices'],
           ['HDMI black level: Auto', 'For anything plugged in by HDMI (game console, Blu-ray, streaming stick). Set the device’s output range to Auto, and leave the TV’s matching setting at Auto if it has one. A mismatch crushes or washes out blacks.'],
           ['Streaming device: match content', 'On a separate Chromecast, Apple TV or Fire TV, turn on match dynamic range and match frame rate, so films play at their natural speed without judder.'],
+          ['Streaming device resolution: 4K', 'If a separate Chromecast or streaming box is plugged into a 4K TV, set its resolution to 4K or Auto (on a Chromecast with Google TV: Settings → Display &amp; Sound → Resolution). At 1080p, the TV has to upscale everything you watch. TVs with Google TV or another smart system built in don’t need this.'],
           ['Film motion: natural cadence', 'Motion Clarity Off plays films as they were shot. If slow camera pans look jerky to you, try Motion Clarity → Custom with a little Judder Reduction.'],
           ['Game console: game mode and HDR calibration', 'Use the TV’s game picture mode (Game Master on some TCL models) on the console’s input, then run the console’s own HDR calibration screen.'],
           ['Copy settings to other inputs', 'In the picture options, use “Apply All Picture Settings” to copy them, or repeat the values from your summary on each input you use.'],
@@ -331,6 +332,7 @@ function brandFrom(t) {
         ['#', 'Your devices'],
         ['HDMI black level: Auto', t.hdmi],
         ['Streaming device: match content', 'On a separate Chromecast, Apple TV or Fire TV, turn on match dynamic range and match frame rate, so films play at their natural speed without judder.'],
+        ['Streaming device resolution: 4K', 'If a separate Chromecast or streaming box is plugged into a 4K TV, set its resolution to 4K or Auto (on a Chromecast with Google TV: Settings → Display &amp; Sound → Resolution). At 1080p, the TV has to upscale everything you watch. TVs with Google TV or another smart system built in don’t need this.'],
         ['Film motion: natural cadence', t.motion],
         ['Game console: game mode and HDR calibration', t.game],
         ['Copy settings to other inputs', t.copy],
@@ -695,6 +697,7 @@ const STEPS = [
       ['#', 'Your devices'],
       ['HDMI black level: Auto', 'For anything plugged in by HDMI (game console, Blu-ray, streaming stick). Also called RGB range or HDMI Black Level. Set Auto on both the TV and the device. A mismatch crushes or washes out blacks.'],
       ['Streaming device: match content', 'On a Chromecast, Apple TV or Fire TV, turn on match dynamic range and match frame rate, so films play at their natural speed without judder.'],
+      ['Streaming device resolution: 4K', 'If a separate Chromecast or streaming box is plugged into a 4K TV, set its resolution to 4K or Auto (on a Chromecast with Google TV: Settings → Display &amp; Sound → Resolution). At 1080p, the TV has to upscale everything you watch. TVs with Google TV or another smart system built in don’t need this.'],
       ['Film motion: natural 24p', 'If your TV has Real Cinema, Cinematic Movement or a 24p setting, turn it on. It smooths camera pans without the “soap opera” look.'],
       ['Game console: Game mode and HDR calibration', 'Use Game mode (and HGIG if offered) on the console’s input, then run the console’s own HDR calibration screen. PS5 and Xbox both have one in their display settings.'],
       ['Copy settings to other inputs', 'Look for “Apply to all inputs” or “Apply picture settings: All sources”. Otherwise, repeat the values from your summary on each input you use.'],
@@ -888,14 +891,27 @@ const dot = document.getElementById('dot'), statusText = document.getElementById
 function setStatus(text, on) { statusText.textContent = text; dot.classList.toggle('on', !!on); }
 function session() { return castReady ? cast.framework.CastContext.getInstance().getCurrentSession() : null; }
 
+// Patterns with a native 4K version. The 4K file is tried first; if the Cast
+// device can't play it (for example an older 1080p Chromecast), the 1080p file
+// is used instead, and that device is remembered so it isn't retried.
+const UHD = { '04-sharpness': '04-sharpness-4k' };
+let lastFile;
+function no4kKey(sess) { return 'no4k:' + sess.getCastDevice().friendlyName; }
+
 function showPattern(name, force) {
   if (localOpen()) playLocal(name);
   const sess = session();
   if (!sess || (name === lastCast && !force)) return;
   lastCast = name;
   if (!name) { const m = sess.getMediaSession(); if (m) m.stop(null, () => {}, () => {}); return; }
+  const want4k = UHD[name] && !store.get(no4kKey(sess));
+  castFile(sess, name, want4k ? UHD[name] : name);
+}
+
+function castFile(sess, name, file) {
+  lastFile = file;
   const s = STEPS.find(x => x.pattern === name);
-  const info = new chrome.cast.media.MediaInfo(PATTERN_BASE + name + '.mp4', 'video/mp4');
+  const info = new chrome.cast.media.MediaInfo(PATTERN_BASE + file + '.mp4', 'video/mp4');
   info.streamType = chrome.cast.media.StreamType.BUFFERED;
   info.metadata = new chrome.cast.media.GenericMediaMetadata();
   info.metadata.title = s ? s.title : 'Test pattern';
@@ -905,8 +921,17 @@ function showPattern(name, force) {
   req.repeatMode = chrome.cast.media.RepeatMode.SINGLE;
   setStatus('Loading pattern on the TV…', true);
   sess.getSessionObj().queueLoad(req,
-    () => setStatus('Showing on ' + sess.getCastDevice().friendlyName, true),
-    err => { lastCast = undefined; setStatus('The TV couldn’t play the pattern (' + (err && err.code) + '). Go back and forward to retry.', true); });
+    () => setStatus('Showing on ' + sess.getCastDevice().friendlyName + (file !== name ? ' (4K)' : ''), true),
+    err => {
+      if (file !== name) { fallbackFrom4k(sess, name); return; }
+      lastCast = undefined;
+      setStatus('The TV couldn’t play the pattern (' + (err && err.code) + '). Go back and forward to retry.', true);
+    });
+}
+
+function fallbackFrom4k(sess, name) {
+  store.set(no4kKey(sess), true);
+  castFile(sess, name, name);
 }
 
 window['__onGCastApiAvailable'] = function (available) {
@@ -922,6 +947,7 @@ window['__onGCastApiAvailable'] = function (available) {
     const sess = session(), m = sess && sess.getMediaSession();
     const current = S(idx).pattern;
     if (rp.playerState === 'IDLE' && m && m.idleReason === 'FINISHED' && current) showPattern(current, true);
+    if (rp.playerState === 'IDLE' && m && m.idleReason === 'ERROR' && current && lastFile && lastFile !== current) fallbackFrom4k(sess, current);
   });
   const connectBtn = document.getElementById('connect'), help = document.getElementById('castHelp');
   connectBtn.style.display = 'block';

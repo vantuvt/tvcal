@@ -11,6 +11,8 @@ Default Media Receiver (no Cast app registration needed).
 - `patterns/*.png` — "where to look" guides shown on the phone (faint boxes exaggerated), plus clean/halo sharpness examples.
 - `patterns/h*.mp4` — optional HDR10 set: 1920x1080 HEVC Main10 (`hvc1`), PQ / BT.2020, HDR10 metadata
   (mastering display P3-D65, 1000 nits; MaxCLL 1000, MaxFALL 400). Greyscale only.
+- `patterns/04-sharpness-4k.mp4` — native 3840x2160 sharpness pattern (HEVC Main, `hvc1`, BT.709 limited, 5 min). The phone tries it first and falls back to the 1080p file if the Cast device can't play it, remembering that device.
+- `tools/make_4k_patterns.py` — regenerates the 4K sharpness pattern (ffmpeg with libx265).
 - `tools/make_patterns.py` — regenerates the SDR videos (Python 3, numpy, Pillow, ffmpeg). `ONLY=<name>` re-encodes one pattern.
 - `tools/make_hdr_patterns.py` — regenerates the HDR videos (needs ffmpeg with libx265). `ONLY=<name>` re-encodes one pattern.
 
@@ -70,6 +72,6 @@ page explains how to re-enable it in Site settings → Local network access.
 
 ## Known limits / next ideas
 - HDR10 only (no Dolby Vision). Needs a Cast device that plays HEVC HDR10; if it can't, the phone shows a playback error.
-- HDR patterns are 1080p; some devices only switch into HDR for 4K output.
+- HDR and most SDR patterns are 1080p. That's fine for flat-field patterns (scaling doesn't change a flat level); only sharpness has a native 4K version, since a TV's upscaler adds its own edge enhancement.
 - By-eye only; no camera measurement.
 - A custom Cast receiver would remove the player overlay and allow instant pattern switching.
