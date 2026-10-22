@@ -265,6 +265,9 @@ const BRANDS = {
       hdrfinal: {
         flow: { dark: { do: 'Press Black Level up by 1' } }
       },
+      dv: {
+        flow: { dark: { do: 'Press Black Level down by 1', sub: 'Not Brightness, which is the backlight on TCL. Small changes only; if dark details start to disappear, go back up by 1 and stop there.' } }
+      },
       extras: {
         checklist: [
           ['#', 'Your devices'],
@@ -328,6 +331,10 @@ function brandFrom(t) {
         t.blkTitle !== 'Brightness' ? { title: 'HDR ' + t.blkTitle } : {}),
       hdrhigh: { record: t.tm, ph: 'On', where: t.tmWhere, flow: { tm: { do: t.tmDo, sub: t.tmSub } } },
       hdrfinal: { flow: { dark: { do: `Press ${t.blk} up by 1` } } },
+      // Samsung doesn't support Dolby Vision (it uses HDR10+), so its DV step just explains and moves on.
+      dv: t.noDolbyVision
+        ? { record: null, lead: `${t.name} TVs don’t use Dolby Vision.`, flow: { q: { ask: undefined, do: 'Nothing to change here.', text: t.noDolbyVision } } }
+        : { flow: { dark: { do: `Press ${t.blk} down by 1` } } },
       extras: { checklist: [
         ['#', 'Your devices'],
         ['HDMI black level: Auto', t.hdmi],
@@ -349,6 +356,7 @@ function brandFrom(t) {
 
 BRANDS.samsung = brandFrom({
   name: 'Samsung',
+  noDolbyVision: 'Streaming apps send the same titles in HDR10 or HDR10+, which use the HDR settings you just set, so there’s nothing more to do here.',
   note: 'Using Samsung menu names (2022 and later, with notes for older models). If a name doesn’t match, look for the closest one.',
   update: 'Settings → All Settings → Support → Software Update → Update Now',
   menu: 'Settings → All Settings → Picture',
@@ -687,7 +695,31 @@ const STEPS = [
       q: { ask: 'Does every bar look different from the one next to it?', answers: [['Yes', 'ok'], ['Dark end merges', 'dark'], ['Bright end merges', 'bright']] },
       dark: { do: 'Press Brightness up by 1', sub: 'Then look at the darkest bars again. If box A from the earlier step would come back, stop and leave it.', then: 'q' },
       bright: { do: 'That’s normal on most TVs.', text: 'The brightest bars are beyond what most TVs can show. As long as the rest step up evenly, you’re done.' },
-      ok: { do: 'All done.', text: 'Your TV is set up for SDR and HDR.' }
+      ok: { do: 'All done.', text: 'Your TV is set up for SDR and HDR. Next: Dolby Vision, if your TV has it.' }
+    }
+  },
+  /* Dolby Vision tone maps itself from the TV's factory panel data and the
+     video's scene-by-scene metadata, and DV test patterns need Dolby's licensed
+     encoder, so this is a guidance step with no pattern: pick the accurate mode,
+     keep the defaults, and only fix black level if dark areas look grey. */
+  {
+    id: 'dv', pos: 'any', title: 'Dolby Vision (optional)', pattern: null, record: 'Dolby Vision picture mode', ph: 'Dolby Vision Dark',
+    lead: 'Dolby Vision adjusts the picture to your TV scene by scene, so there’s no pattern to tune. A few settings still matter, and most TVs keep them separate from the HDR ones you just set.',
+    flow: {
+      start: 'q',
+      q: { ask: 'Does your TV play Dolby Vision? Streaming apps show a “Dolby Vision” label on titles that use it.', answers: [['Yes', 'play'], ['Not sure', 'play'], ['No, skip', '@extras']] },
+      play: { do: 'Start a Dolby Vision film or show, then pause it on a normal scene',
+              sub: 'Look for the Dolby Vision label in Netflix, Disney+, Prime Video or Apple TV. The TV only shows its Dolby Vision settings while Dolby Vision is playing, and changes you make now only affect Dolby Vision.', then: 'on' },
+      on: { ask: 'Open the picture mode list. Do the names include “Dolby Vision”, or did the TV show a Dolby Vision badge?', answers: [['Yes', 'mode'], ['No', 'fix'], ['Can’t tell', 'mode']] },
+      fix: { do: 'Make sure Dolby Vision reaches the TV',
+             sub: 'Some streaming plans and older devices only send HDR10. If you use a separate Chromecast in an HDMI port: turn on the TV’s enhanced HDMI format for that port, and on the Chromecast set Dynamic range to match content. Then start the title again. If it still doesn’t show, your setup plays it as HDR10, which the HDR steps already covered.', then: 'on' },
+      mode: { do: 'Choose Dolby Vision Dark (or Filmmaker / Cinema if there’s no Dark)',
+              sub: 'Dark is the most accurate. Bright and Vivid boost everything. IQ modes follow the room light, which is fine for daytime viewing in a bright room.', then: 'clean' },
+      clean: { do: 'Turn off the extras and leave the rest at default',
+               sub: 'Turn off dynamic contrast, colour enhancers, motion smoothing and energy saving here too. Leave Contrast, Colour and Gamma at this mode’s defaults: Dolby Vision is already fitting the picture to your TV.', then: 'q2' },
+      q2: { ask: 'Find a dark scene. Do black areas, like letterbox bars or a night sky, look grey or glowing?', answers: [['No, they look black', 'ok'], ['Yes, greyish', 'dark']] },
+      dark: { do: 'Press Brightness down by 1', sub: 'Small changes only. If dark details start to disappear, go back up by 1 and stop there.', then: 'q2' },
+      ok: { do: 'Dolby Vision is set.', text: 'Dolby Vision films and shows will use these settings automatically.' }
     }
   },
   {

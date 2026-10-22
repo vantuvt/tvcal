@@ -30,6 +30,12 @@ highlights A–D = 400/600/800/1000 nits on a 100-nit background (tests tone map
 final check = 12 grey steps from 0.05 to 1000 nits. The HDR pass is optional and
 comes after the SDR steps.
 
+Dolby Vision (optional, after HDR) is a guidance step with no pattern: Dolby Vision
+tone maps itself, and DV test videos need Dolby's licensed encoder. The phone has
+the user pause a Dolby Vision title, pick the Dark (or Filmmaker/Cinema) mode, turn
+off extras, and lower black level only if blacks look grey. Samsung TVs don't
+support Dolby Vision, so for Samsung the step just says so.
+
 Pattern levels are written directly as video code values (16 = black, 235 = white),
 so the below-black box (12) survives instead of being clipped. Decoded test patches
 were checked to match their intended values exactly.
