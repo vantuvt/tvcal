@@ -7,7 +7,7 @@ Default Media Receiver (no Cast app registration needed).
 
 ## Files
 - `index.html` — the phone wizard (Cast sender). Self-contained.
-- `patterns/*.mp4` — 1920x1080 H.264 High@4.1, 30 fps, 60 s, limited range, BT.709 tagged. Loop on the TV.
+- `patterns/*.mp4` — 1920x1080 H.264 High@4.1, 30 fps, 5 min (a verified 60 s loop repeated without re-encoding), limited range, BT.709 tagged. Loop on the TV.
 - `patterns/*.png` — "where to look" guides shown on the phone (faint boxes exaggerated), plus clean/halo sharpness examples.
 - `patterns/h*.mp4` — optional HDR10 set: 1920x1080 HEVC Main10 (`hvc1`), PQ / BT.2020, HDR10 metadata
   (mastering display P3-D65, 1000 nits; MaxCLL 1000, MaxFALL 400). Greyscale only.

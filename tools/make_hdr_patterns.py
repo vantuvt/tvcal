@@ -156,6 +156,18 @@ X265 = ("hdr10=1:hdr10-opt=1:repeat-headers=1:colorprim=bt2020:transfer=smpte208
         "deblock=-3,-3:sao=0")
 
 
+
+LOOPS = 5  # final video = 5 x 60 s = 5 minutes, so the Cast player doesn't go idle
+
+
+def extend(path):
+    """Repeat the encoded stream LOOPS times without re-encoding, so the
+    longer file is bit-for-bit the same content as the verified 60 s one."""
+    tmp = path + ".long.mp4"
+    subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-stream_loop", str(LOOPS - 1), "-i", path,
+                    "-c", "copy", "-map", "0", "-movflags", "+faststart", tmp], check=True)
+    os.replace(tmp, path)
+
 def encode(name, Y, U, V):
     raw = os.path.join(WORK, name + ".yuv")
     with open(raw, "wb") as f:
@@ -169,6 +181,7 @@ def encode(name, Y, U, V):
         "-x265-params", X265, "-tag:v", "hvc1",
         "-color_range", "tv", "-colorspace", "bt2020nc", "-color_primaries", "bt2020",
         "-color_trc", "smpte2084", "-movflags", "+faststart", "-an", out], check=True)
+    extend(out)
     return raw, out
 
 

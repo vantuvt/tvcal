@@ -915,6 +915,14 @@ window['__onGCastApiAvailable'] = function (available) {
   ctx.setOptions({ receiverApplicationId: chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID,
                    autoJoinPolicy: chrome.cast.AutoJoinPolicy.ORIGIN_SCOPED });
   castReady = true;
+  // Safety net: if a pattern video ever reaches its end, load it again, so the
+  // TV never sits idle (the Cast player ends the session after idling).
+  const rp = new cast.framework.RemotePlayer(), rpc = new cast.framework.RemotePlayerController(rp);
+  rpc.addEventListener(cast.framework.RemotePlayerEventType.PLAYER_STATE_CHANGED, () => {
+    const sess = session(), m = sess && sess.getMediaSession();
+    const current = S(idx).pattern;
+    if (rp.playerState === 'IDLE' && m && m.idleReason === 'FINISHED' && current) showPattern(current, true);
+  });
   const connectBtn = document.getElementById('connect'), help = document.getElementById('castHelp');
   connectBtn.style.display = 'block';
   connectBtn.onclick = () => {

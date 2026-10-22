@@ -243,6 +243,18 @@ PATTERNS = [
 ]
 
 
+
+LOOPS = 5  # final video = 5 x 60 s = 5 minutes, so the Cast player doesn't go idle
+
+
+def extend(path):
+    """Repeat the encoded stream LOOPS times without re-encoding, so the
+    longer file is bit-for-bit the same content as the verified 60 s one."""
+    tmp = path + ".long.mp4"
+    subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-stream_loop", str(LOOPS - 1), "-i", path,
+                    "-c", "copy", "-map", "0", "-movflags", "+faststart", tmp], check=True)
+    os.replace(tmp, path)
+
 def encode(name, Y, U, V):
     raw = os.path.join(WORK, f"{name}.yuv")
     with open(raw, "wb") as f:
@@ -260,6 +272,7 @@ def encode(name, Y, U, V):
         "-movflags", "+faststart", "-an", out,
     ]
     subprocess.run(cmd, check=True)
+    extend(out)
     return raw, out
 
 
