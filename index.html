@@ -34,6 +34,9 @@
   .pos.close { background: #2a2214; border-color: #5a4620; }
   .pos.close svg, .pos.close b { color: #f0c46a; }
   .brand-opt.on { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  .link-opt { text-align: left; }
+  .link-opt span { display: block; font-size: 13px; font-weight: 400; opacity: .8; margin-top: 2px; }
+  input.model[type=text] { width: 100%; }
   .brand-note { font-size: 14px; color: var(--dim); margin: 12px 0 0; }
   .brand.attn { animation: attn .9s ease-in-out 2; }
   @keyframes attn { 50% { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(125,179,255,.35); } }
@@ -131,8 +134,9 @@
     <h1>TV Picture Setup <button id="brandChip" class="linkish chip" style="display:none"></button></h1>
     <google-cast-launcher title="Cast to your TV"></google-cast-launcher>
   </header>
-  <div class="status"><span class="dot" id="dot"></span><span id="statusText">Loading Cast support…</span></div>
-  <button id="connect" class="wide" style="display:none;margin:-4px 0 14px">Connect to TV</button>
+  <div class="status"><span class="dot" id="dot"></span><span id="statusText">Choose how you’ll connect to the TV below.</span></div>
+  <div id="castUI" style="display:none">
+  <button id="connect" class="wide" style="margin:-4px 0 14px">Connect to TV</button>
   <div id="lnaBox" style="display:none;margin:-4px 0 14px">
     <button id="lnaBtn" class="wide">Let this page find my TV</button>
     <div id="lnaStatus" style="font-size:13px;color:var(--dim);margin-top:6px"></div>
@@ -143,6 +147,7 @@
     <p>On Android 12 or later, Chrome needs the <b>Nearby devices</b> permission: Settings → Apps → Chrome → Permissions → Nearby devices → Allow. Then reload this page.</p>
     <p>Check that casting works at all: open the YouTube app and look for its Cast icon. If YouTube can’t find the TV either, the issue is the network or the Chromecast, not this page.</p>
   </div></details>
+  </div>
   <div id="airBox" style="display:none;margin:-4px 0 14px">
     <div class="air">
       <video id="airVideo" muted loop playsinline x-webkit-airplay="allow" preload="none"></video>
@@ -201,7 +206,6 @@ const BRANDS = {
         items: [
           'Update your TV’s software first: Settings → System → About → System update. Updates can change picture processing or reset settings, so do it before you start.',
           'Turn the lights down to how you normally watch.',
-          'At the top, tap “Connect to TV” (or “AirPlay to TV” on an iPhone or iPad) and choose your TV. If you see “Let this page find my TV”, tap that first and choose Allow.',
           'Open the picture menu with the remote: Settings → Display &amp; Sound → Picture. You’ll use it throughout.'
         ]
       },
@@ -326,7 +330,6 @@ function brandFrom(t) {
       start: { items: [
         `Update your TV’s software first: ${t.update}. Updates can change picture processing or reset settings, so do it before you start.`,
         'Turn the lights down to how you normally watch.',
-        'At the top, tap “Connect to TV” (or “AirPlay to TV” on an iPhone or iPad) and choose your TV. If you see “Let this page find my TV”, tap that first and choose Allow.',
         `Open the picture menu with the remote: ${t.menu}. You’ll use it throughout.`
       ] },
       mode: { checklist: t.modeItems, extra: `<details><summary>Where are these settings?</summary><div class="inner">${t.modeWhere}</div></details>` },
@@ -540,13 +543,10 @@ const STEPS = [
     items: [
       'Update your TV’s software first (usually Settings → System or Support → Software update). Updates can change picture processing or reset settings, so do it before you start.',
       'Turn the lights down to how you normally watch.',
-      'At the top, tap “Connect to TV” (or “AirPlay to TV” on an iPhone or iPad) and choose your TV. If you see “Let this page find my TV”, tap that first and choose Allow.',
       'Open your TV’s picture settings menu with the remote. You’ll use it throughout.'
     ],
-    after: `<details><summary>Using an iPhone or iPad?</summary><div class="inner">
-        <p>Open this page in <b>Safari</b> and tap <b>AirPlay to TV</b> at the top instead of “Connect to TV”. It works with an Apple TV and with TVs that have AirPlay built in (many recent Samsung, LG, Sony and Vizio models). Keep the phone and TV on the same Wi-Fi.</p>
-        <p>AirPlay can’t reach a Chromecast or a TV with Google TV built in. For those, use Chrome on an Android phone or a computer.</p>
-        <p>You can always follow along and <button class="linkish" data-local>see each pattern on this phone</button>, but the TV steps need the pattern shown on the TV.</p>
+    after: `<details><summary>Can’t connect to the TV?</summary><div class="inner">
+        <p>You can still follow along and <button class="linkish" data-local>see each pattern on this phone</button>, but the TV steps need the pattern shown on the TV.</p>
       </div></details>`
   },
   {
@@ -561,10 +561,7 @@ const STEPS = [
       ['Gamma: 2.4 in a dark room, 2.2 in a bright one', 'Sometimes shown as BT.1886 (similar to 2.4). It sets how quickly the picture brightens out of black. If your TV has no Gamma setting, skip this.'],
       ['Noise reduction: Off', 'Also called MPEG noise reduction, Smooth gradation or Noise filter. It smears fine detail in streaming shows. Low is fine for an old, grainy source.'],
     ],
-    extra: `<details><summary>Using a Chromecast with Google TV?</summary><div class="inner">
-      <p>On the Chromecast: Settings → Display &amp; Sound → Advanced display settings → <b>Dynamic range</b> → turn on <b>match content</b>.
-      Otherwise the patterns may be shown in HDR and look washed out.</p></div></details>
-      <details><summary>Where are these settings?</summary><div class="inner">
+    extra: `<details><summary>Where are these settings?</summary><div class="inner">
       <p>Usually Settings → <b>Picture</b>, then <b>Expert</b> or <b>Advanced</b> settings. Make the changes on the HDMI input the Chromecast is plugged into; most TVs remember settings per input.</p></div></details>`
   },
   {
@@ -767,6 +764,9 @@ const store = {
 let idx = Math.min(store.get('step') || 0, STEPS.length - 1);
 let brand = store.get('brand');   // 'tcl', 'other', or null (not chosen yet)
 function brandInfo() { return BRANDS[brand] || null; }
+let link = store.get('link');     // 'cast', 'airplay', or null (not chosen yet)
+if (!link) idx = 0;   // the connection is chosen on the start screen
+const IOS = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 // The step as shown: generic step with the chosen brand's overrides on top.
 function S(i) {
   const base = STEPS[i], o = brandInfo() && brandInfo().steps[base.id];
@@ -832,11 +832,42 @@ function brandPicker() {
   return `<div class="box q brand" id="brandBox"><p class="ask">What brand is your TV?</p>
     <div class="answers two">${opt('samsung', 'Samsung')}${opt('lg', 'LG')}${opt('sony', 'Sony')}${opt('tcl', 'TCL')}${opt('hisense', 'Hisense')}${opt('other', 'Another brand')}</div>${note}</div>`;
 }
+function tvName() {
+  const b = brandInfo() ? brandInfo().name : brand === 'other' ? '' : '';
+  return [b, values.model].filter(Boolean).join(' ') || (brand === 'other' ? 'other brand' : '');
+}
+function modelBox() {
+  return `<div class="box q" id="modelBox"><p class="ask">What model is it?</p>
+    <input type="text" class="model" data-record="model" value="${esc(values.model || '')}" placeholder="e.g. 55Q750G"
+      autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false">
+    <p class="brand-note">It’s on a sticker on the back of the TV, or in the TV’s settings under System or Support → About. Optional, but it’s saved with your settings at the end.</p></div>`;
+}
+function linkPicker() {
+  const opt = (k, label, sub) => `<button class="brand-opt link-opt${link === k ? ' on' : ''}" data-link="${k}">${label}<span>${sub}</span></button>`;
+  return `<div class="box q brand" id="linkBox"><p class="ask">How will you show the test patterns on the TV?</p>
+    <div class="answers">
+      ${opt('cast', 'Google Chromecast', 'A Chromecast, or a TV with Google TV built in. Uses Chrome on an Android phone or a computer.')}
+      ${opt('airplay', 'iPhone or iPad (AirPlay)', 'An Apple TV, or a TV with AirPlay built in. Uses Safari.')}
+    </div>${linkNote()}</div>`;
+}
+function linkNote() {
+  const n = t => `<p class="brand-note">${t}</p>`;
+  if (link === 'cast') {
+    if (IOS) return `<div class="tip" style="margin:14px 0 0">An iPhone or iPad can’t cast to a Chromecast from a web page. Open this page in Chrome on an Android phone or a computer on the same Wi-Fi. If your TV also has AirPlay, choose iPhone or iPad instead.</div>`;
+    if (castFailed) return `<div class="tip" style="margin:14px 0 0">Casting isn’t available in this browser. Open this page in Chrome on an Android phone or a computer.</div>`;
+    return n('Next, tap “Connect to TV” at the top and choose your TV. If you see “Let this page find my TV”, tap that first and choose Allow.');
+  }
+  if (link === 'airplay') {
+    if (!AIRPLAY) return `<div class="tip" style="margin:14px 0 0">AirPlay works from Safari on an iPhone, iPad or Mac. Open this page there.</div>`;
+    return n('Next, tap “AirPlay to TV” at the top and choose your TV. A Chromecast or Google TV won’t appear in the AirPlay list.');
+  }
+  return '';
+}
 function updateBrandChip() {
   const chip = document.getElementById('brandChip');
   if (!brand || idx === 0) { chip.style.display = 'none'; return; }
   chip.style.display = '';
-  chip.innerHTML = `TV: ${brandInfo() ? brandInfo().name : 'other brand'} · <u>Change</u>`;
+  chip.innerHTML = `TV: ${esc(tvName())} · <u>Change</u>`;
 }
 
 function render() {
@@ -851,7 +882,7 @@ function render() {
   } else if (s.pattern) {
     h += `<figure><img src="patterns/${s.pattern}.png" alt=""><figcaption>${s.caption}</figcaption></figure>`;
   }
-  if (s.id === 'start') h += brandPicker();
+  if (s.id === 'start') h += brandPicker() + modelBox() + linkPicker();
   if (s.items) h += `<ol class="check">${s.items.map((t, i) => `<li style="cursor:default"><span class="tick" style="border-color:var(--accent);color:var(--accent);font-size:14px;font-weight:700">${i + 1}</span><span>${t}</span></li>`).join('')}</ol>`;
   if (s.after) h += s.after;
   if (s.checklist) {
@@ -863,14 +894,14 @@ function render() {
     if (s.id === 'mode') h += `<label class="rec" style="margin:0 0 14px">Picture mode you chose (optional)
       <input type="text" data-record="mode" value="${esc(values.mode || '')}" placeholder="e.g. Filmmaker"></label>`;
     h += s.extra || '';
-    if (s.id === 'mode' && AIRPLAY) h += APPLE_TV_TIP;
+    if (s.id === 'mode') h += link === 'airplay' ? APPLE_TV_TIP : link === 'cast' ? CHROMECAST_TIP : '';
   }
   if (s.flow) h += flowHtml(s);
   if (s.where) h += `<details><summary>Where is this setting?</summary><div class="inner">${s.where}</div></details>`;
   if (s.dimming) h += (brandInfo() && brandInfo().dimmingHelp) || DIMMING_HELP;
   if (s.pattern && !s.compare) h += `<button class="linkish" data-local>See the pattern on this phone</button>`;
   if (s.summary) {
-    h += `<table>${allSteps().filter(x => x.record).map(x => `<tr><td>${x.record}</td><td>${esc(values[x.id] || '—')}</td></tr>`).join('')}</table>
+    h += `<table><tr><td>TV</td><td>${esc(tvName() || '—')}</td></tr>${allSteps().filter(x => x.record).map(x => `<tr><td>${x.record}</td><td>${esc(values[x.id] || '—')}</td></tr>`).join('')}</table>
       <div class="answers two"><button id="copy">Copy</button><button id="restart">Start over</button></div>`;
   }
   card.innerHTML = h;
@@ -900,6 +931,7 @@ card.addEventListener('click', e => {
     brand = t.dataset.brand; store.set('brand', brand); render();
     return;
   }
+  if (t.dataset.link) { setLink(t.dataset.link); render(); return; }
   if (t.dataset.go && t.dataset.go[0] === '@') {
     go(STEPS.findIndex(x => x.id === t.dataset.go.slice(1))); return;
   }
@@ -911,7 +943,7 @@ card.addEventListener('click', e => {
   if (t.dataset.check !== undefined) { checks[t.dataset.check] = !checks[t.dataset.check]; store.set('checks', checks); t.classList.toggle('on'); }
   if (t.hasAttribute('data-local')) openLocal();
   if (t.id === 'copy') {
-    const text = 'My TV picture settings' + (brandInfo() ? ' (' + brandInfo().name + ')' : '') + '\n' + allSteps().filter(x => x.record).map(x => `${x.record}: ${values[x.id] || '-'}`).join('\n');
+    const text = 'My TV picture settings' + (tvName() ? ' (' + tvName() + ')' : '') + '\n' + allSteps().filter(x => x.record).map(x => `${x.record}: ${values[x.id] || '-'}`).join('\n');
     (navigator.clipboard ? navigator.clipboard.writeText(text) : Promise.reject())
       .then(() => { t.textContent = 'Copied'; }, () => { t.textContent = 'Copy failed'; });
   }
@@ -923,8 +955,8 @@ card.addEventListener('input', e => {
 });
 backBtn.onclick = () => { if (idx > 0) go(trail.length ? trail.pop() : idx - 1, true); };
 nextBtn.onclick = () => {
-  if (idx === 0 && !brand) {          // ask for the brand before starting
-    const b = document.getElementById('brandBox');
+  if (idx === 0 && (!brand || !link)) {   // ask for the brand and connection before starting
+    const b = document.getElementById(brand ? 'linkBox' : 'brandBox');
     b.scrollIntoView({ block: 'center', behavior: 'smooth' });
     b.classList.remove('attn'); void b.offsetWidth; b.classList.add('attn');
     return;
@@ -934,10 +966,12 @@ nextBtn.onclick = () => {
 document.getElementById('brandChip').onclick = () => go(0);
 
 /* ---------- Casting (Google's Default Media Receiver) ---------- */
-let castReady = false, lastCast;
+let castReady = false, castFailed = false, lastCast, castMsg = ['Loading Cast support…'];
 const dot = document.getElementById('dot'), statusText = document.getElementById('statusText');
 function setStatus(text, on) { statusText.textContent = text; dot.classList.toggle('on', !!on); }
-function session() { return castReady ? cast.framework.CastContext.getInstance().getCurrentSession() : null; }
+// Cast messages are remembered, and shown only while Chromecast is the chosen connection.
+function castStatus(text, on) { castMsg = [text, on]; if (link === 'cast') setStatus(text, on); }
+function session() { return castReady && link === 'cast' ? cast.framework.CastContext.getInstance().getCurrentSession() : null; }
 
 // Patterns with a native 4K version. The 4K file is tried first; if the Cast
 // device can't play it (for example an older 1080p Chromecast), the 1080p file
@@ -968,13 +1002,13 @@ function castFile(sess, name, file) {
   item.autoplay = true;
   const req = new chrome.cast.media.QueueLoadRequest([item]);
   req.repeatMode = chrome.cast.media.RepeatMode.SINGLE;
-  setStatus('Loading pattern on the TV…', true);
+  castStatus('Loading pattern on the TV…', true);
   sess.getSessionObj().queueLoad(req,
-    () => setStatus('Showing on ' + sess.getCastDevice().friendlyName + (file !== name ? ' (4K)' : ''), true),
+    () => castStatus('Showing on ' + sess.getCastDevice().friendlyName + (file !== name ? ' (4K)' : ''), true),
     err => {
       if (file !== name) { fallbackFrom4k(sess, name); return; }
       lastCast = undefined;
-      setStatus('The TV couldn’t play the pattern (' + (err && err.code) + '). Go back and forward to retry.', true);
+      castStatus('The TV couldn’t play the pattern (' + (err && err.code) + '). Go back and forward to retry.', true);
     });
 }
 
@@ -984,14 +1018,12 @@ function fallbackFrom4k(sess, name) {
 }
 
 window['__onGCastApiAvailable'] = function (available) {
-  if (!available) {
-    if (!AIRPLAY) setStatus('Casting isn’t available in this browser. Use Chrome on Android or a computer.');
-    return;
-  }
+  if (!available) { castUnavailable(); return; }
   const ctx = cast.framework.CastContext.getInstance();
   ctx.setOptions({ receiverApplicationId: chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID,
                    autoJoinPolicy: chrome.cast.AutoJoinPolicy.ORIGIN_SCOPED });
   castReady = true;
+  applyLink();
   // Safety net: if a pattern video ever reaches its end, load it again, so the
   // TV never sits idle (the Cast player ends the session after idling).
   const rp = new cast.framework.RemotePlayer(), rpc = new cast.framework.RemotePlayerController(rp);
@@ -1002,12 +1034,11 @@ window['__onGCastApiAvailable'] = function (available) {
     if (rp.playerState === 'IDLE' && m && m.idleReason === 'ERROR' && current && lastFile && lastFile !== current) fallbackFrom4k(sess, current);
   });
   const connectBtn = document.getElementById('connect'), help = document.getElementById('castHelp');
-  connectBtn.style.display = 'block';
   connectBtn.onclick = () => {
     if (ctx.getCurrentSession()) { ctx.endCurrentSession(true); return; }
     ctx.requestSession().catch(err => {
       if (err === 'cancel') return;
-      setStatus(err === chrome.cast.ErrorCode.RECEIVER_UNAVAILABLE || err === 'receiver_unavailable'
+      castStatus(err === chrome.cast.ErrorCode.RECEIVER_UNAVAILABLE || err === 'receiver_unavailable'
         ? 'No TV found. See “TV not found?” below.' : 'Couldn’t connect (' + err + ').');
       help.style.display = 'block'; showLna();
     });
@@ -1016,16 +1047,16 @@ window['__onGCastApiAvailable'] = function (available) {
   const onCastState = st => {
     connectBtn.textContent = st === CS.CONNECTED ? 'Disconnect from TV' : 'Connect to TV';
     connectBtn.classList.toggle('primary', st === CS.NOT_CONNECTED);
-    if (st === CS.NO_DEVICES_AVAILABLE) { setStatus('Looking for your TV… none found yet.'); help.style.display = 'block'; showLna(); }
-    else if (st === CS.NOT_CONNECTED) { setStatus('TV found. Tap “Connect to TV”.'); help.style.display = 'none'; lnaBox.style.display = 'none'; }
-    else if (st === CS.CONNECTING) setStatus('Connecting…', true);
+    if (st === CS.NO_DEVICES_AVAILABLE) { castStatus('Looking for your TV… none found yet.'); help.style.display = 'block'; showLna(); }
+    else if (st === CS.NOT_CONNECTED) { castStatus('TV found. Tap “Connect to TV”.'); help.style.display = 'none'; lnaBox.style.display = 'none'; }
+    else if (st === CS.CONNECTING) castStatus('Connecting…', true);
   };
   ctx.addEventListener(cast.framework.CastContextEventType.CAST_STATE_CHANGED, e => onCastState(e.castState));
   ctx.addEventListener(cast.framework.CastContextEventType.SESSION_STATE_CHANGED, e => {
     const S = cast.framework.SessionState;
     if (e.sessionState === S.SESSION_STARTED || e.sessionState === S.SESSION_RESUMED) {
       lastCast = undefined;
-      setStatus('Connected to ' + ctx.getCurrentSession().getCastDevice().friendlyName, true);
+      castStatus('Connected to ' + ctx.getCurrentSession().getCastDevice().friendlyName, true);
       showPattern(STEPS[idx].pattern, true);
     } else if (e.sessionState === S.SESSION_ENDED) {
       lastCast = undefined;
@@ -1036,13 +1067,12 @@ window['__onGCastApiAvailable'] = function (available) {
     if (st === 'prompt' || st === 'denied') {
       connectBtn.style.display = 'none';
       lnaBtn.classList.add('primary');
-      showLna().then(() => { setStatus('First, let this page find your TV.'); help.style.display = 'none'; });
+      showLna().then(() => { castStatus('First, let this page find your TV.'); help.style.display = 'none'; });
     }
   });
 };
 setTimeout(() => {
-  if (!castReady && !AIRPLAY && statusText.textContent.startsWith('Loading'))
-    setStatus('Cast support didn’t load. Casting needs Chrome on Android or a computer, and an internet connection.');
+  if (!castReady && !castFailed) castUnavailable('Cast support didn’t load. Casting needs Chrome on Android or a computer, and an internet connection.');
 }, 6000);
 
 /* ---------- Chrome "Local network access" site permission ----------
@@ -1093,9 +1123,13 @@ const APPLE_TV_TIP = `<details><summary>Using an Apple TV?</summary><div class="
   <p>On the Apple TV: Settings → Video and Audio → <b>Match Content</b> → turn on <b>Match Dynamic Range</b>.
   Otherwise the patterns may be shown in HDR or Dolby Vision and look washed out.</p>
   <p>Make the picture changes on the HDMI input the Apple TV is plugged into.</p></div></details>`;
+const CHROMECAST_TIP = `<details><summary>Using a separate Chromecast?</summary><div class="inner">
+  <p>On the Chromecast: Settings → Display &amp; Sound → Advanced display settings → <b>Dynamic range</b> → turn on <b>match content</b>.
+  Otherwise the patterns may be shown in HDR and look washed out.</p>
+  <p>Make the picture changes on the HDMI input the Chromecast is plugged into.</p></div></details>`;
 let airName;   // pattern loaded on the AirPlay video (undefined = nothing yet)
 
-function airOn() { return AIRPLAY && !!airVideo.webkitCurrentPlaybackTargetIsWireless; }
+function airOn() { return AIRPLAY && link === 'airplay' && !!airVideo.webkitCurrentPlaybackTargetIsWireless; }
 
 // Over AirPlay the 1080p files are always used: many AirPlay TVs can't play
 // the 4K HEVC sharpness file, and there's no reliable error to fall back on.
@@ -1110,9 +1144,6 @@ function airLoad(name, force) {
 }
 
 if (AIRPLAY) {
-  airBox.style.display = 'block';
-  document.querySelector('google-cast-launcher').style.display = 'none';
-  setStatus('Tap “AirPlay to TV” and choose your TV.');
   airNote.textContent = 'Looking for AirPlay TVs on your Wi-Fi…';
 
   airVideo.addEventListener('webkitplaybacktargetavailabilitychanged', e => {
@@ -1133,7 +1164,7 @@ if (AIRPLAY) {
       airBtn.textContent = 'Change AirPlay TV';
       airBtn.classList.remove('primary');
       airNote.textContent = 'To stop, tap Change AirPlay TV and choose this phone.';
-      setStatus('Showing on your AirPlay TV', true);
+      airStatus('Showing on your AirPlay TV', true);
       // Show this step's pattern; on a step without one, keep the connection
       // pattern playing so it's clear the TV is connected.
       const p = S(idx).pattern;
@@ -1142,7 +1173,7 @@ if (AIRPLAY) {
       airBtn.textContent = 'AirPlay to TV';
       airBtn.classList.add('primary');
       airNote.textContent = 'Works with Apple TV and TVs with AirPlay built in.';
-      setStatus('AirPlay stopped. Tap “AirPlay to TV” to reconnect.');
+      airStatus('AirPlay stopped. Tap “AirPlay to TV” to reconnect.');
       airVideo.pause();
     }
   });
@@ -1151,11 +1182,40 @@ if (AIRPLAY) {
     if (!airOn()) return;
     const hdr = airName && airName[0] === 'h';
     airName = undefined;
-    setStatus(hdr
+    airStatus(hdr
       ? 'The TV couldn’t play this HDR pattern over AirPlay. It needs an Apple TV 4K or a TV that plays HEVC HDR10. You can skip the HDR steps.'
       : 'The TV couldn’t play the pattern over AirPlay. Go back and forward to retry.', true);
   });
-  airVideo.addEventListener('playing', () => { if (airOn()) setStatus('Showing on your AirPlay TV', true); });
+  airVideo.addEventListener('playing', () => { if (airOn()) airStatus('Showing on your AirPlay TV', true); });
+}
+
+/* ---------- Which connection is in use ----------
+   The start screen asks whether the patterns go to a Chromecast or over
+   AirPlay; only that connection's controls and messages are shown. */
+let airMsg = ['Tap “AirPlay to TV” and choose your TV.'];
+function airStatus(text, on) { airMsg = [text, on]; if (link === 'airplay') setStatus(text, on); }
+function castUnavailable(msg) {
+  castFailed = true;
+  castStatus(msg || 'Casting isn’t available in this browser. Use Chrome on an Android phone or a computer.');
+  if (idx === 0) render();   // update the note under the connection question
+  applyLink();
+}
+function setLink(k) {
+  if (k === link) return;
+  if (link === 'cast' && session()) cast.framework.CastContext.getInstance().endCurrentSession(true);
+  if (link === 'airplay' && AIRPLAY) airVideo.pause();
+  link = k; store.set('link', k);
+  lastCast = undefined; airName = undefined;
+  applyLink();
+}
+function applyLink() {
+  const useCast = link === 'cast', useAir = link === 'airplay';
+  document.getElementById('castUI').style.display = useCast && castReady ? '' : 'none';
+  document.querySelector('google-cast-launcher').style.display = useCast && castReady ? '' : 'none';
+  airBox.style.display = useAir && AIRPLAY ? 'block' : 'none';
+  if (useCast) setStatus(...(IOS ? ['Chromecast needs Chrome on an Android phone or a computer.'] : castMsg));
+  else if (useAir) setStatus(...(AIRPLAY ? airMsg : ['AirPlay needs Safari on an iPhone, iPad or Mac.']));
+  else setStatus('Choose how you’ll connect to the TV below.');
 }
 
 /* ---------- Pattern on this screen ---------- */
@@ -1190,6 +1250,7 @@ document.addEventListener('load', updateMore, true);              // images fini
 document.getElementById('moreBtn').onclick = () => window.scrollBy({ top: window.innerHeight * 0.6, behavior: 'smooth' });
 
 render();
+applyLink();
 syncBar();
 </script>
 <script src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1"></script>
