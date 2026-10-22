@@ -41,7 +41,7 @@ so the below-black box (12) survives instead of being clipped. Decoded test patc
 were checked to match their intended values exactly.
 
 ## Brand-specific instructions
-The start screen asks for the TV brand. `BRANDS` in `index.html` holds per-brand
+The start screen asks for the TV brand, the model (optional; shown in the saved settings) and how the patterns get to the TV: **Google Chromecast** or **iPhone/iPad (AirPlay)**. Only the chosen connection's controls appear at the top, and the phone warns if the browser can't use it (for example Chromecast chosen on an iPhone). The setup-mode tips follow the choice (Chromecast or Apple TV). `BRANDS` in `index.html` holds per-brand
 overrides for any part of a step (wording, checklist items, flow nodes, summary
 labels); anything not overridden falls back to the generic text in `STEPS`.
 Currently: **Samsung**, **LG**, **Sony**, **TCL**, **Hisense** and **Another brand**
@@ -80,7 +80,7 @@ Allow, the page reloads and the TV appears. If the site was blocked earlier, the
 page explains how to re-enable it in Site settings → Local network access.
 
 ## Testing checklist
-- Tap "Let this page find my TV" (first visit) and Allow, then "Connect to TV", pick the TV, then Start → Next. Each pattern step should load on the TV and loop.
+- Pick brand, model and connection on the start screen. Tap "Let this page find my TV" (first visit) and Allow, then "Connect to TV", pick the TV, then Start → Next. Each pattern step should load on the TV and loop.
 - The player shows a title/progress overlay for a few seconds after loading; judge the pattern after it fades.
 - Chromecast with Google TV / Google TV Streamer: set Dynamic range to match content, or the SDR patterns may be shown in HDR.
 - iPhone/iPad (Safari): tap "AirPlay to TV", pick an Apple TV or AirPlay 2 TV, then Start → Next. Each pattern should switch on the TV without reconnecting. Steps without a pattern pause the last one rather than disconnecting.
