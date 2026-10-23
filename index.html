@@ -989,6 +989,7 @@ function no4kKey(sess) { return 'no4k:' + sess.getCastDevice().friendlyName; }
 function showPattern(name, force) {
   if (localOpen()) playLocal(name);
   if (airOn()) airLoad(name, force);
+  else if (AIRPLAY && link === 'airplay' && airReleased && name) airStatus('Tap “AirPlay to TV” to show the patterns on the TV again.');
   const sess = session();
   if (!sess || (name === lastCast && !force)) return;
   lastCast = name;
@@ -1143,19 +1144,38 @@ function airOn() { return AIRPLAY && link === 'airplay' && !!airVideo.webkitCurr
 // audible media to an AirPlay TV, so a muted or audio-less video connects but
 // never appears on the TV. Unmuted playback must start from a tap, so play()
 // is always called straight from a button handler (AirPlay to TV, Next, Back).
+let airReleased = false;   // true once the TV was let go after the last pattern
 function airLoad(name, force) {
   if (name === airName && !force) { if (name && airVideo.paused) airPlay(); return; }
   airName = name;
   // Steps without a pattern pause instead of unloading, so the AirPlay
   // connection stays up and the next pattern appears without reconnecting.
-  if (!name) { airVideo.pause(); return; }
+  // Past the last pattern step (Dolby Vision, devices, summary) there's
+  // nothing more to show, so the TV is released instead of left on a frozen
+  // frame; Dolby Vision needs the TV free to play a title from its own apps.
+  if (!name) {
+    if (STEPS.slice(idx + 1).some(x => x.pattern)) airVideo.pause();
+    else airRelease('Patterns finished. The TV is free again.');
+    return;
+  }
+  airReleased = false;
   const url = PATTERN_BASE + name + '.mp4';
-  if (airVideo.currentSrc !== url) airVideo.src = url;
+  if (airVideo.getAttribute('src') !== url) airVideo.src = url;   // not currentSrc: it keeps the old URL after an unload
   airPlay();
   try {
     const s = STEPS.find(x => x.pattern === name);
     if ('mediaSession' in navigator) navigator.mediaSession.metadata = new MediaMetadata({ title: s ? s.title : 'Test pattern', artist: 'TV Picture Setup' });
   } catch (e) {}
+}
+// Stop playback and unload the video, which ends the picture on the TV.
+function airRelease(msg) {
+  if (!airVideo.getAttribute('src')) return;
+  airReleased = true; airName = null;
+  airVideo.pause();
+  airVideo.removeAttribute('src');
+  airVideo.load();
+  try { if ('mediaSession' in navigator) navigator.mediaSession.metadata = null; } catch (e) {}
+  if (msg) airStatus(msg);
 }
 function airPlay() {
   airVideo.muted = false;
@@ -1195,20 +1215,24 @@ if (AIRPLAY) {
       airBtn.textContent = 'AirPlay to TV';
       airBtn.classList.add('primary');
       airNote.textContent = 'Works with Apple TV and TVs with AirPlay built in.';
-      airStatus('AirPlay stopped. Tap “AirPlay to TV” to reconnect.');
+      airStatus(airReleased ? 'Patterns finished. The TV is free again. To show patterns again, tap “AirPlay to TV”.'
+                            : 'AirPlay stopped. Tap “AirPlay to TV” to reconnect.');
       document.getElementById('airHelp').style.display = 'none';
       airVideo.pause();
     }
   });
 
   airVideo.addEventListener('error', () => {
-    if (!airOn()) return;
+    if (!airOn() || !airVideo.getAttribute('src')) return;
     const hdr = airName && airName[0] === 'h';
     airName = undefined;
     airStatus(hdr
       ? 'The TV couldn’t play this HDR pattern over AirPlay. It needs an Apple TV 4K or a TV that plays HEVC HDR10. You can skip the HDR steps.'
       : 'The TV couldn’t play the pattern over AirPlay. Go back and forward to retry.', true);
   });
+  // Leaving or closing the page releases the TV right away. (Not on
+  // visibilitychange: the phone may lock mid-step while the TV keeps playing.)
+  window.addEventListener('pagehide', () => airRelease());
   airVideo.addEventListener('playing', () => { if (airOn()) airStatus('Showing on your AirPlay TV', true); });
   airVideo.addEventListener('waiting', () => { if (airOn()) airStatus('Loading the pattern on the TV…', true); });
 }
