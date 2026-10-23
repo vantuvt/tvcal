@@ -5,6 +5,29 @@ A phone-guided TV picture setup. The phone asks one yes/no question at a time
 then asks again until the step is right. It casts a matching test-pattern video to a Chromecast / Google TV using Google's built-in
 Default Media Receiver (no Cast app registration needed).
 
+## Layout
+The phone shows one focused card at a time: a title, the "where to look" picture,
+one question or one remote action, and one button to go on. Everything else
+(what to look for, where the setting is on this brand, what to do if nothing
+changes) is in a **Help** sheet that slides up from the bottom; after three
+rounds of adjusting without success, a "Not changing? Get help" line opens it
+on the right tab.
+
+Steps are grouped into chapters, and the top row shows where you are
+("Basics · 3 of 4"):
+- **Setup**: TV brand, connect to the TV, get ready
+- **Basics**: quick settings, fit to screen, brightness (black level), contrast
+- **Fine-tune**: sharpness, colour temperature, final grey check
+- **HDR** (optional): HDR checks and Dolby Vision
+- **Devices and room** (optional): tips outside the picture menu
+
+The home screen (hub) lists the chapters with their status (done, skipped, in
+progress), continues where you left off, and holds the optional "write down your
+settings" fields, with Copy and Start over. The connection controls appear on
+the connect screen and in a **Your TV** sheet; on a pattern step, a banner says
+when the pattern isn't showing on the TV. The connection method is picked from
+the browser (AirPlay in Safari, Cast elsewhere), with a link to switch.
+
 ## Files
 - `index.html` — the phone wizard (Cast sender). Self-contained.
 - `patterns/*.mp4` — 1920x1080 H.264 High@4.1, 30 fps, 5 min (a verified 60 s loop repeated without re-encoding), limited range, BT.709 tagged. Loop on the TV.
@@ -41,7 +64,7 @@ so the below-black box (12) survives instead of being clipped. Decoded test patc
 were checked to match their intended values exactly.
 
 ## Brand-specific instructions
-The start screen asks for the TV brand, the model (optional; shown in the saved settings) and how the patterns get to the TV: **Google Chromecast** or **iPhone/iPad (AirPlay)**. Only the chosen connection's controls appear at the top, and the phone warns if the browser can't use it (for example Chromecast chosen on an iPhone). The setup-mode tips follow the choice (Chromecast or Apple TV). `BRANDS` in `index.html` holds per-brand
+The first setup screen asks for the TV brand; the model is optional and entered on the hub with the saved settings. The connect screen picks **Google Cast** or **AirPlay** from the browser, with a link to switch, and warns if the browser can't use it (for example Chromecast on an iPhone). The quick-settings Help follows the choice (Chromecast or Apple TV). `BRANDS` in `index.html` holds per-brand
 overrides for any part of a step (wording, checklist items, flow nodes, summary
 labels); anything not overridden falls back to the generic text in `STEPS`.
 Currently: **Samsung**, **LG**, **Sony**, **TCL**, **Hisense** and **Another brand**
@@ -86,10 +109,10 @@ Allow, the page reloads and the TV appears. If the site was blocked earlier, the
 page explains how to re-enable it in Site settings → Local network access.
 
 ## Testing checklist
-- Pick brand, model and connection on the start screen. Tap "Let this page find my TV" (first visit) and Allow, then "Connect to TV", pick the TV, then Start → Next. Each pattern step should load on the TV and loop.
+- Tap Start, pick the brand, then on the connect screen tap "Let this page find my TV" (first visit) and Allow, then "Connect to TV" and pick the TV. Continue through the chapters; each pattern step should load on the TV and loop.
 - The player shows a title/progress overlay for a few seconds after loading; judge the pattern after it fades.
 - Chromecast with Google TV / Google TV Streamer: set Dynamic range to match content, or the SDR patterns may be shown in HDR.
-- iPhone/iPad (Safari): tap "AirPlay to TV", pick an Apple TV or AirPlay 2 TV, then Start → Next. Each pattern should switch on the TV without reconnecting. Steps without a pattern pause the last one rather than disconnecting, except after the last pattern (Dolby Vision onward), where the video is unloaded so the TV is released. Leaving or closing the page releases it too. Going Back to a pattern step plays it again (or asks to tap AirPlay to TV if the connection ended).
+- iPhone/iPad (Safari): tap "AirPlay to TV", pick an Apple TV or AirPlay 2 TV, then continue. Each pattern should switch on the TV without reconnecting. Steps without a pattern pause the last one rather than disconnecting, except after the last pattern (Dolby Vision onward), where the video is unloaded so the TV is released. Leaving or closing the page releases it too. Going Back to a pattern step plays it again (or asks to tap AirPlay to TV if the connection ended).
 - Apple TV: turn on Match Content → Match Dynamic Range, or the SDR patterns may be shown in HDR.
 
 ## Known limits / next ideas

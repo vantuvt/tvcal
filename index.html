@@ -7,117 +7,197 @@
 <title>TV Picture Setup</title>
 <style>
   :root {
-    --bg: #111113; --panel: #1b1b1f; --panel2: #232329; --line: #2e2e36; --text: #ececf1; --dim: #9a9aa6;
-    --accent: #7db3ff; --accent-ink: #0b1a2e; --ok: #6fd39a; --ok-bg: #12291d; --act-bg: #14243a; --act-line: #23406a;
+    --bg: #111113; --panel: #1b1b1f; --panel2: #232329; --line: #2e2e36; --line2: #3a3a45; --text: #ececf1; --dim: #9a9aa6;
+    --accent: #7db3ff; --accent-ink: #0b1a2e; --ok: #6fd39a; --ok-bg: #12291d; --ok-line: #245a3c;
+    --act-bg: #14243a; --act-line: #23406a; --act-dim: #b9c8de;
+    --warn-bg: #2a2214; --warn-line: #5a4620; --warn: #f0c46a; --warn-text: #f0d9a8;
   }
   * { box-sizing: border-box; }
   html, body { margin: 0; background: var(--bg); color: var(--text);
     font: 17px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; -webkit-text-size-adjust: 100%; }
-  main { max-width: 520px; margin: 0 auto; padding: 12px 16px calc(var(--bar-h, 82px) + 28px); }
-  header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 4px 0 6px; }
-  h1 { font-size: 16px; margin: 0; color: var(--dim); font-weight: 600; }
-  google-cast-launcher { width: 40px; height: 40px; display: inline-block; cursor: pointer;
-    --connected-color: var(--accent); --disconnected-color: var(--text); }
-  .status { font-size: 13px; color: var(--dim); margin: 0 0 12px; display: flex; gap: 8px; align-items: center; }
+  main { max-width: 520px; margin: 0 auto; padding: 8px 16px calc(var(--bar-h, 0px) + 24px); }
+  button { font: inherit; color: inherit; cursor: pointer; touch-action: manipulation; }
+  button:active { transform: scale(.98); }
+
+  /* ---------- Top row: back, chapter progress, all steps, help ---------- */
+  .top { display: flex; align-items: center; gap: 8px; min-height: 52px; margin: 0 -8px 4px; }
+  .icon { flex: none; width: 44px; height: 44px; display: grid; place-items: center; border: none; background: none; padding: 0; border-radius: 12px; }
+  .icon svg { width: 22px; height: 22px; }
+  .where { flex: 1; min-width: 0; }
+  .where-label { font-size: 13px; font-weight: 600; letter-spacing: .5px; text-transform: uppercase; color: var(--dim); }
+  .segs { display: flex; gap: 4px; margin-top: 6px; max-width: 100%; }
+  .segs span { flex: 1; height: 4px; border-radius: 2px; background: var(--line); }
+  .segs span.on { background: var(--accent); }
+  .pill { flex: none; height: 40px; padding: 0 16px; border-radius: 999px; border: 1px solid var(--line); background: var(--panel); font-size: 15px; font-weight: 600; }
+  .app-name { flex: 1; padding-left: 8px; font-size: 15px; font-weight: 600; color: var(--dim); }
+  .chip { display: flex; align-items: center; gap: 8px; min-height: 40px; padding: 6px 14px; border-radius: 999px; border: 1px solid var(--line);
+    background: none; font-size: 14px; color: var(--dim); }
   .dot { width: 8px; height: 8px; border-radius: 50%; background: #555; flex: none; }
   .dot.on { background: var(--ok); }
-  .progress { display: flex; gap: 4px; margin-bottom: 16px; }
-  .progress span { flex: 1; height: 4px; border-radius: 2px; background: var(--line); }
-  .progress span.done { background: var(--accent); }
-  h2 { font-size: 26px; line-height: 1.2; margin: 0 0 6px; }
-  .pos { display: flex; gap: 10px; align-items: flex-start; border-radius: 10px; padding: 9px 12px; margin: 4px 0 12px;
-    background: var(--panel); border: 1px solid var(--line); }
-  .pos svg { flex: none; width: 22px; height: 22px; margin-top: 1px; fill: none; stroke: currentColor; stroke-width: 1.8;
-    stroke-linecap: round; stroke-linejoin: round; color: var(--accent); }
-  .pos b { display: block; font-size: 15px; }
-  .pos span { display: block; font-size: 13px; color: var(--dim); }
-  .pos.close { background: #2a2214; border-color: #5a4620; }
-  .pos.close svg, .pos.close b { color: #f0c46a; }
-  .brand-opt.on { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
-  .link-opt { text-align: left; }
-  .link-opt span { display: block; font-size: 13px; font-weight: 400; opacity: .8; margin-top: 2px; }
-  input.model[type=text] { width: 100%; }
-  .brand-note { font-size: 14px; color: var(--dim); margin: 12px 0 0; }
-  .brand.attn { animation: attn .9s ease-in-out 2; }
-  @keyframes attn { 50% { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(125,179,255,.35); } }
-  h1 .chip { font-size: 13px; margin-left: 8px; color: var(--dim); text-decoration: none; }
-  .lead { color: var(--dim); margin: 0 0 14px; }
+
+  .banner { display: flex; align-items: center; gap: 12px; margin: 4px 0 8px; padding: 10px 12px 10px 14px; border-radius: 12px;
+    background: var(--warn-bg); border: 1px solid var(--warn-line); color: var(--warn-text); font-size: 15px; }
+  .banner span { flex: 1; }
+  .banner button, .stuck button { flex: none; padding: 8px 14px; border-radius: 10px; border: 1px solid var(--warn-line); background: none; color: var(--warn); font-weight: 600; font-size: 15px; }
+
+  /* ---------- Step content ---------- */
+  h2 { font-size: 28px; line-height: 1.2; margin: 0; }
+  h2:focus { outline: none; }
+  .titlerow { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 16px 0 14px; }
+  .poschip { flex: none; display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--dim); }
+  .poschip svg { width: 18px; height: 18px; fill: none; stroke: var(--accent); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  .poschip.close { color: var(--warn); }
+  .poschip.close svg { stroke: var(--warn); }
+  .lead { color: var(--dim); margin: -6px 0 18px; font-size: 16px; }
   figure { margin: 0 0 16px; }
-  figure img { width: 100%; display: block; border-radius: 10px; border: 1px solid var(--line); background: #000; }
-  figcaption { font-size: 14px; color: var(--dim); margin-top: 6px; }
+  figure img { width: 100%; display: block; border-radius: 12px; border: 1px solid var(--line); background: #000; }
+  figcaption { font-size: 14px; color: var(--dim); margin-top: 8px; }
   .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
   .pair figcaption { text-align: center; color: var(--text); }
 
-  .box { border-radius: 14px; padding: 18px; margin-bottom: 12px; }
+  .box { border-radius: 16px; padding: 20px; margin-bottom: 12px; }
   .q { background: var(--panel); border: 1px solid var(--line); }
-  .q .ask { font-size: 21px; line-height: 1.3; font-weight: 600; margin: 0 0 16px; }
+  .q .ask { font-size: 21px; line-height: 1.3; font-weight: 600; margin: 0 0 18px; }
   .answers { display: grid; gap: 10px; }
   .answers.two { grid-template-columns: 1fr 1fr; }
-  .act { background: var(--act-bg); border: 1px solid var(--act-line); }
-  .act .label { font-size: 13px; text-transform: uppercase; letter-spacing: 1px; color: var(--accent); margin-bottom: 4px; }
-  .act .do { font-size: 21px; line-height: 1.3; font-weight: 600; margin: 0 0 6px; }
-  .act .sub { color: var(--dim); font-size: 15px; margin: 0 0 16px; }
-  .ok { background: var(--ok-bg); border: 1px solid #245a3c; }
-  .ok .do { font-size: 21px; font-weight: 600; margin: 0 0 4px; color: var(--ok); }
-  .ok p { margin: 0; color: var(--text); }
+  .answers button, .brands button { padding: 16px 10px; border-radius: 14px; border: 1px solid var(--line2); background: var(--panel2); font-weight: 600; font-size: 17px; }
+  .act { background: var(--act-bg); border: 1px solid var(--act-line); display: grid; gap: 16px; }
+  .act .label { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--accent); }
+  .act .doing { display: flex; align-items: center; gap: 16px; }
+  .act .key { flex: none; width: 68px; height: 68px; border-radius: 50%; border: 2px solid var(--accent); display: grid; place-items: center; }
+  .act .key svg { width: 30px; height: 30px; fill: none; stroke: var(--accent); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+  .act .do { font-size: 22px; line-height: 1.25; font-weight: 600; margin: 0; }
+  .act .sub { color: var(--act-dim); font-size: 15px; margin: 0; }
+  .stuck { display: flex; align-items: center; gap: 10px; margin: 0 0 12px; padding: 10px 12px 10px 14px; border-radius: 12px;
+    background: var(--warn-bg); border: 1px solid var(--warn-line); color: var(--warn-text); font-size: 15px; }
+  .stuck span { flex: 1; }
+  .skiprow { text-align: center; margin-top: 8px; }
+  .linkish { background: none; border: none; color: var(--accent); padding: 10px 4px; font-weight: 500; font-size: 15px; text-decoration: underline; }
+  .skiprow .linkish { color: var(--dim); }
 
-  button { font: inherit; border-radius: 12px; padding: 15px 16px; border: 1px solid var(--line);
-    background: var(--panel2); color: var(--text); cursor: pointer; font-weight: 600; touch-action: manipulation; }
-  button:active { transform: scale(.98); }
-  button.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
-  button.wide { width: 100%; }
-  .linkish { background: none; border: none; color: var(--accent); padding: 4px 0; font-weight: 500; font-size: 15px; text-decoration: underline; }
+  .fin { min-height: calc(100vh - 260px); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 16px; padding: 24px 12px; }
+  .fin .badge { width: 84px; height: 84px; border-radius: 50%; display: grid; place-items: center; border: 2px solid var(--accent); background: var(--act-bg); }
+  .fin .badge.good { border-color: var(--ok); background: var(--ok-bg); }
+  .fin .badge svg { width: 40px; height: 40px; fill: none; stroke: var(--accent); stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+  .fin .badge.good svg { stroke: var(--ok); }
+  .fin h3 { font-size: 26px; line-height: 1.2; margin: 0; }
+  .fin p { margin: 0; color: var(--dim); font-size: 17px; }
+  .fin .step-name { font-size: 13px; font-weight: 600; letter-spacing: .5px; text-transform: uppercase; color: var(--dim); }
 
-  details { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 0 16px; margin-bottom: 10px; }
-  summary { padding: 14px 0; cursor: pointer; font-size: 15px; color: var(--text); list-style: none; display: flex; justify-content: space-between; }
-  summary::-webkit-details-marker { display: none; }
-  summary::after { content: "+"; color: var(--dim); font-size: 20px; line-height: 1; }
-  details[open] summary::after { content: "–"; }
-  details .inner { padding-bottom: 14px; font-size: 15px; color: var(--dim); }
-  details .inner p { margin: 0 0 8px; }
-  details b, .tip b { color: var(--text); }
-  .tip { background: #2a2214; border: 1px solid #5a4620; color: #f0d9a8; border-radius: 12px; padding: 12px 14px; font-size: 15px; margin-bottom: 12px; }
+  .brands { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .brands button.on { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  .brands.attn { animation: attn .9s ease-in-out 2; border-radius: 16px; }
+  @keyframes attn { 50% { box-shadow: 0 0 0 3px rgba(125,179,255,.45); } }
+  .note { font-size: 14px; color: var(--dim); margin: 14px 0 0; }
 
-  .check { list-style: none; padding: 0; margin: 0 0 14px; }
-  .check li { display: flex; gap: 12px; align-items: flex-start; background: var(--panel); border: 1px solid var(--line);
-    border-radius: 12px; padding: 14px; margin-bottom: 8px; cursor: pointer; }
-  .check li .tick { flex: none; width: 26px; height: 26px; border-radius: 50%; border: 2px solid var(--dim); display: grid; place-items: center; margin-top: 1px; }
-  .check li.on .tick { background: var(--ok); border-color: var(--ok); }
-  .check li.on .tick::after { content: ""; width: 10px; height: 6px; border-left: 3px solid #0d2418; border-bottom: 3px solid #0d2418; transform: rotate(-45deg) translate(1px, -1px); }
-  .check .t { font-weight: 600; }
-  .check .d { font-size: 14px; color: var(--dim); }
-  .check li.sect { background: none; border: none; padding: 14px 2px 2px; margin: 0; cursor: default;
-    font-size: 13px; text-transform: uppercase; letter-spacing: 1px; color: var(--dim); }
+  .cards { display: grid; gap: 10px; }
+  .card { display: flex; gap: 14px; align-items: flex-start; background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 16px; }
+  .card svg { flex: none; width: 28px; height: 28px; fill: none; stroke: var(--accent); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  .tipline { font-size: 14px; color: var(--dim); margin: 16px 0 0; }
+  .okline { display: flex; gap: 10px; align-items: center; margin: 0 0 14px; color: var(--ok); font-size: 15px; }
 
-  label.rec { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 14px; font-size: 15px; }
-  input[type=text] { width: 120px; background: var(--bg); border: 1px solid var(--line); color: var(--text);
+  .conn { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 18px; }
+  .conn .detected { margin: 0 0 14px; font-size: 15px; color: var(--dim); }
+  .conn .detected b { color: var(--text); }
+  .conn > .linkish { display: block; margin: 8px auto 0; }
+
+  .check { list-style: none; padding: 0; margin: 0 0 12px; }
+  .check li { margin-bottom: 8px; }
+  .check li.sect { padding: 14px 2px 2px; margin: 0; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; color: var(--dim); }
+  .check button { width: 100%; text-align: left; display: flex; gap: 14px; align-items: flex-start; background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 15px; }
+  .check button[aria-pressed=true] { background: var(--ok-bg); border-color: var(--ok-line); }
+  .check .tick { flex: none; width: 26px; height: 26px; border-radius: 50%; border: 2px solid var(--dim); display: grid; place-items: center; margin-top: 1px; }
+  .check [aria-pressed=true] .tick { background: var(--ok); border-color: var(--ok); }
+  .check [aria-pressed=true] .tick::after { content: ""; width: 10px; height: 6px; border-left: 3px solid #0d2418; border-bottom: 3px solid #0d2418; transform: rotate(-45deg) translate(1px, -1px); }
+  .check .t { display: block; font-weight: 600; }
+  .check .d { display: block; font-size: 14px; color: var(--dim); }
+  details.also { border: 1px dashed var(--line2); border-radius: 14px; padding: 0 14px; margin-bottom: 12px; }
+  details.also > summary { padding: 14px 0; cursor: pointer; font-size: 15px; list-style: none; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+  details.also > summary > span { flex: 1; color: var(--text); }
+  details.also > summary > span span { color: var(--dim); }
+  details.also > summary span { color: var(--dim); }
+  details.also > summary::-webkit-details-marker { display: none; }
+  details.also > summary::after { content: "+"; color: var(--dim); font-size: 20px; line-height: 1; }
+  details.also[open] > summary::after { content: "–"; }
+
+  /* ---------- Hub ---------- */
+  .chapters { display: grid; gap: 10px; margin-bottom: 10px; }
+  .chap { width: 100%; text-align: left; display: flex; align-items: center; gap: 14px; background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 16px; }
+  .chap.cur { background: var(--act-bg); border: 2px solid var(--accent); padding: 15px; }
+  .chap.opt:not(.done):not(.cur) { background: none; border-style: dashed; border-color: var(--line2); }
+  .chap .num { flex: none; width: 32px; height: 32px; border-radius: 50%; border: 2px solid #4a4a56; color: var(--dim); display: grid; place-items: center; font-weight: 700; font-size: 15px; }
+  .chap.cur .num { border-color: var(--accent); color: var(--accent); }
+  .chap.done .num { background: var(--ok); border-color: var(--ok); }
+  .chap.done .num svg { width: 16px; height: 16px; fill: none; stroke: #0d2418; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+  .chap .txt { flex: 1; min-width: 0; }
+  .chap .txt b { display: block; font-size: 17px; }
+  .chap .txt b i { font-style: normal; font-size: 13px; font-weight: 500; color: var(--dim); margin-left: 4px; }
+  .chap .txt span { display: block; font-size: 14px; color: var(--dim); }
+  .chap.cur .txt span { color: var(--act-dim); }
+  .chap .right { flex: none; font-size: 13px; font-weight: 600; color: var(--accent); }
+  .chap.mini { padding: 12px 16px; }
+  .chap.mini .num { width: 28px; height: 28px; border-width: 0; }
+  .chap.mini .num svg { width: 22px; height: 22px; fill: none; stroke: var(--dim); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  .sect-h { font-size: 15px; margin: 26px 0 4px; }
+  .sect-h span { font-weight: 400; color: var(--dim); }
+  .settings { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 2px 16px; margin: 10px 0 12px; }
+  .settings label { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--line); font-size: 15px; }
+  .settings label:last-child { border-bottom: none; }
+  input[type=text] { width: 140px; background: var(--bg); border: 1px solid var(--line); color: var(--text);
     border-radius: 8px; padding: 9px 10px; font: inherit; font-size: 16px; }
-  table { width: 100%; border-collapse: collapse; margin-bottom: 14px; }
-  td { padding: 10px 0; border-bottom: 1px solid var(--line); }
-  td:last-child { text-align: right; color: var(--dim); }
+  input::placeholder { color: #6e6e7a; }
 
-  /* Fixed bottom bar: solid panel with a divider and shadow so it reads as
-     separate from the scrolling content above it. */
-  .bar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 5; background: #1c1c22;
-    border-top: 1px solid #3a3a45; box-shadow: 0 -10px 28px rgba(0,0,0,.55);
-    padding: 12px 16px calc(12px + env(safe-area-inset-bottom)); }
-  /* "More below" hint: a fade over the content plus a small pill, shown only
-     when there is more to scroll to. */
-  .more { position: fixed; left: 0; right: 0; bottom: var(--bar-h, 82px); z-index: 4; height: 64px;
+  /* ---------- Bottom bar ---------- */
+  .bar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 5; background: #16161a;
+    border-top: 1px solid var(--line); padding: 12px 16px calc(16px + env(safe-area-inset-bottom)); }
+  .bar .inner { max-width: 520px; margin: 0 auto; display: grid; gap: 6px; }
+  .bar button { width: 100%; padding: 16px; border-radius: 14px; font-weight: 600; font-size: 17px; border: 1px solid #4a4a56; background: var(--panel2); }
+  .bar button.primary, button.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  .bar .hint { font-size: 13px; color: var(--dim); text-align: center; }
+  .more { position: fixed; left: 0; right: 0; bottom: var(--bar-h, 0px); z-index: 4; height: 64px;
     pointer-events: none; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 10px;
-    background: linear-gradient(rgba(17,17,19,0), rgba(17,17,19,.92));
-    opacity: 0; transition: opacity .2s; }
+    background: linear-gradient(rgba(17,17,19,0), rgba(17,17,19,.92)); opacity: 0; transition: opacity .2s; }
   .more.show { opacity: 1; }
   .more button { pointer-events: auto; font-size: 13px; font-weight: 600; padding: 6px 12px 6px 14px; border-radius: 999px;
-    background: var(--panel2); color: var(--text); border: 1px solid var(--line); display: flex; gap: 6px; align-items: center; }
-  .more.show button { animation: nudge 1.6s ease-in-out 2; }
-  @keyframes nudge { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(3px); } }
-  @media (prefers-reduced-motion: reduce) { .more.show button { animation: none; } }
-  .bar .inner { max-width: 520px; margin: 0 auto; display: flex; gap: 10px; }
-  .bar button { flex: 1 1 0; min-width: 0; }
-  /* Skip is a real, enabled action: same weight as Back, with a visible border. */
-  .bar #next.skip { background: var(--panel2); color: var(--text); border-color: #4a4a56; }
+    background: var(--panel2); border: 1px solid var(--line); display: flex; gap: 6px; align-items: center; }
 
+  /* ---------- Bottom sheet (Help, and the TV connection) ---------- */
+  .sheet { width: 100%; max-width: 520px; max-height: 88vh; margin: auto auto 0; padding: 0; border: none; border-top: 1px solid var(--line2);
+    border-radius: 22px 22px 0 0; background: #1c1c22; color: var(--text); box-shadow: 0 -12px 32px rgba(0,0,0,.6); }
+  .sheet::backdrop { background: rgba(0,0,0,.6); }
+  .sheet-inner { padding: 10px 20px calc(20px + env(safe-area-inset-bottom)); }
+  .grab { width: 40px; height: 5px; border-radius: 3px; background: #4a4a56; margin: 0 auto 6px; }
+  .sheet-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .sheet-head h2 { font-size: 20px; }
+  .sheet-head .icon { margin-right: -10px; }
+  .tabs { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 4px; background: var(--bg); border-radius: 12px; padding: 4px; margin: 10px 0 16px; }
+  .tabs button { border: none; background: none; border-radius: 9px; padding: 10px 4px; font-size: 14px; font-weight: 600; color: var(--dim); }
+  .tabs button[aria-selected=true] { background: var(--line); color: var(--text); }
+  .help { font-size: 16px; color: var(--dim); }
+  .help p { margin: 0 0 12px; }
+  .help b, .help h3 { color: var(--text); }
+  .help h3 { font-size: 16px; margin: 18px 0 8px; }
+  .help .say { color: var(--text); }
+  .sheet-foot { display: grid; gap: 10px; margin-top: 18px; }
+  .sheet-foot button { width: 100%; padding: 14px; border-radius: 14px; font-weight: 600; font-size: 16px; border: 1px solid #4a4a56; background: var(--panel2); }
+  .sheet-foot button.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+
+  /* The TV connection controls: one element, moved between the connect
+     step and the TV sheet, and parked out of sight otherwise. */
+  #parking { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+  .status { font-size: 14px; color: var(--dim); margin: 0 0 12px; display: flex; gap: 8px; align-items: center; }
+  .status span:nth-child(2) { flex: 1; }
+  google-cast-launcher { width: 36px; height: 36px; display: inline-block; cursor: pointer; flex: none;
+    --connected-color: var(--accent); --disconnected-color: var(--text); }
+  #connectPanel button.wide { width: 100%; padding: 15px 16px; border-radius: 14px; border: 1px solid var(--line2); background: var(--panel2); font-weight: 600; }
+  #connectPanel details { border: 1px solid var(--line); border-radius: 12px; padding: 0 14px; margin-top: 12px; }
+  #connectPanel summary { padding: 12px 0; cursor: pointer; font-size: 15px; list-style: none; display: flex; justify-content: space-between; }
+  #connectPanel summary::-webkit-details-marker { display: none; }
+  #connectPanel summary::after { content: "+"; color: var(--dim); font-size: 20px; line-height: 1; }
+  #connectPanel details[open] summary::after { content: "–"; }
+  #connectPanel details .inner { padding-bottom: 12px; font-size: 15px; color: var(--dim); }
+  #connectPanel details .inner p { margin: 0 0 8px; }
+  #connectPanel details b { color: var(--text); }
   .air { display: flex; gap: 12px; align-items: center; }
   .air video { flex: none; width: 96px; aspect-ratio: 16 / 9; border-radius: 8px; background: #000; border: 1px solid var(--line); }
   .air > div { flex: 1; min-width: 0; }
@@ -125,30 +205,36 @@
 
   #localView { position: fixed; inset: 0; background: #000; display: none; z-index: 10; }
   #localView video { width: 100%; height: 100%; object-fit: contain; }
-  #localView button { position: absolute; top: 12px; right: 12px; opacity: .7; }
+  #localView button { position: absolute; top: 12px; right: 12px; opacity: .8; padding: 10px 16px; border-radius: 12px; border: 1px solid var(--line2); background: var(--panel2); font-weight: 600; }
+  @media (prefers-reduced-motion: reduce) { .brands.attn { animation: none; } }
 </style>
 </head>
 <body>
 <main>
-  <header>
-    <h1>TV Picture Setup <button id="brandChip" class="linkish chip" style="display:none"></button></h1>
-    <google-cast-launcher title="Cast to your TV"></google-cast-launcher>
-  </header>
-  <div class="status"><span class="dot" id="dot"></span><span id="statusText">Choose how you’ll connect to the TV below.</span></div>
+  <div id="top"></div>
+  <div id="banner"></div>
+  <section id="card"></section>
+</main>
+
+<div class="more" id="more" aria-hidden="true"><button id="moreBtn" tabindex="-1">More below <span aria-hidden="true">↓</span></button></div>
+<div class="bar" id="bar"><div class="inner" id="barInner"></div></div>
+
+<div id="parking"><div id="connectPanel">
+  <div class="status"><span class="dot" id="dot"></span><span id="statusText"></span><google-cast-launcher title="Cast to your TV"></google-cast-launcher></div>
   <div id="castUI" style="display:none">
-  <button id="connect" class="wide" style="margin:-4px 0 14px">Connect to TV</button>
-  <div id="lnaBox" style="display:none;margin:-4px 0 14px">
-    <button id="lnaBtn" class="wide">Let this page find my TV</button>
-    <div id="lnaStatus" style="font-size:13px;color:var(--dim);margin-top:6px"></div>
+    <button id="connect" class="wide">Connect to TV</button>
+    <div id="lnaBox" style="display:none;margin-top:12px">
+      <button id="lnaBtn" class="wide">Let this page find my TV</button>
+      <div id="lnaStatus" style="font-size:13px;color:var(--dim);margin-top:6px"></div>
+    </div>
+    <details id="castHelp" style="display:none"><summary>TV not found?</summary><div class="inner">
+      <p>Chrome must allow this site to <b>find devices on your local network</b>. Use the button above, or tap the icon left of the web address → Site settings → Local network access → Allow.</p>
+      <p>Make sure the phone and the Chromecast are on the <b>same Wi-Fi network</b> (not a guest network, and not mobile data).</p>
+      <p>On Android 12 or later, Chrome needs the <b>Nearby devices</b> permission: Settings → Apps → Chrome → Permissions → Nearby devices → Allow. Then reload this page.</p>
+      <p>Check that casting works at all: open the YouTube app and look for its Cast icon. If YouTube can’t find the TV either, the issue is the network or the Chromecast, not this page.</p>
+    </div></details>
   </div>
-  <details id="castHelp" style="display:none"><summary>TV not found?</summary><div class="inner">
-    <p>Chrome must allow this site to <b>find devices on your local network</b>. Use the button above, or tap the icon left of the web address → Site settings → Local network access → Allow.</p>
-    <p>Make sure the phone and the Chromecast are on the <b>same Wi-Fi network</b> (not a guest network, and not mobile data).</p>
-    <p>On Android 12 or later, Chrome needs the <b>Nearby devices</b> permission: Settings → Apps → Chrome → Permissions → Nearby devices → Allow. Then reload this page.</p>
-    <p>Check that casting works at all: open the YouTube app and look for its Cast icon. If YouTube can’t find the TV either, the issue is the network or the Chromecast, not this page.</p>
-  </div></details>
-  </div>
-  <div id="airBox" style="display:none;margin:-4px 0 14px">
+  <div id="airBox" style="display:none">
     <div class="air">
       <video id="airVideo" loop playsinline x-webkit-airplay="allow" preload="metadata"></video>
       <div>
@@ -156,22 +242,21 @@
         <div id="airNote" class="air-note"></div>
       </div>
     </div>
-    <details id="airHelp" style="display:none;margin:10px 0 0"><summary>Connected, but nothing on the TV?</summary><div class="inner">
+    <details id="airHelp" style="display:none"><summary>Connected, but nothing on the TV?</summary><div class="inner">
       <p>Use the <b>AirPlay to TV</b> button on this page, not Screen Mirroring in Control Center.</p>
       <p>Tap <b>Change AirPlay TV</b>, choose <b>iPhone</b>, then tap <b>AirPlay to TV</b> and choose the TV again.</p>
       <p>On the TV, check that AirPlay is turned on and allows this phone (often Settings → System → AirPlay, or Apple AirPlay and HomeKit settings).</p>
       <p>Still nothing? Reload this page in Safari and try once more.</p>
     </div></details>
   </div>
-  <div class="progress" id="progress"></div>
-  <section id="card"></section>
-</main>
-
-<div class="more" id="more" aria-hidden="true"><button id="moreBtn" tabindex="-1">More below <span aria-hidden="true">↓</span></button></div>
-<div class="bar" id="bar"><div class="inner">
-  <button id="back">Back</button>
-  <button class="primary" id="next">Next</button>
 </div></div>
+
+<dialog class="sheet" id="sheet" aria-labelledby="sheetTitle"><div class="sheet-inner">
+  <div class="grab" aria-hidden="true"></div>
+  <div class="sheet-head"><h2 id="sheetTitle"></h2>
+    <button class="icon" data-act="close" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+  <div id="sheetBody"></div>
+</div></dialog>
 
 <div id="localView"><video id="localVideo" muted loop playsinline></video><button id="closeLocal">Close</button></div>
 
@@ -543,21 +628,26 @@ BRANDS.hisense = brandFrom({
 });
 
 const STEPS = [
+  /* The hub is the home screen: chapter cards, plus the settings summary. */
+  { id: 'hub', title: 'TV Picture Setup', pattern: null, hub: true },
+  { id: 'brand', chapter: 'setup', title: 'What brand is your TV?', pattern: null, brandPick: true,
+    lead: 'So the steps use your TV’s menu names.' },
+  { id: 'connect', chapter: 'setup', title: 'Show the test patterns on your TV', pattern: null, connect: true,
+    lead: 'Your phone and the TV need to be on the same Wi-Fi.' },
   {
-    id: 'start', title: 'Let’s set up your TV picture', pattern: null,
+    id: 'start', chapter: 'setup', title: 'Get ready', pattern: null,
     lead: 'About 10 minutes. You’ll answer simple questions about what you see, and change settings with your TV remote.',
+    /* items[0] is the software-update advice, shown as a one-line tip; the
+       other two are shown as cards. Brands override all three. */
     items: [
       'Update your TV’s software first (usually Settings → System or Support → Software update). Updates can change picture processing or reset settings, so do it before you start.',
       'Turn the lights down to how you normally watch.',
       'Open your TV’s picture settings menu with the remote. You’ll use it throughout.'
-    ],
-    after: `<details><summary>Can’t connect to the TV?</summary><div class="inner">
-        <p>You can still follow along and <button class="linkish" data-local>see each pattern on this phone</button>, but the TV steps need the pattern shown on the TV.</p>
-      </div></details>`
+    ]
   },
   {
-    id: 'mode', pos: 'any', title: 'Quick settings first', pattern: null, record: 'Picture mode',
-    lead: 'These make the biggest difference. Tap each one when it’s done.',
+    id: 'mode', chapter: 'basics', pos: 'any', title: 'Quick settings first', pattern: null, record: 'Picture mode',
+    lead: 'These three make the biggest difference. Tap each one when it’s done.',
     checklist: [
       ['Picture mode: Filmmaker, Movie or Cinema', 'If you have Filmmaker Mode, use it. Otherwise Movie, Cinema or Calibrated.'],
       ['Motion smoothing: Off', 'Also called TruMotion, Auto Motion Plus, MotionFlow or Motion Interpolation.'],
@@ -571,20 +661,7 @@ const STEPS = [
       <p>Usually Settings → <b>Picture</b>, then <b>Expert</b> or <b>Advanced</b> settings. Make the changes on the HDMI input the Chromecast is plugged into; most TVs remember settings per input.</p></div></details>`
   },
   {
-    id: 'temp', pos: 'seat', title: 'Colour temperature', pattern: '06-temp', record: 'Colour temperature', ph: 'Warm 2',
-    lead: 'Switch between the colour temperature options while watching the TV. The white and grey areas show the difference most clearly: cooler options look bluish, warmer ones look yellowish.',
-    caption: 'The TV is showing white, greys, skin tones, foliage and sky.',
-    where: `<p>Usually Picture → Expert or Advanced settings → <b>Colour temperature</b> (sometimes <b>Colour tone</b> or <b>White balance</b>). Options are often Cool, Standard, Warm 1 and Warm 2; LG uses a scale up to Warm 50, and Sony uses Expert 1 and Expert 2.</p>`,
-    flow: {
-      start: 'set',
-      set: { do: 'Start with the warmest option', sub: 'Warm 2 on most TVs, Warm 50 on LG, Expert 1 on Sony. Flick back and forth to the other options to see the difference on the white and greys, then come back to it.', then: 'q' },
-      q: { ask: 'Give your eyes 30 seconds to adjust. Do the white and grey areas still look clearly yellow or orange?', answers: [['No, they look neutral', 'ok'], ['Yes, still yellow', 'cooler']] },
-      cooler: { do: 'Go one step cooler', sub: 'For example Warm 1 instead of Warm 2. Then wait a moment and look again.', then: 'q' },
-      ok: { do: 'Colour temperature is set.', text: 'Skin tones should look natural, not pink or orange.' }
-    }
-  },
-  {
-    id: 'fit', pos: 'seat', title: 'Fit to screen', pattern: '01-fit', record: 'Picture size', ph: 'Just Scan',
+    id: 'fit', chapter: 'basics', pos: 'seat', title: 'Fit to screen', pattern: '01-fit', record: 'Picture size', ph: 'Just Scan',
     lead: 'Look at the edges of your TV.',
     caption: 'There’s a thin white border around the very edge, with arrows in each corner.',
     flow: {
@@ -596,7 +673,7 @@ const STEPS = [
     }
   },
   {
-    id: 'brightness', pos: 'seat', title: 'Brightness', pattern: '02-brightness', record: 'Brightness',
+    id: 'brightness', chapter: 'basics', pos: 'seat', title: 'Brightness', pattern: '02-brightness', record: 'Brightness',
     lead: 'This makes dark scenes look right: true black, with shadow detail still visible.',
     caption: 'Look inside the grey frames. When it’s right, box A is completely gone and box B is a very faint grey square. (Brightened here so you can see it.)',
     where: `<p>Use the setting called <b>Brightness</b>. On some TVs, Brightness changes the backlight (the whole screen gets lighter or dimmer but the boxes don’t change). If so, use <b>Black level</b> or <b>Shadow detail</b> instead.</p>`,
@@ -612,7 +689,7 @@ const STEPS = [
     }
   },
   {
-    id: 'contrast', pos: 'seat', title: 'Contrast', pattern: '03-contrast', record: 'Contrast',
+    id: 'contrast', chapter: 'basics', pos: 'seat', title: 'Contrast', pattern: '03-contrast', record: 'Contrast',
     lead: 'This makes bright scenes look right, without losing detail in clouds, snow or white shirts.',
     caption: 'When it’s right, you can see all three boxes. A is easy, B is lighter, C is very faint. (Darkened here so you can see them.)',
     where: `<p>Use the setting called <b>Contrast</b>. Don’t confuse it with <b>Dynamic contrast</b> or <b>Contrast enhancer</b>, which should be off.</p>`,
@@ -625,7 +702,7 @@ const STEPS = [
     }
   },
   {
-    id: 'sharpness', pos: 'close', title: 'Sharpness', pattern: '04-sharpness', record: 'Sharpness',
+    id: 'sharpness', chapter: 'fine', pos: 'close', title: 'Sharpness', pattern: '04-sharpness', record: 'Sharpness',
     lead: 'Most TVs add fake outlines to make the picture look crisper. Here’s the difference:',
     compare: true,
     where: `<p>Use the setting called <b>Sharpness</b>. Also turn off <b>Edge enhancement</b>, <b>Super resolution</b> or <b>Reality creation</b> if you have them.</p>
@@ -638,7 +715,20 @@ const STEPS = [
     }
   },
   {
-    id: 'final', pos: 'seat', title: 'Final check', pattern: '05-final',
+    id: 'temp', chapter: 'fine', pos: 'seat', title: 'Colour temperature', pattern: '06-temp', record: 'Colour temperature', ph: 'Warm 2',
+    lead: 'Switch between the colour temperature options while watching the TV. The white and grey areas show the difference most clearly: cooler options look bluish, warmer ones look yellowish.',
+    caption: 'The TV is showing white, greys, skin tones, foliage and sky.',
+    where: `<p>Usually Picture → Expert or Advanced settings → <b>Colour temperature</b> (sometimes <b>Colour tone</b> or <b>White balance</b>). Options are often Cool, Standard, Warm 1 and Warm 2; LG uses a scale up to Warm 50, and Sony uses Expert 1 and Expert 2.</p>`,
+    flow: {
+      start: 'set',
+      set: { do: 'Start with the warmest option', sub: 'Warm 2 on most TVs, Warm 50 on LG, Expert 1 on Sony. Flick back and forth to the other options to see the difference on the white and greys, then come back to it.', then: 'q' },
+      q: { ask: 'Give your eyes 30 seconds to adjust. Do the white and grey areas still look clearly yellow or orange?', answers: [['No, they look neutral', 'ok'], ['Yes, still yellow', 'cooler']] },
+      cooler: { do: 'Go one step cooler', sub: 'For example Warm 1 instead of Warm 2. Then wait a moment and look again.', then: 'q' },
+      ok: { do: 'Colour temperature is set.', text: 'Skin tones should look natural, not pink or orange.' }
+    }
+  },
+  {
+    id: 'final', chapter: 'fine', pos: 'seat', title: 'Final check', pattern: '05-final',
     lead: 'Look at the row of grey squares at the top.',
     caption: 'The squares go from dark grey to white. Each should look plain grey, with no colour.',
     flow: {
@@ -650,16 +740,16 @@ const STEPS = [
     }
   },
   {
-    id: 'hdr', title: 'HDR (optional)', pattern: null,
+    id: 'hdr', chapter: 'hdr', title: 'HDR (optional)', pattern: null,
     lead: 'Movies and shows in HDR or Dolby Vision use separate picture settings on most TVs. This checks them in a few minutes.',
     flow: {
       start: 'q',
-      q: { ask: 'Do you watch HDR content? For example 4K HDR or Dolby Vision on Netflix, Disney+, Prime Video or Apple TV.', answers: [['Yes', 'ok'], ['Not sure', 'ok'], ['No, skip HDR', '@extras']] },
+      q: { ask: 'Do you watch HDR content? For example 4K HDR or Dolby Vision on Netflix, Disney+, Prime Video or Apple TV.', answers: [['Yes', 'ok'], ['Not sure', 'ok'], ['No, skip HDR', '@hub']] },
       ok: { do: 'Let’s check HDR.', text: 'Tap Next. The TV will switch into HDR for the next few patterns.' }
     }
   },
   {
-    id: 'hdrmode', pos: 'any', title: 'Is HDR on?', pattern: 'h1-black', record: 'HDR picture mode', ph: 'HDR Filmmaker',
+    id: 'hdrmode', chapter: 'hdr', pos: 'any', title: 'Is HDR on?', pattern: 'h1-black', record: 'HDR picture mode', ph: 'HDR Filmmaker',
     lead: 'Look at the TV just after the pattern starts.',
     caption: 'This is the next pattern. First, check the TV switched into HDR.',
     where: `<p>Press the <b>Info</b> or <b>Settings</b> button while the pattern plays: the picture mode name usually shows “HDR” (for example HDR Filmmaker, HDR Movie or HDR Cinema).</p>`,
@@ -674,7 +764,7 @@ const STEPS = [
     }
   },
   {
-    id: 'hdrbright', pos: 'seat', title: 'HDR brightness', pattern: 'h1-black', record: 'HDR brightness',
+    id: 'hdrbright', chapter: 'hdr', pos: 'seat', title: 'HDR brightness', pattern: 'h1-black', record: 'HDR brightness',
     lead: 'Same as before, but for HDR. Most TVs keep a separate Brightness setting for HDR.',
     caption: 'Look inside the grey frames. When it’s right, box A is gone and box B is a very faint grey square. (Brightened here so you can see it.)',
     where: `<p>Use <b>Brightness</b> (or <b>Black level</b> / <b>Shadow detail</b>) while HDR is playing. Changes here usually only affect HDR.</p>`,
@@ -690,7 +780,7 @@ const STEPS = [
     }
   },
   {
-    id: 'hdrhigh', pos: 'seat', title: 'HDR highlights', pattern: 'h2-highlights', record: 'HDR tone mapping', ph: 'On',
+    id: 'hdrhigh', chapter: 'hdr', pos: 'seat', title: 'HDR highlights', pattern: 'h2-highlights', record: 'HDR tone mapping', ph: 'On',
     lead: 'Four bright boxes, from bright (A) to very bright (D). Most TVs can’t reach the brightest levels, so they compress them. This checks they do it gracefully.',
     caption: 'When it’s right, you can tell all four boxes apart, each a little brighter than the last.',
     where: `<p>Look for <b>Dynamic Tone Mapping</b>, <b>HDR Tone Mapping</b>, <b>Dynamic HDR</b> or <b>HDR Brightness</b> in the picture menu. Names vary a lot by brand.</p>
@@ -705,7 +795,7 @@ const STEPS = [
     }
   },
   {
-    id: 'hdrfinal', pos: 'seat', title: 'HDR final check', pattern: 'h3-steps',
+    id: 'hdrfinal', chapter: 'hdr', pos: 'seat', title: 'HDR final check', pattern: 'h3-steps',
     lead: 'A row of grey bars, from nearly black on the left to very bright on the right.',
     caption: 'Each bar should be a little brighter than the one before.',
     flow: {
@@ -721,7 +811,7 @@ const STEPS = [
      encoder, so this is a guidance step with no pattern: pick the accurate mode,
      keep the defaults, and only fix black level if dark areas look grey. */
   {
-    id: 'dv', pos: 'any', title: 'Dolby Vision (optional)', pattern: null, record: 'Dolby Vision picture mode', ph: 'Dolby Vision Dark',
+    id: 'dv', chapter: 'hdr', pos: 'any', title: 'Dolby Vision (optional)', pattern: null, record: 'Dolby Vision picture mode', ph: 'Dolby Vision Dark',
     lead: 'Dolby Vision adjusts the picture to your TV scene by scene, so there’s no pattern to tune. A few settings still matter, and most TVs keep them separate from the HDR ones you just set.',
     flow: {
       start: 'q',
@@ -741,7 +831,7 @@ const STEPS = [
     }
   },
   {
-    id: 'extras', pos: 'any', title: 'Your devices and room (optional)', pattern: null,
+    id: 'extras', chapter: 'tips', pos: 'any', title: 'Your devices and room (optional)', pattern: null,
     lead: 'A few things outside the picture menu that also make a difference. Tap the ones you’ve done, and skip any that don’t apply.',
     checklist: [
       ['#', 'Your devices'],
@@ -758,21 +848,45 @@ const STEPS = [
       ['Bias lighting (optional)', 'A dim, neutral-white light behind the TV (6500 K, about a tenth as bright as the screen) makes blacks look deeper and eases eye strain in a dark room.'],
       ['Seating', 'Eyes level with about the middle of the screen, sitting straight on. LCD colour and contrast fade when viewed from an angle.'],
     ]
-  },
-  { id: 'done', title: 'Your settings', pattern: null, summary: true,
-    lead: 'Take a screenshot or copy these. If you also watch through another input (like a game console), set the same values there.' }
+  }
 ];
 
 const store = {
   get(k) { try { return JSON.parse(localStorage.getItem('tvcal2.' + k)); } catch (e) { return null; } },
   set(k, v) { try { localStorage.setItem('tvcal2.' + k, JSON.stringify(v)); } catch (e) {} }
 };
-let idx = Math.min(store.get('step') || 0, STEPS.length - 1);
-let brand = store.get('brand');   // 'tcl', 'other', or null (not chosen yet)
-function brandInfo() { return BRANDS[brand] || null; }
-let link = store.get('link');     // 'cast', 'airplay', or null (not chosen yet)
-if (!link) idx = 0;   // the connection is chosen on the start screen
+
+/* ---------- Chapters ----------
+   Steps are grouped into chapters. The hub (home screen) lists them; inside a
+   chapter the top row shows "Basics · 3 of 4". Steps and chapters remember
+   whether they were done or skipped. */
+const CHAPTERS = {
+  setup:  { name: 'Setup', desc: 'Your TV and how to connect' },
+  basics: { name: 'Basics', desc: 'Picture mode, fit, brightness, contrast' },
+  fine:   { name: 'Fine-tune', desc: 'Sharpness, colour temperature, grey check' },
+  hdr:    { name: 'HDR', desc: 'For 4K HDR and Dolby Vision shows', optional: true },
+  tips:   { name: 'Devices and room', desc: 'Tips outside the picture menu', optional: true }
+};
+const MAIN_CHAPTERS = ['setup', 'basics', 'fine', 'hdr'];
+// Short names for "Next: …" buttons, where the step title is a sentence.
+const SHORT = { connect: 'Connect to TV', start: 'Get ready', mode: 'Quick settings', hdr: 'HDR', dv: 'Dolby Vision', extras: 'Devices and room' };
+// Steps without a test pattern of their own that still show one on the TV, so it's clear the TV is connected.
+const TV_PATTERN = { connect: '01-fit', start: '01-fit' };
+
+function ID(id) { return STEPS.findIndex(x => x.id === id); }
+const HUB = ID('hub');
 const IOS = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+// Safari (iPhone, iPad, Mac) can AirPlay a video; everything else uses Cast from Chrome.
+const SAFARI_AIRPLAY = !!window.WebKitPlaybackTargetAvailabilityEvent;
+
+let brand = store.get('brand');   // a key of BRANDS, 'other', or null (not chosen yet)
+function brandInfo() { return BRANDS[brand] || null; }
+let link = store.get('link') || (IOS || SAFARI_AIRPLAY ? 'airplay' : 'cast');
+let idx = Math.max(0, ID(store.get('stepId')));
+if (!brand && STEPS[idx].chapter && STEPS[idx].chapter !== 'setup') idx = HUB;
+const status = store.get('status') || {};   // step id -> 'done' | 'skipped'
+function saveStatus() { store.set('status', status); }
+
 // The step as shown: generic step with the chosen brand's overrides on top.
 function S(i) {
   const base = STEPS[i], o = brandInfo() && brandInfo().steps[base.id];
@@ -785,196 +899,436 @@ function S(i) {
   return m;
 }
 function allSteps() { return STEPS.map((_, i) => S(i)); }
+function patternFor(i) { const s = S(i); return s.pattern || TV_PATTERN[s.id] || null; }
 const values = store.get('values') || {};
 const checks = store.get('checks') || {};
 let node = null, loops = 0;
 
-const card = document.getElementById('card');
-const progress = document.getElementById('progress');
-const backBtn = document.getElementById('back');
-const nextBtn = document.getElementById('next');
-STEPS.forEach(() => progress.appendChild(document.createElement('span')));
+function chSteps(ch) { return STEPS.filter(x => x.chapter === ch); }
+function chState(ch) {
+  const st = chSteps(ch).map(x => status[x.id]);
+  if (st.every(Boolean)) return st.every(v => v === 'skipped') ? 'skipped' : 'done';
+  return st.some(Boolean) ? 'started' : 'new';
+}
+function nextChapter() { return MAIN_CHAPTERS.find(c => !['done', 'skipped'].includes(chState(c))); }
+function chapterEntry(ch) {
+  const list = chSteps(ch);
+  if (ch !== 'setup' && !brand) return ID('brand');
+  return ID((list.find(x => !status[x.id]) || list[0]).id);
+}
+
+const $ = id => document.getElementById(id);
+const card = $('card'), top_ = $('top'), banner = $('banner'), bar = $('bar'), barInner = $('barInner');
+const sheet = $('sheet'), sheetBody = $('sheetBody'), sheetTitle = $('sheetTitle');
+const panel = $('connectPanel'), parking = $('parking');
 
 function esc(s) { return String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
-
-function flowHtml(s) {
-  const n = s.flow[node];
-  if (n.ask) {
-    const two = n.answers.length === 2 ? ' two' : '';
-    return `<div class="box q"><p class="ask">${n.ask}</p><div class="answers${two}">
-      ${n.answers.map(([label, to]) => `<button data-go="${to}">${label}</button>`).join('')}</div></div>
-      ${loops >= 6 && s.stuck ? `<div class="tip">${s.stuck}</div>` : ''}
-      <details><summary>Not sure what to look for?</summary><div class="inner">${LOOK_TIPS}</div></details>`;
-  }
-  if (n.then) {
-    return `<div class="box act"><div class="label">On your TV remote</div><p class="do">${n.do}</p><p class="sub">${n.sub}</p>
-      <button class="primary wide" data-go="${n.then}" data-loop="1">Done</button></div>`;
-  }
-  const rec = s.record ? `<label class="rec">Write down the setting? (optional)
-      <input type="text" data-record="${s.id}" value="${esc(values[s.id] || '')}" placeholder="e.g. ${s.ph || '48'}"></label>` : '';
-  return `<div class="box ok"><p class="do">✓ ${n.do}</p><p>${n.text}</p>${rec}</div>`;
+// Help text written as collapsible <details> becomes a heading and paragraphs inside the Help sheet.
+function unfold(html) {
+  return String(html || '').replace(/<details><summary>([\s\S]*?)<\/summary><div class="inner">/g, '<h3>$1</h3><div>')
+    .replace(/<\/div><\/details>/g, '</div>');
 }
+
+const svg = (d, cls) => `<svg viewBox="0 0 24 24" ${cls ? `class="${cls}"` : ''} fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
+const ICON = {
+  back: svg('<path d="M15 5l-7 7 7 7"/>'),
+  home: svg('<rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/>'),
+  tick: svg('<path d="M5 12l5 5 9-10"/>'),
+  info: svg('<circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/>'),
+  minus: svg('<path d="M5 12h14"/>'),
+  plus: svg('<path d="M5 12h14M12 5v14"/>'),
+  remote: svg('<rect x="7" y="2" width="10" height="20" rx="3"/><circle cx="12" cy="7" r="1.5"/><path d="M10 12h4M10 15h4"/>'),
+  bulb: svg('<path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-4 10.5c.7.7 1 1.5 1 2.5h6c0-1 .3-1.8 1-2.5A6 6 0 0 0 12 3z"/>'),
+  tips: svg('<path d="M4 6h16M4 12h16M4 18h10"/>')
+};
 
 /* Where the viewer should be for each step. Judging the picture is done from
    the usual seat (distance, angle and eye adaptation all change what you see);
    sharpness halos are fine detail, so that check is done up close. */
 const POSITIONS = {
-  seat:  { label: 'From your usual seat, straight on', note: 'Distance, viewing angle and how used your eyes are to the room all change what you see.',
+  seat:  { chip: 'From your seat', label: 'From your usual seat, straight on', note: 'Distance, viewing angle and how used your eyes are to the room all change what you see.',
            icon: '<path d="M4 11V8a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v3"/><path d="M2 12a2 2 0 0 1 4 0v2h12v-2a2 2 0 0 1 4 0v5H2z"/><path d="M5 17v2M19 17v2"/>' },
-  close: { label: 'Up close: about 1 m (3 ft) from the screen', note: 'This detail is too fine to judge from a sofa.',
+  close: { chip: 'Up close, about 1 m', label: 'Up close: about 1 m (3 ft) from the screen', note: 'This detail is too fine to judge from a sofa.',
            icon: '<rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M12 19v-3M9 21h6"/><path d="M8 10h8M13 7l3 3-3 3"/>' },
-  any:   { label: 'Anywhere you can see the TV menu', note: 'This step is just settings.',
+  any:   { chip: 'Settings only', label: 'Anywhere you can see the TV menu', note: 'This step is just settings.',
            icon: '<rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M7 8h10M7 12h6"/><path d="M12 19v-3M9 21h6"/>' }
 };
-function posBadge(k) {
+function posChip(k) {
   const p = POSITIONS[k];
-  return `<div class="pos ${k}"><svg viewBox="0 0 24 24" aria-hidden="true">${p.icon}</svg><div><b>${p.label}</b><span>${p.note}</span></div></div>`;
+  return `<span class="poschip ${k}"><svg viewBox="0 0 24 24" aria-hidden="true">${p.icon}</svg>${p.chip}</span>`;
 }
 
-function brandPicker() {
-  const opt = (k, label) => `<button class="brand-opt${brand === k ? ' on' : ''}" data-brand="${k}">${label}</button>`;
-  const note = brandInfo() ? `<p class="brand-note">${brandInfo().note}</p>`
-    : brand === 'other' ? `<p class="brand-note">Using general names that work on most TVs. Your TV may use slightly different words.</p>` : '';
-  return `<div class="box q brand" id="brandBox"><p class="ask">What brand is your TV?</p>
-    <div class="answers two">${opt('samsung', 'Samsung')}${opt('lg', 'LG')}${opt('sony', 'Sony')}${opt('tcl', 'TCL')}${opt('hisense', 'Hisense')}${opt('other', 'Another brand')}</div>${note}</div>`;
-}
 function tvName() {
-  const b = brandInfo() ? brandInfo().name : brand === 'other' ? '' : '';
+  const b = brandInfo() ? brandInfo().name : '';
   return [b, values.model].filter(Boolean).join(' ') || (brand === 'other' ? 'other brand' : '');
 }
-function modelBox() {
-  return `<div class="box q" id="modelBox"><p class="ask">What model is it?</p>
-    <input type="text" class="model" data-record="model" value="${esc(values.model || '')}" placeholder="e.g. 55Q750G"
-      autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false">
-    <p class="brand-note">It’s on a sticker on the back of the TV, or in the TV’s settings under System or Support → About. Optional, but it’s saved with your settings at the end.</p></div>`;
-}
-function linkPicker() {
-  const opt = (k, label, sub) => `<button class="brand-opt link-opt${link === k ? ' on' : ''}" data-link="${k}">${label}<span>${sub}</span></button>`;
-  return `<div class="box q brand" id="linkBox"><p class="ask">How will you show the test patterns on the TV?</p>
-    <div class="answers">
-      ${opt('cast', 'Google Chromecast', 'A Chromecast, or a TV with Google TV built in. Uses Chrome on an Android phone or a computer.')}
-      ${opt('airplay', 'iPhone or iPad (AirPlay)', 'An Apple TV, or a TV with AirPlay built in (including some TVs with Google TV). Uses Safari.')}
-    </div>${linkNote()}</div>`;
-}
-function linkNote() {
-  const n = t => `<p class="brand-note">${t}</p>`;
-  if (link === 'cast') {
-    if (IOS) return `<div class="tip" style="margin:14px 0 0">An iPhone or iPad can’t cast to a Chromecast from a web page. Open this page in Chrome on an Android phone or a computer on the same Wi-Fi. If your TV also has AirPlay, choose iPhone or iPad instead.</div>`;
-    if (castFailed) return `<div class="tip" style="margin:14px 0 0">Casting isn’t available in this browser. Open this page in Chrome on an Android phone or a computer.</div>`;
-    return n('Next, tap “Connect to TV” at the top and choose your TV. If you see “Let this page find my TV”, tap that first and choose Allow.');
-  }
-  if (link === 'airplay') {
-    if (!AIRPLAY) return `<div class="tip" style="margin:14px 0 0">AirPlay works from Safari on an iPhone, iPad or Mac. Open this page there.</div>`;
-    return n('Next, tap “AirPlay to TV” at the top and choose your TV. A separate Chromecast won’t appear in the AirPlay list.');
-  }
-  return '';
-}
-function updateBrandChip() {
-  const chip = document.getElementById('brandChip');
-  if (!brand || idx === 0) { chip.style.display = 'none'; return; }
-  chip.style.display = '';
-  chip.innerHTML = `TV: ${esc(tvName())} · <u>Change</u>`;
+function connected() {
+  if (link === 'cast') return !!session();
+  if (link === 'airplay') return airOn();
+  return false;
 }
 
+/* ---------- Navigation ----------
+   Back retraces the steps actually visited (so skipping HDR and pressing Back
+   returns to the HDR question, not the last HDR step). */
+const trail = store.get('trailIds') || [];
+function go(i, back) {
+  if (!back && i !== idx) { trail.push(STEPS[idx].id); if (trail.length > 60) trail.shift(); }
+  idx = i; node = null; loops = 0;
+  store.set('trailIds', trail); store.set('stepId', STEPS[idx].id);
+  closeSheet(); render(); window.scrollTo(0, 0); requestAnimationFrame(updateMore);
+  const h = card.querySelector('h2'); if (h) h.focus({ preventScroll: true });
+}
+function goBack() {
+  let id, i = -1;
+  while (trail.length && i < 0) { id = trail.pop(); i = ID(id); }
+  go(i < 0 ? HUB : i, true);
+}
+function nextIdx() { return idx + 1 < STEPS.length ? idx + 1 : HUB; }
+function finishStep(how) { status[STEPS[idx].id] = how || 'done'; saveStatus(); go(nextIdx()); }
+function nextLabel() {
+  const n = nextIdx();
+  if (n === HUB) return 'Finish';
+  const ns = S(n);
+  if (ns.chapter !== STEPS[idx].chapter) return 'Next: ' + CHAPTERS[ns.chapter].name;
+  return 'Next: ' + (SHORT[ns.id] || ns.title);
+}
+
+/* ---------- Rendering ----------
+   Each screen is one focused card: a title, the picture to look at, one
+   question or one remote action, and the button to go on. Everything else
+   (where a setting is, what to look for, what to do when stuck) is in the
+   Help sheet. */
 function render() {
   const s = S(idx);
   if (node === null) { node = s.flow ? s.flow.start : null; loops = 0; }
-  [...progress.children].forEach((el, i) => el.classList.toggle('done', i <= idx));
+  if (card.contains(panel)) parking.appendChild(panel);   // keep the connection controls alive
+  card.innerHTML = cardHtml(s);
+  const slot = $('connSlot');
+  if (slot && !sheet.open) slot.appendChild(panel);
+  renderChrome();
+  showPattern(patternFor(idx));
+}
+// The parts that change with the TV connection: top row, banner and bottom bar.
+function renderChrome() {
+  const s = S(idx);
+  top_.innerHTML = topHtml(s);
+  const judging = !s.flow || !!(s.flow[node].ask || s.flow[node].then);
+  banner.innerHTML = s.pattern && judging && !connected() && !localOpen()
+    ? `<div class="banner" role="status"><span>The test pattern isn’t showing on the TV.</span><button data-act="tv">Connect</button></div>` : '';
+  const b = barHtml(s);
+  barInner.innerHTML = b;
+  bar.style.display = b ? '' : 'none';
+  syncBar();
+}
+// Called on every connection status message. The connect and Get ready
+// screens mention the connection, so they're redrawn when it changes.
+let chromeTimer, lastConn = null;
+function refreshChrome() {
+  clearTimeout(chromeTimer);
+  chromeTimer = setTimeout(() => {
+    const c = connected(), changed = c !== lastConn;
+    lastConn = c;
+    if (changed && (S(idx).connect || S(idx).id === 'start') && !sheet.open) render();
+    else renderChrome();
+  }, 60);
+}
 
-  let h = `<h2>${s.title}</h2>${s.pos ? posBadge(s.pos) : ''}<p class="lead">${s.lead}</p>`;
-  if (s.compare) {
-    h += `<div class="pair"><figure><img src="patterns/sharpness-clean.png" alt="Clean lines"><figcaption>✓ Clean</figcaption></figure>
-      <figure><img src="patterns/sharpness-halo.png" alt="Lines with bright halos"><figcaption>✗ Halos</figcaption></figure></div>`;
-  } else if (s.pattern) {
-    h += `<figure><img src="patterns/${s.pattern}.png" alt=""><figcaption>${s.caption}</figcaption></figure>`;
+function topHtml(s) {
+  if (s.hub) {
+    return `<div class="top"><div class="app-name">TV Picture Setup</div>
+      <button class="chip" data-act="tv"><span class="dot${connected() ? ' on' : ''}"></span>${esc(brandInfo() ? brandInfo().name : 'TV')} · ${connected() ? 'Connected' : 'Not connected'}</button></div>`;
   }
-  if (s.id === 'start') h += brandPicker() + modelBox() + linkPicker();
-  if (s.items) h += `<ol class="check">${s.items.map((t, i) => `<li style="cursor:default"><span class="tick" style="border-color:var(--accent);color:var(--accent);font-size:14px;font-weight:700">${i + 1}</span><span>${t}</span></li>`).join('')}</ol>`;
-  if (s.after) h += s.after;
+  const list = chSteps(s.chapter), k = list.findIndex(x => x.id === s.id);
+  const segs = list.length > 1 ? `<div class="segs" style="width:${Math.min(40 * list.length, 220)}px">${list.map((x, i) => `<span class="${i <= k ? 'on' : ''}"></span>`).join('')}</div>` : '';
+  const label = list.length > 1 ? `${CHAPTERS[s.chapter].name} · ${k + 1} of ${list.length}` : CHAPTERS[s.chapter].name;
+  return `<div class="top">
+    <button class="icon" data-act="back" aria-label="Back">${ICON.back}</button>
+    <div class="where"><div class="where-label">${label}</div>${segs}</div>
+    <button class="icon" data-act="hub" aria-label="All steps">${ICON.home}</button>
+    ${helpTabs(s).length ? `<button class="pill" data-act="help">Help</button>` : ''}
+  </div>`;
+}
+
+function barHtml(s) {
+  const btn = (act, label, primary, extra) => `<button class="${primary ? 'primary' : ''}" data-act="${act}" ${extra || ''}>${label}</button>`;
+  if (s.hub) {
+    const ch = nextChapter();
+    if (!ch) return '';
+    return btn('chapter', ch === 'setup' && chState('setup') === 'new' ? 'Start' : 'Continue: ' + CHAPTERS[ch].name, true, `data-ch="${ch}"`);
+  }
+  if (s.connect) return connected() ? btn('next', nextLabel(), true) : btn('skip', 'Skip for now', false);
+  if (s.flow) {
+    const n = s.flow[node];
+    if (n.ask) return '';
+    if (n.then) return btn('then', 'Done', true, `data-to="${n.then}"`);
+    const last = nextIdx() !== HUB && S(nextIdx()).chapter !== s.chapter && s.chapter !== 'setup'
+      ? `<div class="hint">Last step in ${CHAPTERS[s.chapter].name}</div>` : '';
+    return btn('next', nextLabel(), true) + last;
+  }
+  if (s.id === 'start') return btn('next', 'Start: ' + CHAPTERS.basics.name, true);
+  return btn('next', nextLabel(), true);
+}
+
+function cardHtml(s) {
+  if (s.hub) return hubHtml();
+  const n = s.flow ? s.flow[node] : null;
+  if (n && !n.ask && !n.then) return doneHtml(s, n);
+  let h = `<div class="titlerow"><h2 tabindex="-1">${s.title}</h2>${s.pos ? posChip(s.pos) : ''}</div>`;
+  const firstNode = n && node === s.flow.start;
+  // Steps with a pattern show the "where to look" picture; their background is in Help.
+  if (s.lead && (!s.pattern || s.compare || (n && n.then && firstNode)) && (!n || firstNode)) h += `<p class="lead">${s.lead}</p>`;
+
+  if (n && n.ask) {
+    if (s.compare) {
+      h += `<div class="pair"><figure><img src="patterns/sharpness-clean.png" alt="Clean lines"><figcaption>✓ Clean</figcaption></figure>
+        <figure><img src="patterns/sharpness-halo.png" alt="Lines with bright halos"><figcaption>✗ Halos</figcaption></figure></div>`;
+    } else if (s.pattern) {
+      h += `<figure><img src="patterns/${s.pattern}.png" alt="Where to look on the TV"><figcaption>${s.caption}</figcaption></figure>`;
+    }
+    const two = n.answers.length === 2 ? ' two' : '';
+    h += `<div class="box q"><p class="ask">${n.ask}</p><div class="answers${two}">
+      ${n.answers.map(([label, to]) => `<button data-go="${to}">${label}</button>`).join('')}</div></div>`;
+    h += stuckHtml(s);
+    h += `<div class="skiprow"><button class="linkish" data-act="skip">Skip this step</button></div>`;
+    return h;
+  }
+  if (n && n.then) {
+    const key = /\bdown\b/i.test(n.do) ? ICON.minus : /\bup\b/i.test(n.do) ? ICON.plus : ICON.remote;
+    h += `<div class="box act"><div class="label">On your TV remote</div>
+      <div class="doing"><span class="key">${key}</span><p class="do">${n.do}</p></div>
+      ${n.sub ? `<p class="sub">${n.sub}</p>` : ''}</div>`;
+    h += stuckHtml(s);
+    return h;
+  }
+  if (s.brandPick) {
+    const opt = (k, label) => `<button class="${brand === k ? 'on' : ''}" aria-pressed="${brand === k}" data-brand="${k}">${label}</button>`;
+    const note = brandInfo() ? brandInfo().note
+      : brand === 'other' ? 'Using general names that work on most TVs. Your TV may use slightly different words.' : '';
+    return h + `<div class="brands" id="brands">${opt('samsung', 'Samsung')}${opt('lg', 'LG')}${opt('sony', 'Sony')}${opt('tcl', 'TCL')}${opt('hisense', 'Hisense')}${opt('other', 'Another brand')}</div>
+      ${note ? `<p class="note">${note}</p>` : ''}`;
+  }
+  if (s.connect) {
+    return h + `<div class="conn"><p class="detected">${linkSentence()}</p><div id="connSlot"></div>
+      <button class="linkish" data-act="switch-link">${link === 'cast' ? 'Use AirPlay instead' : 'Use Chromecast instead'}</button></div>`;
+  }
+  if (s.items) {
+    const [update, ...todo] = s.items;
+    return h + (connected() ? `<p class="okline">${ICON.tick} The TV is showing a test picture, so it’s connected.</p>` : '') +
+      `<div class="cards">${todo.map((t, i) => `<div class="card">${i ? ICON.remote : ICON.bulb}<span>${t}</span></div>`).join('')}</div>
+      <p class="tipline">Tip: ${update.replace(/ first:/, ': ').replace(/ first /, ' ')}</p>`;
+  }
   if (s.checklist) {
-    h += `<ul class="check">${s.checklist.map(([t, d], i) => {
+    const item = ([t, d], i) => {
       if (t === '#') return `<li class="sect">${d}</li>`;
       const key = s.id + ':' + i;
-      return `<li data-check="${key}" class="${checks[key] ? 'on' : ''}"><span class="tick"></span><span><div class="t">${t}</div><div class="d">${d}</div></span></li>`;
-    }).join('')}</ul>`;
-    if (s.id === 'mode') h += `<label class="rec" style="margin:0 0 14px">Picture mode you chose (optional)
-      <input type="text" data-record="mode" value="${esc(values.mode || '')}" placeholder="e.g. Filmmaker"></label>`;
-    h += s.extra || '';
-    if (s.id === 'mode') h += link === 'airplay' ? APPLE_TV_TIP : link === 'cast' ? CHROMECAST_TIP : '';
+      return `<li><button aria-pressed="${!!checks[key]}" data-check="${key}"><span class="tick"></span><span><span class="t">${t}</span><span class="d">${d}</span></span></button></li>`;
+    };
+    if (s.id === 'mode') {
+      // The three settings that matter most first; the rest behind "Also check".
+      const main = s.checklist.slice(0, 3), rest = s.checklist.slice(3);
+      const names = rest.map(([t]) => t.split(':')[0].replace(/ and .*/, '').toLowerCase()).join(', ');
+      return h + `<ul class="check">${main.map(item).join('')}</ul>
+        <details class="also"><summary><span>Also check <span>· ${esc(names)}</span></span></summary>
+        <ul class="check">${rest.map((x, i) => item(x, i + 3)).join('')}</ul></details>`;
+    }
+    return h + `<ul class="check">${s.checklist.map(item).join('')}</ul>`;
   }
-  if (s.flow) h += flowHtml(s);
-  if (s.where) h += `<details><summary>Where is this setting?</summary><div class="inner">${s.where}</div></details>`;
-  if (s.dimming) h += (brandInfo() && brandInfo().dimmingHelp) || DIMMING_HELP;
-  if (s.pattern && !s.compare) h += `<button class="linkish" data-local>See the pattern on this phone</button>`;
-  if (s.summary) {
-    h += `<table><tr><td>TV</td><td>${esc(tvName() || '—')}</td></tr>${allSteps().filter(x => x.record).map(x => `<tr><td>${x.record}</td><td>${esc(values[x.id] || '—')}</td></tr>`).join('')}</table>
-      <div class="answers two"><button id="copy">Copy</button><button id="restart">Start over</button></div>`;
-  }
-  card.innerHTML = h;
-
-  const finished = !s.flow || !!(s.flow[node] && s.flow[node].text);
-  backBtn.style.display = idx === 0 ? 'none' : '';
-  nextBtn.style.display = idx === STEPS.length - 1 ? 'none' : '';
-  nextBtn.textContent = idx === 0 ? 'Start' : finished ? 'Next' : 'Skip this step';
-  nextBtn.classList.toggle('skip', !finished);
-  store.set('step', idx);
-  updateBrandChip();
-  showPattern(s.pattern);
+  return h;
 }
 
-// Back retraces the steps actually visited (so skipping HDR and pressing Back
-// returns to the HDR question, not the last HDR step).
-const trail = store.get('trail') || [];
-function go(i, back) {
-  if (!back && i !== idx) trail.push(idx);
-  idx = i; node = null; store.set('trail', trail); render(); window.scrollTo(0, 0);
+function stuckHtml(s) {
+  if (loops < 3 || !helpTabs(s).some(([k]) => k === 'stuck')) return '';
+  return `<div class="stuck" role="status"><span>Not changing?</span><button data-act="help" data-tab="stuck">Get help</button></div>`;
 }
 
-card.addEventListener('click', e => {
-  const t = e.target.closest('button, li[data-check]');
-  if (!t) return;
-  if (t.dataset.brand) {
-    brand = t.dataset.brand; store.set('brand', brand); render();
-    return;
+function doneHtml(s, n) {
+  const good = node === 'ok' || !s.flow.ok;
+  return `<div class="fin"><div class="step-name">${s.title}</div>
+    <div class="badge${good ? ' good' : ''}">${good ? ICON.tick : ICON.info}</div>
+    <h3 tabindex="-1">${n.do.replace(/\.$/, '')}</h3><p>${n.text}</p></div>`;
+}
+
+function linkSentence() {
+  if (link === 'cast') {
+    if (IOS) return 'An iPhone or iPad can’t cast to a Chromecast from a web page. Open this page in Chrome on an Android phone or a computer on the same Wi-Fi, or use AirPlay if your TV has it.';
+    if (castFailed) return 'Casting isn’t available in this browser. Open this page in Chrome on an Android phone or a computer.';
+    return 'We’ll use <b>Google Cast</b>, for a Chromecast or a TV with Google TV built in. Tap <b>Connect to TV</b> and choose your TV.';
   }
-  if (t.dataset.link) { setLink(t.dataset.link); render(); return; }
-  if (t.dataset.go && t.dataset.go[0] === '@') {
-    go(STEPS.findIndex(x => x.id === t.dataset.go.slice(1))); return;
+  if (!SAFARI_AIRPLAY) return 'AirPlay works from Safari on an iPhone, iPad or Mac. Open this page there.';
+  return 'We’ll use <b>AirPlay</b>, for an Apple TV or a TV with AirPlay built in. Tap <b>AirPlay to TV</b> and choose your TV. A separate Chromecast won’t appear in that list.';
+}
+
+/* ---------- Hub ---------- */
+function hubHtml() {
+  const ch = nextChapter(), allDone = !ch;
+  let h = `<div class="titlerow"><h2 tabindex="-1">${allDone ? 'Your picture is set' : 'Let’s make your TV look right'}</h2></div>
+    <p class="lead">${allDone ? 'Write down the values you ended on if you’d like a record, for example to set the same values on another input.'
+      : 'About 10 minutes. You answer simple questions about what you see, and change settings with your TV remote.'}</p>
+    <div class="chapters">${MAIN_CHAPTERS.map((c, i) => chapterCard(c, i + 1, c === ch)).join('')}</div>
+    <button class="chap mini${chState('tips') === 'done' ? ' done' : ''}" data-act="chapter" data-ch="tips">
+      <span class="num">${chState('tips') === 'done' ? ICON.tick : ICON.tips}</span>
+      <span class="txt"><b>${CHAPTERS.tips.name} <i>optional</i></b><span>${CHAPTERS.tips.desc}</span></span></button>`;
+  if (chState('basics') !== 'new') {
+    h += `<h3 class="sect-h">Your settings <span>· optional</span></h3>
+      <div class="settings">
+        <label>TV model<input type="text" data-record="model" value="${esc(values.model || '')}" placeholder="e.g. 55Q750G"
+          autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false"></label>
+        ${allSteps().filter(x => x.record).map(x => `<label>${x.record}<input type="text" data-record="${x.id}" value="${esc(values[x.id] || '')}" placeholder="${esc(x.ph ? 'e.g. ' + x.ph : 'value')}"></label>`).join('')}
+      </div>
+      <div class="answers two"><button data-act="copy">Copy</button><button data-act="restart">Start over</button></div>`;
   }
-  if (t.dataset.go) {
-    if (t.dataset.loop) loops++;
-    node = t.dataset.go; render();
-    const box = card.querySelector('.box'); if (box) box.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+  return h;
+}
+function chapterCard(c, num, current) {
+  const st = chState(c), info = CHAPTERS[c], list = chSteps(c);
+  const mark = st === 'done' ? ICON.tick : st === 'skipped' ? '–' : num;
+  let sub = st === 'done' ? 'Done' : st === 'skipped' ? 'Skipped' : info.desc;
+  if (c === 'setup' && st === 'done' && tvName()) sub = 'Done · ' + esc(tvName());
+  const count = st === 'started' ? `${list.filter(x => status[x.id]).length} of ${list.length}` : '';
+  return `<button class="chap ${st}${current ? ' cur' : ''}${info.optional ? ' opt' : ''}" data-act="chapter" data-ch="${c}">
+    <span class="num">${mark}</span>
+    <span class="txt"><b>${info.name}${info.optional ? ' <i>optional</i>' : ''}</b><span>${sub}</span></span>
+    ${count ? `<span class="right">${count}</span>` : ''}</button>`;
+}
+
+/* ---------- Help sheet ---------- */
+const APPLE_TV_TIP = `<details><summary>Using an Apple TV?</summary><div class="inner">
+  <p>On the Apple TV: Settings → Video and Audio → <b>Match Content</b> → turn on <b>Match Dynamic Range</b>.
+  Otherwise the patterns may be shown in HDR or Dolby Vision and look washed out.</p>
+  <p>Make the picture changes on the HDMI input the Apple TV is plugged into.</p></div></details>`;
+const CHROMECAST_TIP = `<details><summary>Using a separate Chromecast?</summary><div class="inner">
+  <p>On the Chromecast: Settings → Display &amp; Sound → Advanced display settings → <b>Dynamic range</b> → turn on <b>match content</b>.
+  Otherwise the patterns may be shown in HDR and look washed out.</p>
+  <p>Make the picture changes on the HDMI input the Chromecast is plugged into.</p></div></details>`;
+
+function helpTabs(s) {
+  const tabs = [];
+  if (s.pattern) {
+    let look = s.lead ? `<p class="say">${s.lead}</p>` : '';
+    if (s.caption) look += `<p class="say"><b>${s.caption}</b></p>`;
+    if (s.pos) look += `<h3>${POSITIONS[s.pos].label}</h3><p>${POSITIONS[s.pos].note}</p>`;
+    look += `<h3>Tips</h3>${LOOK_TIPS}`;
+    tabs.push(['look', 'What to see', look, true]);
   }
-  if (t.dataset.check !== undefined) { checks[t.dataset.check] = !checks[t.dataset.check]; store.set('checks', checks); t.classList.toggle('on'); }
-  if (t.hasAttribute('data-local')) openLocal();
-  if (t.id === 'copy') {
-    const text = 'My TV picture settings' + (tvName() ? ' (' + tvName() + ')' : '') + '\n' + allSteps().filter(x => x.record).map(x => `${x.record}: ${values[x.id] || '-'}`).join('\n');
-    (navigator.clipboard ? navigator.clipboard.writeText(text) : Promise.reject())
-      .then(() => { t.textContent = 'Copied'; }, () => { t.textContent = 'Copy failed'; });
+  let where = s.where || '';
+  if (s.extra) where += unfold(s.extra);
+  if (s.id === 'mode') where += unfold(link === 'airplay' ? APPLE_TV_TIP : CHROMECAST_TIP);
+  if (where) tabs.push(['where', 'Where is it?', where]);
+  let stuck = s.stuck ? `<p class="say">${s.stuck}</p>` : '';
+  if (s.dimming) stuck += unfold((brandInfo() && brandInfo().dimmingHelp) || DIMMING_HELP);
+  if (stuck) tabs.push(['stuck', 'Not changing?', stuck]);
+  return tabs;
+}
+let helpTab = null;
+function openHelp(tab) {
+  const tabs = helpTabs(S(idx));
+  if (!tabs.length) return;
+  helpTab = tabs.some(t => t[0] === tab) ? tab : tabs[0][0];
+  sheet.dataset.mode = 'help';
+  sheetTitle.textContent = 'Help with ' + S(idx).title.replace(/ \(optional\)$/, '');
+  fillHelp();
+  showSheet();
+}
+function fillHelp() {
+  const tabs = helpTabs(S(idx)), cur = tabs.find(t => t[0] === helpTab) || tabs[0];
+  sheetBody.innerHTML = (tabs.length > 1 ? `<div class="tabs" role="tablist">${tabs.map(([k, label]) =>
+      `<button role="tab" aria-selected="${k === cur[0]}" data-tab="${k}">${label}</button>`).join('')}</div>` : '<div style="height:12px"></div>') +
+    `<div class="help" role="tabpanel">${cur[2]}</div>
+    <div class="sheet-foot">${cur[3] ? '<button data-act="local">See the pattern on this phone</button>' : ''}
+      <button class="primary" data-act="close">Back to the step</button></div>`;
+}
+
+/* ---------- TV sheet: the connection controls, from any screen ---------- */
+function openTV() {
+  sheet.dataset.mode = 'tv';
+  sheetTitle.textContent = 'Your TV';
+  sheetBody.innerHTML = `<p class="help" style="margin:8px 0 14px">${linkSentence()}</p><div id="tvSlot"></div>
+    <div class="sheet-foot">
+      <button data-act="switch-link">${link === 'cast' ? 'Use AirPlay instead' : 'Use Chromecast instead'}</button>
+      ${patternFor(idx) ? '<button data-act="local">See the pattern on this phone</button>' : ''}
+      <button class="primary" data-act="close">Done</button></div>`;
+  $('tvSlot').appendChild(panel);
+  showSheet();
+}
+function showSheet() { if (!sheet.open) { if (sheet.showModal) sheet.showModal(); else sheet.setAttribute('open', ''); } }
+function closeSheet() { if (sheet.open) { if (sheet.close) sheet.close(); else { sheet.removeAttribute('open'); onSheetClosed(); } } }
+function onSheetClosed() {
+  if (sheet.contains(panel)) {
+    parking.appendChild(panel);
+    const slot = $('connSlot'); if (slot) slot.appendChild(panel);
   }
-  if (t.id === 'restart') { for (const k in checks) delete checks[k]; store.set('checks', checks); trail.length = 0; go(0, true); }
+  renderChrome();
+}
+sheet.addEventListener('close', onSheetClosed);
+// A tap on the dimmed area above the sheet closes it.
+sheet.addEventListener('click', e => { if (e.target === sheet) closeSheet(); });
+
+/* ---------- Taps ---------- */
+document.addEventListener('click', e => {
+  const t = e.target.closest('button');
+  if (!t || t.closest('#connectPanel')) return;
+  const d = t.dataset;
+  if (d.brand) { brand = d.brand; store.set('brand', brand); render(); return; }
+  if (d.check) {
+    checks[d.check] = !checks[d.check]; store.set('checks', checks);
+    t.setAttribute('aria-pressed', String(!!checks[d.check])); return;
+  }
+  if (d.tab && !d.act) { helpTab = d.tab; fillHelp(); return; }
+  if (d.go) {
+    const to = d.go;
+    if (to[0] === '@') {
+      const target = to.slice(1), ch = STEPS[idx].chapter;
+      status[STEPS[idx].id] = 'skipped';
+      // Skipping out of a chapter (for example "No, skip HDR") skips the rest of it.
+      if (target === 'hub') chSteps(ch).forEach(x => { if (!status[x.id]) status[x.id] = 'skipped'; });
+      saveStatus(); go(ID(target)); return;
+    }
+    node = to; render(); window.scrollTo(0, 0); requestAnimationFrame(updateMore); return;
+  }
+  switch (d.act) {
+    case 'back': goBack(); break;
+    case 'hub': go(HUB); break;
+    case 'help': openHelp(d.tab); break;
+    case 'tv': openTV(); break;
+    case 'close': closeSheet(); break;
+    case 'local': closeSheet(); openLocal(); break;
+    case 'then': loops++; node = d.to; render(); window.scrollTo(0, 0); requestAnimationFrame(updateMore); break;
+    case 'skip': finishStep('skipped'); break;
+    case 'next':
+      if (S(idx).brandPick && !brand) {   // ask for the brand before going on
+        const b = $('brands'); b.classList.remove('attn'); void b.offsetWidth; b.classList.add('attn'); return;
+      }
+      finishStep(); break;
+    case 'chapter': go(chapterEntry(d.ch)); break;
+    case 'switch-link': {
+      const inSheet = sheet.open;
+      setLink(link === 'cast' ? 'airplay' : 'cast');
+      if (inSheet) openTV(); else render();
+      break;
+    }
+    case 'copy': {
+      const text = 'My TV picture settings' + (tvName() ? ' (' + tvName() + ')' : '') + '\n' + allSteps().filter(x => x.record).map(x => `${x.record}: ${values[x.id] || '-'}`).join('\n');
+      (navigator.clipboard ? navigator.clipboard.writeText(text) : Promise.reject())
+        .then(() => { t.textContent = 'Copied'; }, () => { t.textContent = 'Copy failed'; });
+      break;
+    }
+    case 'restart':
+      for (const k in checks) delete checks[k];
+      for (const k in status) delete status[k];
+      store.set('checks', checks); saveStatus(); trail.length = 0; go(HUB, true);
+      break;
+  }
 });
-card.addEventListener('input', e => {
+document.addEventListener('input', e => {
   const k = e.target.dataset && e.target.dataset.record;
   if (k) { values[k] = e.target.value.trim(); store.set('values', values); }
 });
-backBtn.onclick = () => { if (idx > 0) go(trail.length ? trail.pop() : idx - 1, true); };
-nextBtn.onclick = () => {
-  if (idx === 0 && (!brand || !link)) {   // ask for the brand and connection before starting
-    const b = document.getElementById(brand ? 'linkBox' : 'brandBox');
-    b.scrollIntoView({ block: 'center', behavior: 'smooth' });
-    b.classList.remove('attn'); void b.offsetWidth; b.classList.add('attn');
-    return;
-  }
-  if (idx < STEPS.length - 1) go(idx + 1);
-};
-document.getElementById('brandChip').onclick = () => go(0);
 
 /* ---------- Casting (Google's Default Media Receiver) ---------- */
 let castReady = false, castFailed = false, lastCast, castMsg = ['Loading Cast support…'];
 const dot = document.getElementById('dot'), statusText = document.getElementById('statusText');
-function setStatus(text, on) { statusText.textContent = text; dot.classList.toggle('on', !!on); }
+function setStatus(text, on) { statusText.textContent = text; dot.classList.toggle('on', !!on); refreshChrome(); }
 // Cast messages are remembered, and shown only while Chromecast is the chosen connection.
 function castStatus(text, on) { castMsg = [text, on]; if (link === 'cast') setStatus(text, on); }
 function session() { return castReady && link === 'cast' ? cast.framework.CastContext.getInstance().getCurrentSession() : null; }
@@ -1036,7 +1390,7 @@ window['__onGCastApiAvailable'] = function (available) {
   const rp = new cast.framework.RemotePlayer(), rpc = new cast.framework.RemotePlayerController(rp);
   rpc.addEventListener(cast.framework.RemotePlayerEventType.PLAYER_STATE_CHANGED, () => {
     const sess = session(), m = sess && sess.getMediaSession();
-    const current = S(idx).pattern;
+    const current = patternFor(idx);
     if (rp.playerState === 'IDLE' && m && m.idleReason === 'FINISHED' && current) showPattern(current, true);
     if (rp.playerState === 'IDLE' && m && m.idleReason === 'ERROR' && current && lastFile && lastFile !== current) fallbackFrom4k(sess, current);
   });
@@ -1064,7 +1418,7 @@ window['__onGCastApiAvailable'] = function (available) {
     if (e.sessionState === S.SESSION_STARTED || e.sessionState === S.SESSION_RESUMED) {
       lastCast = undefined;
       castStatus('Connected to ' + ctx.getCurrentSession().getCastDevice().friendlyName, true);
-      showPattern(STEPS[idx].pattern, true);
+      showPattern(patternFor(idx), true);
     } else if (e.sessionState === S.SESSION_ENDED) {
       lastCast = undefined;
     }
@@ -1126,14 +1480,6 @@ lnaBtn.onclick = async () => {
 const AIRPLAY = !!window.WebKitPlaybackTargetAvailabilityEvent;
 const airBox = document.getElementById('airBox'), airVideo = document.getElementById('airVideo');
 const airBtn = document.getElementById('airBtn'), airNote = document.getElementById('airNote');
-const APPLE_TV_TIP = `<details><summary>Using an Apple TV?</summary><div class="inner">
-  <p>On the Apple TV: Settings → Video and Audio → <b>Match Content</b> → turn on <b>Match Dynamic Range</b>.
-  Otherwise the patterns may be shown in HDR or Dolby Vision and look washed out.</p>
-  <p>Make the picture changes on the HDMI input the Apple TV is plugged into.</p></div></details>`;
-const CHROMECAST_TIP = `<details><summary>Using a separate Chromecast?</summary><div class="inner">
-  <p>On the Chromecast: Settings → Display &amp; Sound → Advanced display settings → <b>Dynamic range</b> → turn on <b>match content</b>.
-  Otherwise the patterns may be shown in HDR and look washed out.</p>
-  <p>Make the picture changes on the HDMI input the Chromecast is plugged into.</p></div></details>`;
 let airName;   // pattern loaded on the AirPlay video (undefined = nothing yet)
 
 function airOn() { return AIRPLAY && link === 'airplay' && !!airVideo.webkitCurrentPlaybackTargetIsWireless; }
@@ -1197,7 +1543,7 @@ if (AIRPLAY) {
   airBtn.onclick = () => {
     // The picker needs a video to send, so load one if nothing is loaded yet.
     // Start the video from this tap, so iOS treats it as real playback.
-    airLoad(S(idx).pattern || airName || '01-fit');
+    airLoad(patternFor(idx) || airName || '01-fit');
     airVideo.webkitShowPlaybackTargetPicker();
   };
 
@@ -1245,7 +1591,7 @@ function airStatus(text, on) { airMsg = [text, on]; if (link === 'airplay') setS
 function castUnavailable(msg) {
   castFailed = true;
   castStatus(msg || 'Casting isn’t available in this browser. Use Chrome on an Android phone or a computer.');
-  if (idx === 0) render();   // update the note under the connection question
+  if (S(idx).connect) render();   // update the note on the connect screen
   applyLink();
 }
 function setLink(k) {
@@ -1284,22 +1630,24 @@ document.getElementById('closeLocal').onclick = closeLocal;
 document.addEventListener('fullscreenchange', () => { if (!document.fullscreenElement && localOpen()) closeLocal(); });
 
 /* ---------- Scroll hint ---------- */
-const bar = document.getElementById('bar'), more = document.getElementById('more');
+const more = $('more');
 function updateMore() {
   const left = document.documentElement.scrollHeight - (window.scrollY + window.innerHeight);
   more.classList.toggle('show', left > 24);
 }
-function syncBar() { document.documentElement.style.setProperty('--bar-h', bar.offsetHeight + 'px'); updateMore(); }
+function syncBar() {
+  document.documentElement.style.setProperty('--bar-h', (bar.style.display === 'none' ? 0 : bar.offsetHeight) + 'px');
+  updateMore();
+}
 if (window.ResizeObserver) { new ResizeObserver(syncBar).observe(bar); new ResizeObserver(updateMore).observe(document.querySelector('main')); }
 window.addEventListener('scroll', updateMore, { passive: true });
 window.addEventListener('resize', syncBar);
 document.addEventListener('toggle', updateMore, true);            // <details> opened/closed
 document.addEventListener('load', updateMore, true);              // images finished loading
-document.getElementById('moreBtn').onclick = () => window.scrollBy({ top: window.innerHeight * 0.6, behavior: 'smooth' });
+$('moreBtn').onclick = () => window.scrollBy({ top: window.innerHeight * 0.6, behavior: 'smooth' });
 
-render();
 applyLink();
-syncBar();
+render();
 </script>
 <script src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1"></script>
 </body>
