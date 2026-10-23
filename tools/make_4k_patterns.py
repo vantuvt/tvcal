@@ -14,6 +14,7 @@ Usage: make_4k_patterns.py OUT_DIR WORK_DIR
 """
 import os
 import subprocess
+from silent_audio import add_silent_audio
 import sys
 
 import numpy as np
@@ -80,6 +81,7 @@ def encode(name, Y):
     subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-stream_loop", str(LOOPS - 1), "-i", out,
                     "-c", "copy", "-map", "0", "-movflags", "+faststart", tmp], check=True)
     os.replace(tmp, out)
+    add_silent_audio(out)   # needed for AirPlay from iPhone/iPad
     return raw, out
 
 
