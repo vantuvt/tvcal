@@ -89,7 +89,7 @@ page explains how to re-enable it in Site settings → Local network access.
 - Pick brand, model and connection on the start screen. Tap "Let this page find my TV" (first visit) and Allow, then "Connect to TV", pick the TV, then Start → Next. Each pattern step should load on the TV and loop.
 - The player shows a title/progress overlay for a few seconds after loading; judge the pattern after it fades.
 - Chromecast with Google TV / Google TV Streamer: set Dynamic range to match content, or the SDR patterns may be shown in HDR.
-- iPhone/iPad (Safari): tap "AirPlay to TV", pick an Apple TV or AirPlay 2 TV, then Start → Next. Each pattern should switch on the TV without reconnecting. Steps without a pattern pause the last one rather than disconnecting.
+- iPhone/iPad (Safari): tap "AirPlay to TV", pick an Apple TV or AirPlay 2 TV, then Start → Next. Each pattern should switch on the TV without reconnecting. Steps without a pattern pause the last one rather than disconnecting, except after the last pattern (Dolby Vision onward), where the video is unloaded so the TV is released. Leaving or closing the page releases it too. Going Back to a pattern step plays it again (or asks to tap AirPlay to TV if the connection ended).
 - Apple TV: turn on Match Content → Match Dynamic Range, or the SDR patterns may be shown in HDR.
 
 ## Known limits / next ideas
