@@ -66,7 +66,13 @@ Safari can't use Google Cast, so when the page runs in Safari it hides the Cast
 controls and shows **AirPlay to TV** instead. A small preview `<video>` is sent
 to the AirPlay receiver with `webkitShowPlaybackTargetPicker()`, and each step
 swaps its source; the page stays usable on the phone. It works with Apple TV and
-TVs with AirPlay 2 built in, but not with Chromecast or Google TV. Over AirPlay the
+TVs with AirPlay 2 built in (including some Google TV models), but not with a
+separate Chromecast. Every pattern video carries a **silent audio track** and the
+AirPlay video plays **unmuted**: iOS only routes real, audible media to an AirPlay
+TV, so a muted or audio-less video connects but never shows on the TV. Unmuted
+playback has to start from a tap, so `play()` is always called from a button
+handler (AirPlay to TV, Next, Back). The generators add the track via
+`tools/silent_audio.py`; the picture streams are copied unchanged. Over AirPlay the
 1080p files are always used (no 4K sharpness file). HDR patterns need an Apple TV
 4K or a TV that plays HEVC HDR10; if playback fails, the phone says so.
 

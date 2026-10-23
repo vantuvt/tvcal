@@ -10,6 +10,7 @@ manifest of the regions used for verification.
 import json
 import os
 import subprocess
+from silent_audio import add_silent_audio
 import sys
 
 import numpy as np
@@ -273,6 +274,7 @@ def encode(name, Y, U, V):
     ]
     subprocess.run(cmd, check=True)
     extend(out)
+    add_silent_audio(out)   # needed for AirPlay from iPhone/iPad
     return raw, out
 
 

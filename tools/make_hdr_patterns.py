@@ -12,6 +12,7 @@ Usage: make_hdr_patterns.py OUT_DIR WORK_DIR
 import json
 import os
 import subprocess
+from silent_audio import add_silent_audio
 import sys
 
 import numpy as np
@@ -182,6 +183,7 @@ def encode(name, Y, U, V):
         "-color_range", "tv", "-colorspace", "bt2020nc", "-color_primaries", "bt2020",
         "-color_trc", "smpte2084", "-movflags", "+faststart", "-an", out], check=True)
     extend(out)
+    add_silent_audio(out)   # needed for AirPlay from iPhone/iPad
     return raw, out
 
 
