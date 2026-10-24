@@ -24,6 +24,7 @@
     --sheet: #1c1c22; --bar-bg: #16161a; --tab-on: #2e2e36;
     --fade0: rgba(17,17,19,0); --fade1: rgba(17,17,19,.92);
     --shadow: rgba(0,0,0,.6); --backdrop: rgba(0,0,0,.6);
+    --img-frame: #2e2e36;
   }
   @media (prefers-color-scheme: light) { :root:not([data-theme=dark]) { 
     color-scheme: light;
@@ -36,6 +37,7 @@
     --sheet: #ffffff; --bar-bg: #ffffff; --tab-on: #ffffff;
     --fade0: rgba(244,244,246,0); --fade1: rgba(244,244,246,.94);
     --shadow: rgba(20,20,40,.18); --backdrop: rgba(20,20,30,.35);
+    --img-frame: #85858f;
    } }
   :root[data-theme=light] { 
     color-scheme: light;
@@ -48,6 +50,7 @@
     --sheet: #ffffff; --bar-bg: #ffffff; --tab-on: #ffffff;
     --fade0: rgba(244,244,246,0); --fade1: rgba(244,244,246,.94);
     --shadow: rgba(20,20,40,.18); --backdrop: rgba(20,20,30,.35);
+    --img-frame: #85858f;
    }
   * { box-sizing: border-box; }
   html, body { margin: 0; background: var(--bg); color: var(--text);
@@ -87,7 +90,9 @@
   .poschip.close svg { stroke: var(--warn); }
   .lead { color: var(--dim); margin: -6px 0 18px; font-size: 16px; }
   figure { margin: 0 0 16px; }
-  figure img { width: 100%; display: block; border-radius: 12px; border: 1px solid var(--line); background: #000; }
+  /* The guides are pictures of the TV screen: a frame keeps a mostly white one
+     (Contrast) from merging into a light page. */
+  figure img { width: 100%; display: block; border-radius: 12px; border: 2px solid var(--img-frame); background: #000; }
   figcaption { font-size: 14px; color: var(--dim); margin-top: 8px; }
   .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
   .pair figcaption { text-align: center; color: var(--text); }
