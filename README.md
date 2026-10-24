@@ -23,7 +23,10 @@ Steps are grouped into chapters, and the top row shows where you are
 
 The home screen (hub) lists the chapters with their status (done, skipped, in
 progress), continues where you left off, and holds the optional "write down your
-settings" fields, with Copy and Start over. The connection controls appear on
+settings" fields, with Copy. **Reset the tool** at the bottom of the hub
+(after a confirmation) clears everything saved on the phone (progress, ticks,
+brand, connection choice and written-down settings) but keeps Appearance;
+the TV's own settings are never changed. The connection controls appear on
 the connect screen and in a **Your TV** sheet; on a pattern step, a banner says
 when the pattern isn't showing on the TV. The connection method is picked from
 the browser (AirPlay in Safari, Cast elsewhere), with a link to switch.

@@ -25,6 +25,7 @@
     --fade0: rgba(17,17,19,0); --fade1: rgba(17,17,19,.92);
     --shadow: rgba(0,0,0,.6); --backdrop: rgba(0,0,0,.6);
     --img-frame: #2e2e36;
+    --danger: #f28b82; --danger-ink: #2b0b09;
   }
   @media (prefers-color-scheme: light) { :root:not([data-theme=dark]) { 
     color-scheme: light;
@@ -38,6 +39,7 @@
     --fade0: rgba(244,244,246,0); --fade1: rgba(244,244,246,.94);
     --shadow: rgba(20,20,40,.18); --backdrop: rgba(20,20,30,.35);
     --img-frame: #85858f;
+    --danger: #c42b2b; --danger-ink: #ffffff;
    } }
   :root[data-theme=light] { 
     color-scheme: light;
@@ -51,6 +53,7 @@
     --fade0: rgba(244,244,246,0); --fade1: rgba(244,244,246,.94);
     --shadow: rgba(20,20,40,.18); --backdrop: rgba(20,20,30,.35);
     --img-frame: #85858f;
+    --danger: #c42b2b; --danger-ink: #ffffff;
    }
   * { box-sizing: border-box; }
   html, body { margin: 0; background: var(--bg); color: var(--text);
@@ -256,6 +259,9 @@
   .sheet-foot { display: grid; gap: 10px; margin-top: 18px; }
   .sheet-foot button { width: 100%; padding: 14px; border-radius: 14px; font-weight: 600; font-size: 16px; border: 1px solid var(--line3); background: var(--panel2); }
   .sheet-foot button.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  .sheet-foot button.danger { background: var(--danger); color: var(--danger-ink); border-color: var(--danger); }
+  .resetrow { text-align: center; margin: 24px 0 4px; }
+  .resetrow .linkish { color: var(--dim); }
 
   /* The TV connection controls: one element, moved between the connect
      step and the TV sheet, and parked out of sight otherwise. */
@@ -1337,9 +1343,14 @@ function hubHtml() {
           autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false"></label>
         ${allSteps().filter(x => x.record).map(x => `<label>${x.record}<input type="text" data-record="${x.id}" value="${esc(values[x.id] || '')}" placeholder="${esc(x.ph ? 'e.g. ' + x.ph : 'value')}"></label>`).join('')}
       </div>
-      <div class="answers two"><button data-act="copy">Copy</button><button data-act="restart">Start over</button></div>`;
+      <div class="answers"><button data-act="copy">Copy my settings</button></div>`;
   }
+  if (hasSaved()) h += `<div class="resetrow"><button class="linkish" data-act="reset">Reset the tool</button></div>`;
   return h;
+}
+// Anything a reset would clear: progress, ticks, brand, written-down settings.
+function hasSaved() {
+  return !!brand || Object.keys(status).length > 0 || Object.values(checks).some(Boolean) || Object.values(values).some(Boolean);
 }
 function chapterCard(c, num, current) {
   const st = chState(c), info = CHAPTERS[c], list = chSteps(c);
@@ -1411,6 +1422,37 @@ function openTV() {
       <button class="primary" data-act="close">Done</button></div>`;
   $('tvSlot').appendChild(panel);
   showSheet();
+}
+/* ---------- Reset ----------
+   Clears everything the tool has saved on this phone except Appearance (and
+   which Cast devices can't play 4K), then reloads to a fresh start. The TV's
+   own picture settings are never touched. */
+function openReset() {
+  sheet.dataset.mode = 'confirm';
+  sheetTitle.textContent = 'Reset the tool?';
+  const written = Object.values(values).some(Boolean);
+  sheetBody.innerHTML = `<div class="help" style="margin-top:10px">
+      <p class="say">This starts again from the beginning. It clears your progress, ticks, TV brand and connection choice${written ? ', and the settings you wrote down' : ''}.</p>
+      <p>Your TV’s own picture settings aren’t changed.</p>
+      ${written ? '<p>To keep a record of your written-down settings, copy them first.</p>' : ''}
+    </div>
+    <div class="sheet-foot">
+      ${written ? '<button data-act="copy">Copy my settings</button>' : ''}
+      <button class="danger" data-act="reset-now">Reset</button>
+      <button data-act="close">Cancel</button>
+    </div>`;
+  showSheet();
+}
+function resetAll() {
+  try {
+    Object.keys(localStorage)
+      .filter(k => k.startsWith('tvcal2.') && k !== 'tvcal2.theme' && !k.startsWith('tvcal2.no4k:'))
+      .forEach(k => localStorage.removeItem(k));
+  } catch (e) {}
+  closeLocal();
+  if (session()) { const m = session().getMediaSession(); if (m) m.stop(null, () => {}, () => {}); }
+  airRelease();
+  location.replace(location.pathname + location.search);   // fresh start, at the top of the hub
 }
 function showSheet() { if (!sheet.open) { if (sheet.showModal) sheet.showModal(); else sheet.setAttribute('open', ''); } }
 function closeSheet() { if (sheet.open) { if (sheet.close) sheet.close(); else { sheet.removeAttribute('open'); onSheetClosed(); } } }
@@ -1495,11 +1537,8 @@ document.addEventListener('click', e => {
         .then(() => { t.textContent = 'Copied'; }, () => { t.textContent = 'Copy failed'; });
       break;
     }
-    case 'restart':
-      for (const k in checks) delete checks[k];
-      for (const k in status) delete status[k];
-      store.set('checks', checks); saveStatus(); trail.length = 0; go(HUB, true);
-      break;
+    case 'reset': openReset(); break;
+    case 'reset-now': resetAll(); break;
   }
 });
 document.addEventListener('input', e => {
