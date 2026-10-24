@@ -1,16 +1,16 @@
 # tvcal: TV picture setup, by eye
 
 A website about setting up a TV's picture, built around a phone-guided setup
-tool. The site (home page, brand guides, troubleshooting, test-pattern downloads
+tool. The site (home page, brand guides, troubleshooting
 and explainers) is plain static HTML; the tool lives at `setup/`.
 
 ## The website
-- `index.html`, `guides/`, `sources/`, `troubleshoot/`, `learn/`, `test-patterns/`:
+- `index.html`, `guides/`, `sources/`, `troubleshoot/`, `learn/`:
   generated pages. **Don't edit these by hand**; edit the sources and rebuild.
 - `src/pages/*.html` — hand-written page bodies. Each starts with a JSON comment
   (`title`, `path`, `nav`, `description`); the build wraps it in the shared
   header and footer. Placeholders: `{{root}}` (relative path to the site root),
-  `{{brandCards}}`, `{{blackNames}}`, `{{patternFiles}}`, `{{icon.*}}`.
+  `{{brandCards}}`, `{{blackNames}}`, `{{icon.*}}`.
 - `guides/<brand>/` — generated from `BRANDS` and `STEPS` in `setup/index.html`,
   so the guides always use the same menu names as the tool. After changing the
   tool's wording, rebuild.
@@ -20,6 +20,10 @@ and explainers) is plain static HTML; the tool lives at `setup/`.
   written-down settings carry across.
 - `tools/build_site.mjs` — the build: `node tools/build_site.mjs` (Node 18+, no
   dependencies). Commit the output; GitHub Pages serves it without a build step.
+
+The test patterns are only shown on the TV by the setup tool; the site has no
+download page for them. (The files in `patterns/` are still publicly reachable,
+since the TV has to fetch them.)
 
 The brand guides link to `setup/?brand=<key>`, which opens the tool with that
 brand already chosen.
