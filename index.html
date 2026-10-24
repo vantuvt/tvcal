@@ -157,8 +157,12 @@
   .more { position: fixed; left: 0; right: 0; bottom: var(--bar-h, 0px); z-index: 4; height: 64px;
     pointer-events: none; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 10px;
     background: linear-gradient(rgba(17,17,19,0), rgba(17,17,19,.92)); opacity: 0; transition: opacity .2s; }
+  /* Hidden = not there at all: no taps, no highlight, no text selection.
+     visibility waits for the fade-out before switching off. */
+  .more:not(.show) { visibility: hidden; transition: opacity .2s, visibility 0s .2s; }
   .more.show { opacity: 1; }
-  .more button { pointer-events: auto; font-size: 13px; font-weight: 600; padding: 6px 12px 6px 14px; border-radius: 999px;
+  .more.show button { pointer-events: auto; }
+  .more button { pointer-events: none; user-select: none; -webkit-tap-highlight-color: transparent; font-size: 13px; font-weight: 600; padding: 6px 12px 6px 14px; border-radius: 999px;
     background: var(--panel2); border: 1px solid var(--line); display: flex; gap: 6px; align-items: center; }
 
   /* ---------- Bottom sheet (Help, and the TV connection) ---------- */
