@@ -4,14 +4,51 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#111113">
+<script>
+  // Apply the saved Appearance before the page draws, so there is no flash of the other theme.
+  try { const t = JSON.parse(localStorage.getItem('tvcal2.theme')); if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t; } catch (e) {}
+</script>
 <title>TV Picture Setup</title>
 <style>
+  /* Colours are theme tokens. Dark is the default; light follows the phone's
+     setting (Auto), or is forced with data-theme on <html> from the hub's
+     Appearance switch. */
   :root {
-    --bg: #111113; --panel: #1b1b1f; --panel2: #232329; --line: #2e2e36; --line2: #3a3a45; --text: #ececf1; --dim: #9a9aa6;
-    --accent: #7db3ff; --accent-ink: #0b1a2e; --ok: #6fd39a; --ok-bg: #12291d; --ok-line: #245a3c;
+    color-scheme: dark;
+    --bg: #111113; --panel: #1b1b1f; --panel2: #232329; --line: #2e2e36; --line2: #3a3a45; --line3: #4a4a56;
+    --text: #ececf1; --dim: #9a9aa6; --ph: #6e6e7a; --dot-off: #555;
+    --accent: #7db3ff; --accent-ink: #0b1a2e; --ring: rgba(125,179,255,.45);
+    --ok: #6fd39a; --ok-bg: #12291d; --ok-line: #245a3c; --tick-ink: #0d2418;
     --act-bg: #14243a; --act-line: #23406a; --act-dim: #b9c8de;
     --warn-bg: #2a2214; --warn-line: #5a4620; --warn: #f0c46a; --warn-text: #f0d9a8;
+    --sheet: #1c1c22; --bar-bg: #16161a; --tab-on: #2e2e36;
+    --fade0: rgba(17,17,19,0); --fade1: rgba(17,17,19,.92);
+    --shadow: rgba(0,0,0,.6); --backdrop: rgba(0,0,0,.6);
   }
+  @media (prefers-color-scheme: light) { :root:not([data-theme=dark]) { 
+    color-scheme: light;
+    --bg: #f4f4f6; --panel: #ffffff; --panel2: #ebebf0; --line: #dcdce3; --line2: #c8c8d1; --line3: #a9a9b5;
+    --text: #17171b; --dim: #5b5b66; --ph: #8a8a95; --dot-off: #b4b4bf;
+    --accent: #1f62d1; --accent-ink: #ffffff; --ring: rgba(31,98,209,.35);
+    --ok: #17773f; --ok-bg: #e2f4e9; --ok-line: #9fd3b2; --tick-ink: #ffffff;
+    --act-bg: #e9f0fc; --act-line: #b6cbf0; --act-dim: #3b4d6b;
+    --warn-bg: #fff3da; --warn-line: #e5c27f; --warn: #835400; --warn-text: #5a420f;
+    --sheet: #ffffff; --bar-bg: #ffffff; --tab-on: #ffffff;
+    --fade0: rgba(244,244,246,0); --fade1: rgba(244,244,246,.94);
+    --shadow: rgba(20,20,40,.18); --backdrop: rgba(20,20,30,.35);
+   } }
+  :root[data-theme=light] { 
+    color-scheme: light;
+    --bg: #f4f4f6; --panel: #ffffff; --panel2: #ebebf0; --line: #dcdce3; --line2: #c8c8d1; --line3: #a9a9b5;
+    --text: #17171b; --dim: #5b5b66; --ph: #8a8a95; --dot-off: #b4b4bf;
+    --accent: #1f62d1; --accent-ink: #ffffff; --ring: rgba(31,98,209,.35);
+    --ok: #17773f; --ok-bg: #e2f4e9; --ok-line: #9fd3b2; --tick-ink: #ffffff;
+    --act-bg: #e9f0fc; --act-line: #b6cbf0; --act-dim: #3b4d6b;
+    --warn-bg: #fff3da; --warn-line: #e5c27f; --warn: #835400; --warn-text: #5a420f;
+    --sheet: #ffffff; --bar-bg: #ffffff; --tab-on: #ffffff;
+    --fade0: rgba(244,244,246,0); --fade1: rgba(244,244,246,.94);
+    --shadow: rgba(20,20,40,.18); --backdrop: rgba(20,20,30,.35);
+   }
   * { box-sizing: border-box; }
   html, body { margin: 0; background: var(--bg); color: var(--text);
     font: 17px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; -webkit-text-size-adjust: 100%; }
@@ -32,7 +69,7 @@
   .app-name { flex: 1; padding-left: 8px; font-size: 15px; font-weight: 600; color: var(--dim); }
   .chip { display: flex; align-items: center; gap: 8px; min-height: 40px; padding: 6px 14px; border-radius: 999px; border: 1px solid var(--line);
     background: none; font-size: 14px; color: var(--dim); }
-  .dot { width: 8px; height: 8px; border-radius: 50%; background: #555; flex: none; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--dot-off); flex: none; }
   .dot.on { background: var(--ok); }
 
   .banner { display: flex; align-items: center; gap: 12px; margin: 4px 0 8px; padding: 10px 12px 10px 14px; border-radius: 12px;
@@ -87,7 +124,7 @@
   .brands { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
   .brands button.on { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
   .brands.attn { animation: attn .9s ease-in-out 2; border-radius: 16px; }
-  @keyframes attn { 50% { box-shadow: 0 0 0 3px rgba(125,179,255,.45); } }
+  @keyframes attn { 50% { box-shadow: 0 0 0 3px var(--ring); } }
   .note { font-size: 14px; color: var(--dim); margin: 14px 0 0; }
 
   .cards { display: grid; gap: 10px; }
@@ -108,7 +145,7 @@
   .check button[aria-pressed=true] { background: var(--ok-bg); border-color: var(--ok-line); }
   .check .tick { flex: none; width: 26px; height: 26px; border-radius: 50%; border: 2px solid var(--dim); display: grid; place-items: center; margin-top: 1px; }
   .check [aria-pressed=true] .tick { background: var(--ok); border-color: var(--ok); }
-  .check [aria-pressed=true] .tick::after { content: ""; width: 10px; height: 6px; border-left: 3px solid #0d2418; border-bottom: 3px solid #0d2418; transform: rotate(-45deg) translate(1px, -1px); }
+  .check [aria-pressed=true] .tick::after { content: ""; width: 10px; height: 6px; border-left: 3px solid var(--tick-ink); border-bottom: 3px solid var(--tick-ink); transform: rotate(-45deg) translate(1px, -1px); }
   .check .t { display: block; font-weight: 600; }
   .check .d { display: block; font-size: 14px; color: var(--dim); }
   details.also { border: 1px dashed var(--line2); border-radius: 14px; padding: 0 14px; margin-bottom: 12px; }
@@ -125,10 +162,10 @@
   .chap { width: 100%; text-align: left; display: flex; align-items: center; gap: 14px; background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 16px; }
   .chap.cur { background: var(--act-bg); border: 2px solid var(--accent); padding: 15px; }
   .chap.opt:not(.done):not(.cur) { background: none; border-style: dashed; border-color: var(--line2); }
-  .chap .num { flex: none; width: 32px; height: 32px; border-radius: 50%; border: 2px solid #4a4a56; color: var(--dim); display: grid; place-items: center; font-weight: 700; font-size: 15px; }
+  .chap .num { flex: none; width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--line3); color: var(--dim); display: grid; place-items: center; font-weight: 700; font-size: 15px; }
   .chap.cur .num { border-color: var(--accent); color: var(--accent); }
   .chap.done .num { background: var(--ok); border-color: var(--ok); }
-  .chap.done .num svg { width: 16px; height: 16px; fill: none; stroke: #0d2418; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+  .chap.done .num svg { width: 16px; height: 16px; fill: none; stroke: var(--tick-ink); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
   .chap .txt { flex: 1; min-width: 0; }
   .chap .txt b { display: block; font-size: 17px; }
   .chap .txt b i { font-style: normal; font-size: 13px; font-weight: 500; color: var(--dim); margin-left: 4px; }
@@ -145,18 +182,23 @@
   .settings label:last-child { border-bottom: none; }
   input[type=text] { width: 140px; background: var(--bg); border: 1px solid var(--line); color: var(--text);
     border-radius: 8px; padding: 9px 10px; font: inherit; font-size: 16px; }
-  input::placeholder { color: #6e6e7a; }
+  input::placeholder { color: var(--ph); }
+
+  .appearance { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 28px 0 8px; font-size: 15px; color: var(--dim); }
+  .seg { display: grid; grid-auto-flow: column; gap: 4px; background: var(--panel2); border: 1px solid var(--line); border-radius: 12px; padding: 3px; }
+  .seg button { border: none; background: none; border-radius: 9px; padding: 8px 14px; font-size: 14px; font-weight: 600; color: var(--dim); min-height: 36px; }
+  .seg button[aria-checked=true] { background: var(--tab-on); color: var(--text); box-shadow: 0 1px 2px var(--shadow); }
 
   /* ---------- Bottom bar ---------- */
-  .bar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 5; background: #16161a;
+  .bar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 5; background: var(--bar-bg);
     border-top: 1px solid var(--line); padding: 12px 16px calc(16px + env(safe-area-inset-bottom)); }
   .bar .inner { max-width: 520px; margin: 0 auto; display: grid; gap: 6px; }
-  .bar button { width: 100%; padding: 16px; border-radius: 14px; font-weight: 600; font-size: 17px; border: 1px solid #4a4a56; background: var(--panel2); }
+  .bar button { width: 100%; padding: 16px; border-radius: 14px; font-weight: 600; font-size: 17px; border: 1px solid var(--line3); background: var(--panel2); }
   .bar button.primary, button.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
   .bar .hint { font-size: 13px; color: var(--dim); text-align: center; }
   .more { position: fixed; left: 0; right: 0; bottom: var(--bar-h, 0px); z-index: 4; height: 64px;
     pointer-events: none; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 10px;
-    background: linear-gradient(rgba(17,17,19,0), rgba(17,17,19,.92)); opacity: 0; transition: opacity .2s; }
+    background: linear-gradient(var(--fade0), var(--fade1)); opacity: 0; transition: opacity .2s; }
   /* Hidden = not there at all: no taps, no highlight, no text selection.
      visibility waits for the fade-out before switching off. */
   .more:not(.show) { visibility: hidden; transition: opacity .2s, visibility 0s .2s; }
@@ -167,23 +209,23 @@
 
   /* ---------- Bottom sheet (Help, and the TV connection) ---------- */
   .sheet { width: 100%; max-width: 520px; max-height: 88vh; margin: auto auto 0; padding: 0; border: none; border-top: 1px solid var(--line2);
-    border-radius: 22px 22px 0 0; background: #1c1c22; color: var(--text); box-shadow: 0 -12px 32px rgba(0,0,0,.6); }
-  .sheet::backdrop { background: rgba(0,0,0,.6); }
+    border-radius: 22px 22px 0 0; background: var(--sheet); color: var(--text); box-shadow: 0 -12px 32px var(--shadow); }
+  .sheet::backdrop { background: var(--backdrop); }
   .sheet-inner { padding: 10px 20px calc(20px + env(safe-area-inset-bottom)); }
-  .grab { width: 40px; height: 5px; border-radius: 3px; background: #4a4a56; margin: 0 auto 6px; }
+  .grab { width: 40px; height: 5px; border-radius: 3px; background: var(--line3); margin: 0 auto 6px; }
   .sheet-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
   .sheet-head h2 { font-size: 20px; }
   .sheet-head .icon { margin-right: -10px; }
   .tabs { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 4px; background: var(--bg); border-radius: 12px; padding: 4px; margin: 10px 0 16px; }
   .tabs button { border: none; background: none; border-radius: 9px; padding: 10px 4px; font-size: 14px; font-weight: 600; color: var(--dim); }
-  .tabs button[aria-selected=true] { background: var(--line); color: var(--text); }
+  .tabs button[aria-selected=true] { background: var(--tab-on); color: var(--text); box-shadow: 0 1px 2px var(--shadow); }
   .help { font-size: 16px; color: var(--dim); }
   .help p { margin: 0 0 12px; }
   .help b, .help h3 { color: var(--text); }
   .help h3 { font-size: 16px; margin: 18px 0 8px; }
   .help .say { color: var(--text); }
   .sheet-foot { display: grid; gap: 10px; margin-top: 18px; }
-  .sheet-foot button { width: 100%; padding: 14px; border-radius: 14px; font-weight: 600; font-size: 16px; border: 1px solid #4a4a56; background: var(--panel2); }
+  .sheet-foot button { width: 100%; padding: 14px; border-radius: 14px; font-weight: 600; font-size: 16px; border: 1px solid var(--line3); background: var(--panel2); }
   .sheet-foot button.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
 
   /* The TV connection controls: one element, moved between the connect
@@ -890,6 +932,20 @@ let link = store.get('link') || (IOS || SAFARI_AIRPLAY ? 'airplay' : 'cast');
 let idx = Math.max(0, ID(store.get('stepId')));
 if (!brand && STEPS[idx].chapter && STEPS[idx].chapter !== 'setup') idx = HUB;
 const status = store.get('status') || {};   // step id -> 'done' | 'skipped'
+
+/* ---------- Appearance ----------
+   Auto follows the phone's light or dark setting; Light and Dark force one.
+   The <head> script applies a saved choice before the page first draws. */
+let theme = store.get('theme') || 'auto';
+const lightQuery = window.matchMedia ? matchMedia('(prefers-color-scheme: light)') : null;
+function applyTheme() {
+  const root = document.documentElement;
+  if (theme === 'auto') delete root.dataset.theme; else root.dataset.theme = theme;
+  const dark = theme === 'dark' || (theme === 'auto' && !(lightQuery && lightQuery.matches));
+  document.querySelector('meta[name=theme-color]').content = dark ? '#111113' : '#f4f4f6';
+}
+if (lightQuery && lightQuery.addEventListener) lightQuery.addEventListener('change', applyTheme);
+applyTheme();
 function saveStatus() { store.set('status', status); }
 
 // The step as shown: generic step with the chosen brand's overrides on top.
@@ -1183,6 +1239,9 @@ function hubHtml() {
       </div>
       <div class="answers two"><button data-act="copy">Copy</button><button data-act="restart">Start over</button></div>`;
   }
+  const opt = (k, label) => `<button role="radio" aria-checked="${theme === k}" data-theme-pick="${k}">${label}</button>`;
+  h += `<div class="appearance"><span id="appearanceLabel">Appearance</span>
+    <div class="seg" role="radiogroup" aria-labelledby="appearanceLabel">${opt('auto', 'Auto')}${opt('light', 'Light')}${opt('dark', 'Dark')}</div></div>`;
   return h;
 }
 function chapterCard(c, num, current) {
@@ -1275,6 +1334,7 @@ document.addEventListener('click', e => {
   if (!t || t.closest('#connectPanel')) return;
   const d = t.dataset;
   if (d.brand) { brand = d.brand; store.set('brand', brand); render(); return; }
+  if (d.themePick) { theme = d.themePick; store.set('theme', theme); applyTheme(); render(); return; }
   if (d.check) {
     checks[d.check] = !checks[d.check]; store.set('checks', checks);
     t.setAttribute('aria-pressed', String(!!checks[d.check])); return;

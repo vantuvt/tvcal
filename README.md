@@ -28,6 +28,11 @@ the connect screen and in a **Your TV** sheet; on a pattern step, a banner says
 when the pattern isn't showing on the TV. The connection method is picked from
 the browser (AirPlay in Safari, Cast elsewhere), with a link to switch.
 
+There's a light and a dark theme. **Appearance** at the bottom of the hub
+chooses Auto (follow the phone's setting, the default), Light or Dark, and
+remembers the choice. All colours are CSS tokens on `:root`, with the light
+values under `prefers-color-scheme: light` and `[data-theme=light]`.
+
 ## Files
 - `index.html` — the phone wizard (Cast sender). Self-contained.
 - `patterns/*.mp4` — 1920x1080 H.264 High@4.1, 30 fps, 5 min (a verified 60 s loop repeated without re-encoding), limited range, BT.709 tagged. Loop on the TV.
