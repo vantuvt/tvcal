@@ -1,0 +1,22 @@
+<!--{"title": "Test patterns", "path": "test-patterns/", "nav": "patterns", "description": "Free TV test pattern videos for SDR and HDR10: brightness, contrast, sharpness, colour temperature and HDR highlights. Play them from a USB stick or media player."}-->
+<div class="wrap narrow">
+<div class="page-head">
+  <p class="eyebrow">Test patterns</p>
+  <h1 class="page-title">Play the patterns yourself</h1>
+  <p class="lead">Every pattern the guided setup uses, as video files. Copy them to a USB stick or a media server and play them on the TV, then follow your <a href="{{root}}guides/">brand guide</a> for what to look for.</p>
+</div>
+
+<div class="callout" style="margin-top: 28px">{{icon.info}}<p>Play these files directly, not copies uploaded to YouTube or a cloud service: re-compression changes the exact levels the patterns depend on. Each file is about five minutes long, so loop it if your player allows.</p></div>
+
+<section aria-label="Pattern files">
+{{patternFiles}}
+</section>
+
+<section class="section prose" aria-labelledby="spec-h">
+  <h2 class="section-h" id="spec-h" style="font-size: 26px">About the files</h2>
+  <p><b>SDR:</b> 1920×1080, H.264, 30 fps, limited range, tagged BT.709. The sharpness pattern also comes in native 3840×2160 (HEVC), so a 4K TV doesn’t add its own upscaling to it.</p>
+  <p><b>HDR10:</b> 1920×1080, HEVC Main10, PQ and BT.2020, with HDR10 metadata (mastering display P3-D65, 1000 nits; MaxCLL 1000, MaxFALL 400). Greyscale only.</p>
+  <p>Levels are written directly as video code values, so the below-black box survives instead of being clipped. The generators are in the <a href="https://github.com/vantuvt/tvcal/tree/main/tools">project’s tools folder</a>.</p>
+  <p>There are no Dolby Vision patterns: Dolby Vision fits itself to the TV, and making Dolby Vision test videos needs Dolby’s licensed encoder.</p>
+</section>
+</div>

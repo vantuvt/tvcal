@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#111113">
+<script>
+  // Apply the saved Appearance (shared with the setup tool) before the page draws.
+  try { var t = JSON.parse(localStorage.getItem('tvcal2.theme')); if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t; } catch (e) {}
+</script>
+<title>Brand guides · tvcal</title>
+<meta name="description" content="TV picture setup guides with each brand's own menu names: Samsung, LG, Sony, TCL, Hisense and others.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20rx%3D%226%22%20fill%3D%22%23111113%22%2F%3E%3Crect%20x%3D%225%22%20y%3D%227%22%20width%3D%225%22%20height%3D%2218%22%20fill%3D%22%233a3a3a%22%2F%3E%3Crect%20x%3D%2211%22%20y%3D%227%22%20width%3D%225%22%20height%3D%2218%22%20fill%3D%22%237a7a7a%22%2F%3E%3Crect%20x%3D%2217%22%20y%3D%227%22%20width%3D%225%22%20height%3D%2218%22%20fill%3D%22%23bdbdbd%22%2F%3E%3Crect%20x%3D%2223%22%20y%3D%227%22%20width%3D%224%22%20height%3D%2218%22%20fill%3D%22%23f2f2f2%22%2F%3E%3C%2Fsvg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&amp;family=IBM+Plex+Sans:wght@400;500;600;700&amp;display=swap">
+<link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-header">
+  <div class="wrap">
+    <a class="logo" href="../"><span class="logo-mark" aria-hidden="true"><span></span><span></span><span></span><span></span></span>tvcal</a>
+    <nav class="nav" aria-label="Main">
+      <a href="../setup/">Setup</a>
+      <a href="../guides/" aria-current="page">Brand guides</a>
+      <a href="../troubleshoot/">Troubleshoot</a>
+      <a href="../test-patterns/">Test patterns</a>
+      <a href="../learn/">Learn</a>
+    </nav>
+  </div>
+</header>
+<main id="main">
+<div class="wrap">
+<div class="page-head">
+  <p class="eyebrow">Brand guides</p>
+  <h1 class="page-title">Set up your TV, in its own words</h1>
+  <p class="lead">Every brand names its picture controls differently, and the most important one, black level, has a different name on almost every TV. Pick your brand for the exact menu names, step by step.</p>
+</div>
+<section class="section" style="padding-top: 32px" aria-label="Brands">
+  <div class="grid" style="--min: 170px">
+  <a class="card" href="../guides/samsung/"><span class="card-title">Samsung</span><span class="card-sub">Key setting: Shadow Detail</span></a>
+  <a class="card" href="../guides/lg/"><span class="card-title">LG</span><span class="card-sub">Key setting: Screen Brightness</span></a>
+  <a class="card" href="../guides/sony/"><span class="card-title">Sony</span><span class="card-sub">Key setting: Black level</span></a>
+  <a class="card" href="../guides/tcl/"><span class="card-title">TCL</span><span class="card-sub">Key setting: Black Level</span></a>
+  <a class="card" href="../guides/hisense/"><span class="card-title">Hisense</span><span class="card-sub">Key setting: Brightness</span></a>
+  <a class="card dashed" href="../guides/other/"><span class="card-title">Another brand</span><span class="card-sub">Common names that work on most TVs</span></a>
+</div>
+</section>
+<section class="section" aria-labelledby="how-h">
+  <h2 class="section-h" id="how-h">Read it, or be guided</h2>
+  <p class="section-lead">Each guide covers the same steps as the guided setup. Read it here to see what’s involved, or start the setup on your phone and it walks you through each one with the test pattern on your TV.</p>
+  <a class="btn btn-primary" href="../setup/">Start guided setup <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+</section>
+</div>
+</main>
+<footer class="site-footer">
+  <div class="wrap">
+    <span>tvcal · free and open source</span>
+    <div class="links">
+      <a href="https://github.com/vantuvt/tvcal">GitHub</a>
+      <a href="https://github.com/vantuvt/tvcal/issues/new">Report a problem</a>
+      <label>Appearance
+        <select id="appearance">
+          <option value="auto">Auto</option>
+          <option value="light">Light</option>
+          <option value="dark">Dark</option>
+        </select>
+      </label>
+    </div>
+  </div>
+</footer>
+<script src="../assets/site.js" defer></script>
+</body>
+</html>

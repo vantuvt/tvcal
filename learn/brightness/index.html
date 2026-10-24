@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#111113">
+<script>
+  // Apply the saved Appearance (shared with the setup tool) before the page draws.
+  try { var t = JSON.parse(localStorage.getItem('tvcal2.theme')); if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t; } catch (e) {}
+</script>
+<title>Brightness isn’t how bright your TV is · tvcal</title>
+<meta name="description" content="On most TVs the Brightness control sets where black sits, not how bright the picture is. What brightness, backlight and contrast each do, with an interactive demo.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20rx%3D%226%22%20fill%3D%22%23111113%22%2F%3E%3Crect%20x%3D%225%22%20y%3D%227%22%20width%3D%225%22%20height%3D%2218%22%20fill%3D%22%233a3a3a%22%2F%3E%3Crect%20x%3D%2211%22%20y%3D%227%22%20width%3D%225%22%20height%3D%2218%22%20fill%3D%22%237a7a7a%22%2F%3E%3Crect%20x%3D%2217%22%20y%3D%227%22%20width%3D%225%22%20height%3D%2218%22%20fill%3D%22%23bdbdbd%22%2F%3E%3Crect%20x%3D%2223%22%20y%3D%227%22%20width%3D%224%22%20height%3D%2218%22%20fill%3D%22%23f2f2f2%22%2F%3E%3C%2Fsvg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&amp;family=IBM+Plex+Sans:wght@400;500;600;700&amp;display=swap">
+<link rel="stylesheet" href="../../assets/site.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-header">
+  <div class="wrap">
+    <a class="logo" href="../../"><span class="logo-mark" aria-hidden="true"><span></span><span></span><span></span><span></span></span>tvcal</a>
+    <nav class="nav" aria-label="Main">
+      <a href="../../setup/">Setup</a>
+      <a href="../../guides/">Brand guides</a>
+      <a href="../../troubleshoot/">Troubleshoot</a>
+      <a href="../../test-patterns/">Test patterns</a>
+      <a href="../../learn/" aria-current="page">Learn</a>
+    </nav>
+  </div>
+</header>
+<main id="main">
+<article class="wrap narrow" style="padding-top: 40px; padding-bottom: 40px">
+  <nav class="crumbs" aria-label="Breadcrumb"><a href="../../learn/">Learn</a> <span aria-hidden="true">›</span> Basics</nav>
+  <h1 class="page-title">Brightness isn’t how bright your TV is</h1>
+  <p class="lead" style="margin-bottom: 36px">On many TVs, the control called Brightness doesn’t make the picture brighter. It decides where black sits. The control that makes the whole picture brighter usually has another name.</p>
+
+  <figure class="demo" data-demo>
+    <div class="demo-ramp" role="img" aria-label="Grey scale from black to white in eleven steps"></div>
+    <div class="demo-controls">
+      <div>
+        <label for="demo-black"><b>Black level</b><span class="mono muted" data-out="black">0</span></label>
+        <input id="demo-black" type="range" min="-10" max="10" step="1" value="0">
+      </div>
+      <div>
+        <label for="demo-light"><b>Backlight</b><span class="mono muted" data-out="light">80</span></label>
+        <input id="demo-light" type="range" min="20" max="100" step="5" value="80">
+      </div>
+    </div>
+    <figcaption>Move the sliders to see the difference. (The demo needs JavaScript.)</figcaption>
+  </figure>
+
+  <div class="prose">
+  <h2 class="section-h">Three controls, three jobs</h2>
+  <p>Try the sliders above. Black level moves the dark end of the scale. Backlight turns the whole thing up and down without changing which steps you can tell apart.</p>
+  <div class="settings-table" style="margin-bottom: 40px">
+    <div class="settings-row"><div class="k"><strong>Black level</strong></div><div class="v"><span>Where black sits. Set it once with a test pattern and leave it.</span></div></div>
+    <div class="settings-row"><div class="k"><strong>Backlight or light output</strong></div><div class="v"><span>How bright the whole picture is. Change it to suit the room: brighter by day, dimmer at night.</span></div></div>
+    <div class="settings-row"><div class="k"><strong>Contrast</strong></div><div class="v"><span>Where white sits. Too high, and the brightest details merge into flat white.</span></div></div>
+  </div>
+
+  <h2 class="section-h">Your TV may use different names</h2>
+  <p>The black-level control has a different name on almost every brand:</p>
+  </div>
+  <ul class="grid" style="--min: 200px; list-style: none; padding: 0; margin: 0 0 40px; gap: 10px">
+  <li class="card" style="padding: 14px 16px"><span class="muted small">Samsung</span><br>Shadow Detail</li>
+  <li class="card" style="padding: 14px 16px"><span class="muted small">LG</span><br>Screen Brightness</li>
+  <li class="card" style="padding: 14px 16px"><span class="muted small">Sony</span><br>Black level</li>
+  <li class="card" style="padding: 14px 16px"><span class="muted small">TCL</span><br>Black Level</li>
+  <li class="card" style="padding: 14px 16px"><span class="muted small">Hisense</span><br>Brightness</li>
+</ul>
+
+  <div class="card highlight" style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 18px">
+    <div style="flex: 1 1 320px; min-width: 0">
+      <h2 style="margin: 0 0 6px; font-size: 22px">Set yours with a pattern</h2>
+      <p style="margin: 0">Your phone shows the pattern on the TV and tells you which button to press.</p>
+    </div>
+    <a class="btn btn-primary" href="../../setup/">Start setup</a>
+  </div>
+
+  <nav class="article-nav" aria-label="More articles">
+    <a href="../../learn/">All articles</a>
+    <a href="../../troubleshoot/grey-blacks/">Blacks look grey? →</a>
+  </nav>
+</article>
+</main>
+<footer class="site-footer">
+  <div class="wrap">
+    <span>tvcal · free and open source</span>
+    <div class="links">
+      <a href="https://github.com/vantuvt/tvcal">GitHub</a>
+      <a href="https://github.com/vantuvt/tvcal/issues/new">Report a problem</a>
+      <label>Appearance
+        <select id="appearance">
+          <option value="auto">Auto</option>
+          <option value="light">Light</option>
+          <option value="dark">Dark</option>
+        </select>
+      </label>
+    </div>
+  </div>
+</footer>
+<script src="../../assets/site.js" defer></script>
+</body>
+</html>

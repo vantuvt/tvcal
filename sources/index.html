@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#111113">
+<script>
+  // Apply the saved Appearance (shared with the setup tool) before the page draws.
+  try { var t = JSON.parse(localStorage.getItem('tvcal2.theme')); if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t; } catch (e) {}
+</script>
+<title>Streaming box and console settings · tvcal</title>
+<meta name="description" content="Set up an Apple TV, Chromecast with Google TV, Fire TV, PlayStation 5, Xbox or PC so it sends the right signal before you set up the TV.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20rx%3D%226%22%20fill%3D%22%23111113%22%2F%3E%3Crect%20x%3D%225%22%20y%3D%227%22%20width%3D%225%22%20height%3D%2218%22%20fill%3D%22%233a3a3a%22%2F%3E%3Crect%20x%3D%2211%22%20y%3D%227%22%20width%3D%225%22%20height%3D%2218%22%20fill%3D%22%237a7a7a%22%2F%3E%3Crect%20x%3D%2217%22%20y%3D%227%22%20width%3D%225%22%20height%3D%2218%22%20fill%3D%22%23bdbdbd%22%2F%3E%3Crect%20x%3D%2223%22%20y%3D%227%22%20width%3D%224%22%20height%3D%2218%22%20fill%3D%22%23f2f2f2%22%2F%3E%3C%2Fsvg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&amp;family=IBM+Plex+Sans:wght@400;500;600;700&amp;display=swap">
+<link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-header">
+  <div class="wrap">
+    <a class="logo" href="../"><span class="logo-mark" aria-hidden="true"><span></span><span></span><span></span><span></span></span>tvcal</a>
+    <nav class="nav" aria-label="Main">
+      <a href="../setup/">Setup</a>
+      <a href="../guides/" aria-current="page">Brand guides</a>
+      <a href="../troubleshoot/">Troubleshoot</a>
+      <a href="../test-patterns/">Test patterns</a>
+      <a href="../learn/">Learn</a>
+    </nav>
+  </div>
+</header>
+<main id="main">
+<div class="wrap">
+<div class="page-head">
+  <p class="eyebrow">Before you start</p>
+  <h1 class="page-title">Set up your streaming box or console</h1>
+  <p class="lead">Get the box sending the right signal first. Otherwise you end up adjusting the TV to cover for it, and the settings are wrong for everything else.</p>
+  <div class="tabs" id="device-tabs" role="tablist" aria-label="Device" hidden></div>
+</div>
+
+<div class="split">
+<div class="split-main" data-tabs="#device-tabs">
+
+<section class="card device" id="apple-tv" data-tab="Apple TV" aria-labelledby="apple-tv-h">
+  <h2 id="apple-tv-h">Apple TV 4K</h2>
+  <p class="body">Turn on content matching, so the Apple TV switches to each show’s own format instead of sending everything one way.</p>
+  <div class="settings-table">
+    <div class="settings-row"><div class="k"><strong>Match Dynamic Range</strong><span class="mono">Settings → Video and Audio → Match Content</span></div><div class="v"><strong>On</strong><span>Sends HDR only for HDR content. Without it, the test patterns may be shown in HDR and look washed out.</span></div></div>
+    <div class="settings-row"><div class="k"><strong>Match Frame Rate</strong><span class="mono">Settings → Video and Audio → Match Content</span></div><div class="v"><strong>On</strong><span>Films play at their own frame rate, so slow pans don’t stutter.</span></div></div>
+  </div>
+  <p class="small muted" style="margin: 16px 0 0">Make the TV’s picture changes on the HDMI input the Apple TV uses: most TVs keep settings per input.</p>
+</section>
+
+<section class="card device" id="google-tv" data-tab="Google TV" aria-labelledby="google-tv-h">
+  <h2 id="google-tv-h">Chromecast with Google TV and Google TV Streamer</h2>
+  <p class="body">Set it to follow the content. TVs with Google TV built in don’t need any of this.</p>
+  <div class="settings-table">
+    <div class="settings-row"><div class="k"><strong>Dynamic range</strong><span class="mono">Settings → Display &amp; Sound</span></div><div class="v"><strong>Match content</strong><span>HDR only for HDR shows. Without it, ordinary video and the SDR test patterns can be shown in HDR. On some versions it’s under Advanced display settings.</span></div></div>
+    <div class="settings-row"><div class="k"><strong>Match content frame rate</strong><span class="mono">Settings → Display &amp; Sound</span></div><div class="v"><strong>On</strong><span>Films play at their own frame rate.</span></div></div>
+    <div class="settings-row"><div class="k"><strong>Resolution</strong><span class="mono">Settings → Display &amp; Sound → Resolution</span></div><div class="v"><strong>4K or Auto</strong><span>On a 4K TV. At 1080p, the TV has to upscale everything you watch.</span></div></div>
+  </div>
+</section>
+
+<section class="card device" id="fire-tv" data-tab="Fire TV" aria-labelledby="fire-tv-h">
+  <h2 id="fire-tv-h">Amazon Fire TV</h2>
+  <p class="body">Let the stick follow the content rather than forcing one format.</p>
+  <div class="settings-table">
+    <div class="settings-row"><div class="k"><strong>Match Original Frame Rate</strong><span class="mono">Display settings</span></div><div class="v"><strong>On</strong><span>It’s off by default. Films then play at their own frame rate.</span></div></div>
+    <div class="settings-row"><div class="k"><strong>Dynamic range</strong><span class="mono">Display settings</span></div><div class="v"><strong>Follow the content</strong><span>If you see a choice, pick the option that switches to HDR only for HDR content, not the one that always outputs HDR.</span></div></div>
+  </div>
+</section>
+
+<section class="card device" id="playstation" data-tab="PlayStation 5" aria-labelledby="playstation-h">
+  <h2 id="playstation-h">PlayStation 5</h2>
+  <p class="body">Set the output, then run the console’s own HDR adjustment with the TV in its game mode.</p>
+  <div class="settings-table">
+    <div class="settings-row"><div class="k"><strong>RGB Range</strong><span class="mono">Settings → Screen and Video → Video Output</span></div><div class="v"><strong>Automatic</strong><span>Console and TV agree on where black is. Only change it if the TV doesn’t read it correctly.</span></div></div>
+    <div class="settings-row"><div class="k"><strong>HDR</strong><span class="mono">Settings → Screen and Video → Video Output</span></div><div class="v"><strong>On When Supported</strong><span>HDR for HDR games and apps; everything else stays SDR. Always On converts SDR to HDR.</span></div></div>
+    <div class="settings-row"><div class="k"><strong>Adjust HDR</strong><span class="mono">Settings → Screen and Video → Video Output</span></div><div class="v"><strong>Follow the on-screen steps</strong><span>Tells games how bright your TV can go.</span></div></div>
+  </div>
+</section>
+
+<section class="card device" id="xbox" data-tab="Xbox" aria-labelledby="xbox-h">
+  <h2 id="xbox-h">Xbox Series X|S</h2>
+  <p class="body">Use the standard colour space for a TV, and calibrate HDR for games.</p>
+  <div class="settings-table">
+    <div class="settings-row"><div class="k"><strong>Colour space</strong><span class="mono">TV &amp; display options</span></div><div class="v"><strong>Standard (recommended)</strong><span>Right for TVs. PC RGB is for monitors set to full range.</span></div></div>
+    <div class="settings-row"><div class="k"><strong>Allow HDR10</strong><span class="mono">Settings → General → TV &amp; display options → Advanced → Video modes</span></div><div class="v"><strong>On</strong><span>Lets HDR games and apps use HDR. Auto HDR, which adds HDR to older games, is a personal choice.</span></div></div>
+    <div class="settings-row"><div class="k"><strong>Calibrate HDR for games</strong><span class="mono">Settings → General → TV &amp; display options</span></div><div class="v"><strong>Follow the on-screen steps</strong><span>Tells games how bright your TV can go.</span></div></div>
+  </div>
+</section>
+
+<section class="card device" id="pc" data-tab="PC" aria-labelledby="pc-h">
+  <h2 id="pc-h">Windows PC</h2>
+  <p class="body">PCs are the most common cause of a range mismatch, because graphics cards often send full range while TVs expect limited.</p>
+  <div class="settings-table">
+    <div class="settings-row"><div class="k"><strong>Output range</strong><span class="mono">Graphics driver display settings</span></div><div class="v"><strong>Match the TV</strong><span>Full on the PC with the TV’s HDMI input set to full (often called PC mode), or limited on both. Either works; mixing them doesn’t.</span></div></div>
+    <div class="settings-row"><div class="k"><strong>HDR</strong><span class="mono">Windows display settings</span></div><div class="v"><strong>On for HDR games and films</strong><span>The desktop can look dull in HDR; turn it off for everyday use if you prefer.</span></div></div>
+    <div class="settings-row"><div class="k"><strong>Windows HDR Calibration</strong><span class="mono">Free app from Microsoft</span></div><div class="v"><strong>Run once with HDR on</strong><span>Tells games how bright your TV can go.</span></div></div>
+  </div>
+</section>
+
+<div class="callout"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16.5v.01"/></svg><p>Box set up? Now set up the TV, on the same HDMI input you’ll watch on. <a href="../setup/">Start the guided setup</a>.</p></div>
+
+<div class="sources">
+  Menu names are from each maker’s documentation where available, and can change with software updates:
+  <ul>
+    <li><a href="https://support.apple.com/en-us/102277">Apple: Turn on Match Dynamic Range or Match Frame Rate</a></li>
+    <li><a href="https://support.google.com/chromecast/answer/10117046">Google: Display settings for Chromecast with Google TV and Google TV Streamer</a></li>
+    <li><a href="https://www.playstation.com/support/hardware/ps5-4k-resolution-guide/">PlayStation: PS5 video output settings</a></li>
+    <li><a href="https://news.xbox.com/en-us/2020/11/06/is-your-tv-ready-to-power-your-dreams/">Xbox Wire: Xbox Series X|S TV settings</a></li>
+    <li><a href="https://www.aftvnews.com/?p=30046">AFTVnews: Fire TV frame rate matching</a></li>
+  </ul>
+</div>
+</div>
+
+<aside class="split-aside">
+  <div class="card">
+    <h2 style="margin: 0 0 12px; font-size: 19px">The three things to check</h2>
+    <p><b>Dynamic range.</b> Send HDR only when the show is HDR. Forcing everything into HDR makes ordinary video look dull.</p>
+    <p><b>Frame rate.</b> Match the film’s rate, often 24 frames a second, so pans don’t stutter.</p>
+    <p><b>Colour range.</b> Box and TV must agree, or blacks turn grey or crush.</p>
+    <a href="../troubleshoot/grey-blacks/">See what a range mismatch looks like</a>
+  </div>
+  <div class="card">
+    <h2 style="margin: 0 0 8px; font-size: 19px">Using the TV’s own apps?</h2>
+    <p>Then there’s no box to set up. Go straight to your brand guide.</p>
+    <a href="../guides/">Brand guides</a>
+  </div>
+</aside>
+</div>
+</div>
+</main>
+<footer class="site-footer">
+  <div class="wrap">
+    <span>tvcal · free and open source</span>
+    <div class="links">
+      <a href="https://github.com/vantuvt/tvcal">GitHub</a>
+      <a href="https://github.com/vantuvt/tvcal/issues/new">Report a problem</a>
+      <label>Appearance
+        <select id="appearance">
+          <option value="auto">Auto</option>
+          <option value="light">Light</option>
+          <option value="dark">Dark</option>
+        </select>
+      </label>
+    </div>
+  </div>
+</footer>
+<script src="../assets/site.js" defer></script>
+</body>
+</html>

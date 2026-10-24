@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#111113">
+<script>
+  // Apply the saved Appearance (shared with the setup tool) before the page draws.
+  try { var t = JSON.parse(localStorage.getItem('tvcal2.theme')); if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t; } catch (e) {}
+</script>
+<title>LG TV picture setup · tvcal</title>
+<meta name="description" content="How to set up a LG TV’s picture by eye, using LG’s own menu names: picture mode, Screen Brightness, contrast, sharpness, colour temperature and HDR.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20rx%3D%226%22%20fill%3D%22%23111113%22%2F%3E%3Crect%20x%3D%225%22%20y%3D%227%22%20width%3D%225%22%20height%3D%2218%22%20fill%3D%22%233a3a3a%22%2F%3E%3Crect%20x%3D%2211%22%20y%3D%227%22%20width%3D%225%22%20height%3D%2218%22%20fill%3D%22%237a7a7a%22%2F%3E%3Crect%20x%3D%2217%22%20y%3D%227%22%20width%3D%225%22%20height%3D%2218%22%20fill%3D%22%23bdbdbd%22%2F%3E%3Crect%20x%3D%2223%22%20y%3D%227%22%20width%3D%224%22%20height%3D%2218%22%20fill%3D%22%23f2f2f2%22%2F%3E%3C%2Fsvg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&amp;family=IBM+Plex+Sans:wght@400;500;600;700&amp;display=swap">
+<link rel="stylesheet" href="../../assets/site.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-header">
+  <div class="wrap">
+    <a class="logo" href="../../"><span class="logo-mark" aria-hidden="true"><span></span><span></span><span></span><span></span></span>tvcal</a>
+    <nav class="nav" aria-label="Main">
+      <a href="../../setup/">Setup</a>
+      <a href="../../guides/" aria-current="page">Brand guides</a>
+      <a href="../../troubleshoot/">Troubleshoot</a>
+      <a href="../../test-patterns/">Test patterns</a>
+      <a href="../../learn/">Learn</a>
+    </nav>
+  </div>
+</header>
+<main id="main">
+<div class="wrap">
+<div class="page-head">
+  <nav class="crumbs" aria-label="Breadcrumb"><a href="../../guides/">Brand guides</a> <span aria-hidden="true">›</span> LG</nav>
+  <p class="eyebrow">Brand guide</p>
+  <h1 class="page-title">LG picture setup</h1>
+  <p class="lead">Using LG webOS menu names (2021 and later, with notes for older models). If a name doesn’t match, look for the closest one.</p>
+</div>
+<div class="split">
+<div class="split-main">
+<div class="callout"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16.5v.01"/></svg><p>Watching through a streaming box or console? <a href="../../sources/">Set that up first</a>: a mismatch there makes blacks grey or crushed whatever you do on the TV.</p></div>
+<section class="step" id="ready" aria-labelledby="ready-h">
+  <div class="step-head"><span class="card-num">01</span><h2 id="ready-h">Get ready</h2></div>
+  <div class="step-body">
+<ul><li>Update your TV’s software first: Settings → All Settings → Support → Software Update. Updates can change picture processing or reset settings, so do it before you start.</li><li>Turn the lights down to how you normally watch.</li><li>Open the picture menu with the remote: Settings → All Settings → Picture. You’ll use it throughout.</li></ul>
+  </div>
+</section>
+<section class="step" id="quick" aria-labelledby="quick-h">
+  <div class="step-head"><span class="card-num">02</span><h2 id="quick-h">Quick settings</h2></div>
+  <div class="step-body">
+<p>Do these first. They make the biggest difference.</p>
+<ul class="checklist">
+  <li><strong>Picture Mode: Filmmaker Mode</strong><span>Picture → Picture Mode. Cinema is a good second choice.</span></li>
+  <li><strong>TruMotion: Off</strong><span>Picture → Advanced Settings → Clarity. OLED Motion Pro (or Motion Pro) is a personal choice: sharper motion, but a dimmer picture. Leave it off if unsure.</span></li>
+  <li><strong>Energy Saving Step and AI Brightness: Off</strong><span>Turn off Energy Saving Step, and AI Brightness or AI Picture Pro if your model has them.</span></li>
+  <li><strong>Color Gamut: Auto Detect</strong><span>Picture → Advanced Settings → Color. If there’s no Auto option, leave it at the mode’s default. Avoid Native or Extended.</span></li>
+  <li><strong>Color Depth and Tint: default; Auto Dynamic Contrast Off</strong><span>Leave Color Depth and Tint at the picture mode’s defaults.</span></li>
+  <li><strong>Gamma: BT.1886 or 2.4 in a dark room, 2.2 in a bright one</strong><span>Picture → Advanced Settings → Brightness → Gamma.</span></li>
+  <li><strong>Noise Reduction and MPEG Noise Reduction: Off</strong><span>Picture → Advanced Settings → Clarity. Smooth Gradation can stay at its default.</span></li>
+</ul>
+<details><summary>Where are these settings?</summary><div class="inner"><p>Settings → All Settings → <b>Picture</b> → <b>Advanced Settings</b>, which is grouped into <b>Brightness</b>, <b>Color</b> and <b>Clarity</b>.</p><p>LG keeps separate settings for HDR content, so the HDR steps later will check those.</p></div></details>
+  </div>
+</section>
+<section class="step" id="fit" aria-labelledby="fit-h">
+  <div class="step-head"><span class="card-num">03</span><h2 id="fit-h">Fit to screen</h2></div>
+  <div class="step-body">
+<p>Look at the edges of your TV. There’s a thin white border around the very edge, with arrows in each corner.</p>
+<p>Can you see the white border on all four edges, with arrows touching the corners?</p>
+<div class="do"><strong>If not: turn on Just Scan</strong><span>Picture → Aspect Ratio Settings: set Aspect Ratio to Original and turn Just Scan on.</span></div>
+<p class="uses-pattern">Uses the <a href="../../test-patterns/">Fit to screen pattern</a>. The guided setup shows it on your TV for you.</p>
+  </div>
+</section>
+<section class="step" id="black" aria-labelledby="black-h">
+  <div class="step-head"><span class="card-num">04</span><h2 id="black-h">Screen Brightness</h2></div>
+  <div class="step-body">
+<p>This makes dark scenes look right: true black, with shadow detail still visible. On LG this is Screen Brightness (just “Brightness” on older models).</p>
+<p>Picture → Advanced Settings → Brightness → <b>Screen Brightness</b> (“Brightness” on older models). <b>OLED Pixel Brightness</b> (<b>Backlight</b> on LCD models) sets the overall light output: set it for comfort.</p><p>Don’t confuse this with the setting called <b>Black Level</b>: that’s the HDMI range and should stay on Auto.</p>
+<p>Look inside the grey frames. When it’s right, box A is completely gone and box B is a very faint grey square.</p>
+<p><b>Not changing?</b> Make sure you’re adjusting Screen Brightness, not OLED Pixel Brightness or Black Level. If box B never appears on an LCD model, see “About Local Dimming” below.</p>
+<details><summary>About Local Dimming</summary><div class="inner">
+    <p>LG OLED TVs don’t dim zones, so this only applies to LG LCD (QNED, NanoCell) models.</p>
+    <p>Many LCD TVs dim parts of the backlight in dark areas. On this TV it’s called <b>Local Dimming</b>.</p>
+    <p>The grey frames around the boxes keep the backlight on, like in a real dark scene. Judge the boxes inside the frames, not the black edges of the screen.</p>
+    <p>If box B still never appears, even after raising Screen Brightness a lot, Local Dimming is hiding it. Set it one level lower (for example from High to Medium) and try again. Don’t keep raising Screen Brightness: that makes every dark scene grey.</p>
+  </div></details>
+<p class="uses-pattern">Uses the <a href="../../test-patterns/">Brightness (black level) pattern</a>. The guided setup shows it on your TV for you.</p>
+  </div>
+</section>
+<section class="step" id="contrast" aria-labelledby="contrast-h">
+  <div class="step-head"><span class="card-num">05</span><h2 id="contrast-h">Contrast</h2></div>
+  <div class="step-body">
+<p>This makes bright scenes look right, without losing detail in clouds, snow or white shirts.</p>
+<p>Picture → Advanced Settings → Brightness → <b>Adjust Contrast</b> (“Contrast” on older models). Turn off <b>Auto Dynamic Contrast</b> as well.</p>
+<p>When it’s right, you can see all three boxes. A is easy, B is lighter, C is very faint.</p>
+<p>If box C never appears, also check that Dynamic contrast and any “HDR effect” or “Peak brightness” boost are off.</p>
+<p class="uses-pattern">Uses the <a href="../../test-patterns/">Contrast pattern</a>. The guided setup shows it on your TV for you.</p>
+  </div>
+</section>
+<section class="step" id="sharpness" aria-labelledby="sharpness-h">
+  <div class="step-head"><span class="card-num">06</span><h2 id="sharpness-h">Sharpness</h2></div>
+  <div class="step-body">
+<p>Most TVs add fake outlines to make the picture look crisper. Walk up close to the TV: lower Sharpness until the black lines have no bright outlines beside them.</p>
+<p>Picture → Advanced Settings → Clarity → <b>Sharpness</b>. The default is often 10; 0 adds no artificial sharpening. Turn off <b>Super Resolution</b> too.</p>
+
+<p class="uses-pattern">Uses the <a href="../../test-patterns/">Sharpness, 1080p pattern</a>. The guided setup shows it on your TV for you.</p>
+  </div>
+</section>
+<section class="step" id="colour" aria-labelledby="colour-h">
+  <div class="step-head"><span class="card-num">07</span><h2 id="colour-h">Colour temperature</h2></div>
+  <div class="step-body">
+<p>Switch between the colour temperature options while watching the TV. The white and grey areas show the difference most clearly: cooler options look bluish, warmer ones look yellowish.</p>
+<p>Picture → Advanced Settings → Color → <b>Color Temperature</b>. Newer models use a scale up to <b>Warm 50</b>; older models have presets ending in <b>Warm2</b>.</p>
+<div class="do"><strong>Set Color Temperature to Warm 50</strong><span>Picture → Advanced Settings → Color → Color Temperature (Warm2 on older models). Slide toward the cooler end to see the difference on the white and greys, then come back.</span></div>
+<p>Give your eyes 30 seconds to adjust. Do the white and grey areas still look clearly yellow or orange?</p>
+<div class="do"><strong>If they still look yellow: move a few steps cooler</strong><span>For example Warm 40, or Warm1 on older models. Wait a moment and look again.</span></div>
+<p class="uses-pattern">Uses the <a href="../../test-patterns/">Colour temperature pattern</a>. The guided setup shows it on your TV for you.</p>
+  </div>
+</section>
+<section class="step" id="hdr" aria-labelledby="hdr-h">
+  <div class="step-head"><span class="card-num"></span><h2 id="hdr-h">HDR <span class="opt">optional</span></h2></div>
+  <div class="step-body">
+<p>Movies and shows in HDR or Dolby Vision use separate picture settings on most TVs. This checks them in a few minutes.</p>
+<h3>Is HDR on?</h3>
+<p>Press the <b>Info</b> or <b>Settings</b> button while the pattern plays: the picture mode name usually shows “HDR” (for example HDR Filmmaker, HDR Movie or HDR Cinema).</p>
+<div class="do"><strong>Choose Filmmaker Mode or Cinema for HDR</strong><span>LG keeps separate HDR picture settings. Check Auto Dynamic Contrast is off here too.</span></div>
+<p><b>Not switching to HDR?</b> If you’re casting to the TV’s own built-in Cast, HDR switches on by itself, so check the pattern is still playing. If you use a separate Chromecast in an HDMI port: turn on HDMI Deep Colour for that port (Settings → All Settings → General → Devices → HDMI Settings), and on the Chromecast set Dynamic range to match content.</p>
+<h3>HDR Screen Brightness</h3>
+<p>Same as before, but for HDR. Most TVs keep a separate Brightness setting for HDR.</p>
+<p>Use <b>Screen Brightness</b> while HDR is playing; changes usually only affect HDR. For HDR, OLED Pixel Brightness (Backlight on LCD) is usually best at its maximum.</p>
+<h3>Highlights</h3>
+<p>Four bright boxes, from bright (A) to very bright (D). Most TVs can’t reach the brightest levels, so they compress them. This checks they do it gracefully.</p>
+<p><b>Dynamic Tone Mapping</b> and <b>Peak Brightness</b> are in Picture → Advanced Settings → Brightness. Leave <b>Adjust Contrast</b> at the HDR mode’s default.</p>
+<div class="do"><strong>If some boxes look the same: turn on Dynamic Tone Mapping</strong><span>Picture → Advanced Settings → Brightness → Dynamic Tone Mapping. If it’s already on, try Off. Then look at the boxes again.</span></div>
+<p class="uses-pattern">Uses the <a href="../../test-patterns/#hdr10">HDR10 patterns</a>.</p>
+  </div>
+</section>
+<section class="step" id="dolby-vision" aria-labelledby="dolby-vision-h">
+  <div class="step-head"><span class="card-num"></span><h2 id="dolby-vision-h">Dolby Vision <span class="opt">optional</span></h2></div>
+  <div class="step-body">
+<p>Dolby Vision adjusts the picture to your TV scene by scene, so there’s no pattern to tune. A few settings still matter, and most TVs keep them separate from the HDR ones you just set.</p>
+<div class="do"><strong>Start a Dolby Vision film or show, then pause it on a normal scene</strong><span>Look for the Dolby Vision label in Netflix, Disney+, Prime Video or Apple TV. The TV only shows its Dolby Vision settings while Dolby Vision is playing, and changes you make now only affect Dolby Vision.</span></div>
+<div class="do"><strong>Choose Dolby Vision Dark (or Filmmaker / Cinema if there’s no Dark)</strong><span>Dark is the most accurate. Bright and Vivid boost everything. IQ modes follow the room light, which is fine for daytime viewing in a bright room.</span></div>
+<div class="do"><strong>Turn off the extras and leave the rest at default</strong><span>Turn off dynamic contrast, colour enhancers, motion smoothing and energy saving here too. Leave Contrast, Colour and Gamma at this mode’s defaults: Dolby Vision is already fitting the picture to your TV.</span></div>
+<p>Find a dark scene. Do black areas, like letterbox bars or a night sky, look grey or glowing?</p>
+<div class="do"><strong>If they look grey: press Screen Brightness down by 1</strong><span>Small changes only. If dark details start to disappear, go back up by 1 and stop there.</span></div>
+  </div>
+</section>
+<section class="step" id="devices-room" aria-labelledby="devices-room-h">
+  <div class="step-head"><span class="card-num"></span><h2 id="devices-room-h">Your devices and room <span class="opt">optional</span></h2></div>
+  <div class="step-body">
+<ul class="checklist">
+  <li class="group">Your devices</li>
+  <li><strong>HDMI black level: Auto</strong><span>For anything plugged in by HDMI: set the device’s output range to Auto, and the TV’s Black Level setting (Picture → Advanced Settings → Brightness) to Auto. A mismatch crushes or washes out blacks.</span></li>
+  <li><strong>Streaming device: match content</strong><span>On a separate Chromecast, Apple TV or Fire TV, turn on match dynamic range and match frame rate, so films play at their natural speed without judder.</span></li>
+  <li><strong>Streaming device resolution: 4K</strong><span>If a separate Chromecast or streaming box is plugged into a 4K TV, set its resolution to 4K or Auto (on a Chromecast with Google TV: Settings → Display &amp; Sound → Resolution). At 1080p, the TV has to upscale everything you watch. TVs with Google TV or another smart system built in don’t need this.</span></li>
+  <li><strong>Film motion: natural cadence</strong><span>TruMotion Off plays films as they were shot. If slow camera pans look jerky to you, try TruMotion → Cinematic Movement.</span></li>
+  <li><strong>Game console: game mode and HDR calibration</strong><span>Use Game Optimizer (or the Game picture mode) on the console’s input, then run the console’s own HDR calibration screen.</span></li>
+  <li><strong>Copy settings to other inputs</strong><span>Look for “Apply to All Inputs” in the picture mode settings, or repeat the values from your summary on each input you use.</span></li>
+  <li><strong>Streaming quality: High</strong><span>In Netflix, YouTube and other apps, set playback or data usage to High or Best.</span></li>
+  <li class="group">Your room</li>
+  <li><strong>OLED Pixel Brightness (Backlight on LCD): set for your room</strong><span>This is the light output on LG. Brighter for daytime, dimmer at night.</span></li>
+  <li><strong>Reduce reflections</strong><span>Close blinds or move lamps that reflect in the screen. Glare lowers contrast more than any setting.</span></li>
+  <li><strong>Bias lighting (optional)</strong><span>A dim, neutral-white light behind the TV (6500 K, about a tenth as bright as the screen) makes blacks look deeper and eases eye strain in a dark room.</span></li>
+  <li><strong>Seating</strong><span>Eyes level with about the middle of the screen, sitting straight on. LCD colour and contrast fade when viewed from an angle.</span></li>
+</ul>
+<p><a href="../../sources/">Streaming box and console settings</a></p>
+  </div>
+</section>
+</div>
+<aside class="split-aside sticky">
+  <div class="card">
+    <a class="btn btn-primary" style="width: 100%" href="../../setup/?brand=lg">Start guided setup <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+    <p class="small muted" style="margin: 12px 0 0">Your phone shows each pattern on the TV and asks one question at a time, using LG menu names.</p>
+  </div>
+  <form class="card" data-settings data-title="My TV picture settings (LG)" onsubmit="return false">
+    <h2 style="margin: 0 0 6px; font-size: 20px">Your settings</h2>
+    <p class="small muted" style="margin: 0">Write down what you end up with, so you can put it back if an update resets it.</p>
+    <div class="fields">
+      <div class="field"><label for="v-model">TV model</label><input id="v-model" type="text" data-record="model" autocomplete="off" placeholder="e.g. 55Q750G"></div>
+      <div class="field"><label for="v-mode">Picture mode</label><input id="v-mode" type="text" data-record="mode" autocomplete="off"></div>
+      <div class="field"><label for="v-fit">Picture size</label><input id="v-fit" type="text" data-record="fit" autocomplete="off" placeholder="e.g. Just Scan On"></div>
+      <div class="field"><label for="v-brightness">Screen Brightness</label><input id="v-brightness" type="text" data-record="brightness" autocomplete="off"></div>
+      <div class="field"><label for="v-contrast">Contrast</label><input id="v-contrast" type="text" data-record="contrast" autocomplete="off"></div>
+      <div class="field"><label for="v-sharpness">Sharpness</label><input id="v-sharpness" type="text" data-record="sharpness" autocomplete="off"></div>
+      <div class="field"><label for="v-temp">Colour temperature</label><input id="v-temp" type="text" data-record="temp" autocomplete="off" placeholder="e.g. Warm 50"></div>
+      <div class="field"><label for="v-hdrmode">HDR picture mode</label><input id="v-hdrmode" type="text" data-record="hdrmode" autocomplete="off" placeholder="e.g. Filmmaker Mode"></div>
+      <div class="field"><label for="v-hdrbright">HDR Screen Brightness</label><input id="v-hdrbright" type="text" data-record="hdrbright" autocomplete="off"></div>
+      <div class="field"><label for="v-hdrhigh">Dynamic Tone Mapping</label><input id="v-hdrhigh" type="text" data-record="hdrhigh" autocomplete="off" placeholder="e.g. On"></div>
+      <div class="field"><label for="v-dv">Dolby Vision picture mode</label><input id="v-dv" type="text" data-record="dv" autocomplete="off" placeholder="e.g. Dolby Vision Dark"></div>
+    </div>
+    <button class="btn btn-ghost" type="button" data-copy style="width: 100%">Copy my settings</button>
+    <p class="saved-note" aria-live="polite"></p>
+  </form>
+</aside>
+</div>
+</div>
+</main>
+<footer class="site-footer">
+  <div class="wrap">
+    <span>tvcal · free and open source</span>
+    <div class="links">
+      <a href="https://github.com/vantuvt/tvcal">GitHub</a>
+      <a href="https://github.com/vantuvt/tvcal/issues/new">Report a problem</a>
+      <label>Appearance
+        <select id="appearance">
+          <option value="auto">Auto</option>
+          <option value="light">Light</option>
+          <option value="dark">Dark</option>
+        </select>
+      </label>
+    </div>
+  </div>
+</footer>
+<script src="../../assets/site.js" defer></script>
+</body>
+</html>

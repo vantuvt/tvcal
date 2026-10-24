@@ -1,0 +1,1896 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#111113">
+<script>
+  // Apply the saved Appearance before the page draws, so there is no flash of the other theme.
+  try { const t = JSON.parse(localStorage.getItem('tvcal2.theme')); if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t; } catch (e) {}
+</script>
+<title>TV Picture Setup</title>
+<style>
+  /* Colours are theme tokens. Dark is the default; light follows the phone's
+     setting (Auto), or is forced with data-theme on <html> from the hub's
+     Appearance switch. */
+  :root {
+    color-scheme: dark;
+    --bg: #111113; --panel: #1b1b1f; --panel2: #232329; --line: #2e2e36; --line2: #3a3a45; --line3: #4a4a56;
+    --text: #ececf1; --dim: #9a9aa6; --ph: #6e6e7a; --dot-off: #555;
+    --accent: #7db3ff; --accent-ink: #0b1a2e; --ring: rgba(125,179,255,.45);
+    --ok: #6fd39a; --ok-bg: #12291d; --ok-line: #245a3c; --tick-ink: #0d2418;
+    --act-bg: #14243a; --act-line: #23406a; --act-dim: #b9c8de;
+    --warn-bg: #2a2214; --warn-line: #5a4620; --warn: #f0c46a; --warn-text: #f0d9a8;
+    --sheet: #1c1c22; --bar-bg: #16161a; --tab-on: #2e2e36;
+    --fade0: rgba(17,17,19,0); --fade1: rgba(17,17,19,.92);
+    --shadow: rgba(0,0,0,.6); --backdrop: rgba(0,0,0,.6);
+    --img-frame: #2e2e36;
+    --danger: #f28b82; --danger-ink: #2b0b09;
+  }
+  @media (prefers-color-scheme: light) { :root:not([data-theme=dark]) { 
+    color-scheme: light;
+    --bg: #f4f4f6; --panel: #ffffff; --panel2: #ebebf0; --line: #dcdce3; --line2: #c8c8d1; --line3: #a9a9b5;
+    --text: #17171b; --dim: #5b5b66; --ph: #8a8a95; --dot-off: #b4b4bf;
+    --accent: #1f62d1; --accent-ink: #ffffff; --ring: rgba(31,98,209,.35);
+    --ok: #17773f; --ok-bg: #e2f4e9; --ok-line: #9fd3b2; --tick-ink: #ffffff;
+    --act-bg: #e9f0fc; --act-line: #b6cbf0; --act-dim: #3b4d6b;
+    --warn-bg: #fff3da; --warn-line: #e5c27f; --warn: #835400; --warn-text: #5a420f;
+    --sheet: #ffffff; --bar-bg: #ffffff; --tab-on: #ffffff;
+    --fade0: rgba(244,244,246,0); --fade1: rgba(244,244,246,.94);
+    --shadow: rgba(20,20,40,.18); --backdrop: rgba(20,20,30,.35);
+    --img-frame: #85858f;
+    --danger: #c42b2b; --danger-ink: #ffffff;
+   } }
+  :root[data-theme=light] { 
+    color-scheme: light;
+    --bg: #f4f4f6; --panel: #ffffff; --panel2: #ebebf0; --line: #dcdce3; --line2: #c8c8d1; --line3: #a9a9b5;
+    --text: #17171b; --dim: #5b5b66; --ph: #8a8a95; --dot-off: #b4b4bf;
+    --accent: #1f62d1; --accent-ink: #ffffff; --ring: rgba(31,98,209,.35);
+    --ok: #17773f; --ok-bg: #e2f4e9; --ok-line: #9fd3b2; --tick-ink: #ffffff;
+    --act-bg: #e9f0fc; --act-line: #b6cbf0; --act-dim: #3b4d6b;
+    --warn-bg: #fff3da; --warn-line: #e5c27f; --warn: #835400; --warn-text: #5a420f;
+    --sheet: #ffffff; --bar-bg: #ffffff; --tab-on: #ffffff;
+    --fade0: rgba(244,244,246,0); --fade1: rgba(244,244,246,.94);
+    --shadow: rgba(20,20,40,.18); --backdrop: rgba(20,20,30,.35);
+    --img-frame: #85858f;
+    --danger: #c42b2b; --danger-ink: #ffffff;
+   }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--bg); color: var(--text);
+    font: 17px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; -webkit-text-size-adjust: 100%; }
+  main { max-width: 520px; margin: 0 auto; padding: 8px 16px calc(var(--bar-h, 0px) + 24px); }
+  button { font: inherit; color: inherit; cursor: pointer; touch-action: manipulation; }
+  button:active { transform: scale(.98); }
+
+  /* ---------- Top row: back, chapter progress, all steps, help ---------- */
+  .top { display: flex; align-items: center; gap: 8px; min-height: 52px; margin: 0 -8px 4px; }
+  .icon { flex: none; width: 44px; height: 44px; display: grid; place-items: center; border: none; background: none; padding: 0; border-radius: 12px; }
+  .icon svg { width: 22px; height: 22px; }
+  .where { flex: 1; min-width: 0; }
+  .where-label { font-size: 13px; font-weight: 600; letter-spacing: .5px; text-transform: uppercase; color: var(--dim); }
+  .segs { display: flex; gap: 4px; margin-top: 6px; max-width: 100%; }
+  .segs span { flex: 1; height: 4px; border-radius: 2px; background: var(--line); }
+  .segs span.on { background: var(--accent); }
+  .pill { flex: none; height: 40px; padding: 0 16px; border-radius: 999px; border: 1px solid var(--line); background: var(--panel); font-size: 15px; font-weight: 600; }
+  .app-name { flex: 1; padding-left: 2px; font-size: 15px; font-weight: 600; color: var(--dim); }
+  .chip { display: flex; align-items: center; gap: 8px; min-height: 40px; padding: 6px 14px; border-radius: 999px; border: 1px solid var(--line);
+    background: none; font-size: 14px; color: var(--dim); }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--dot-off); flex: none; }
+  .dot.on { background: var(--ok); }
+
+  .banner { display: flex; align-items: center; gap: 12px; margin: 4px 0 8px; padding: 10px 12px 10px 14px; border-radius: 12px;
+    background: var(--warn-bg); border: 1px solid var(--warn-line); color: var(--warn-text); font-size: 15px; }
+  .banner span { flex: 1; }
+  .banner button, .stuck button { flex: none; padding: 8px 14px; border-radius: 10px; border: 1px solid var(--warn-line); background: none; color: var(--warn); font-weight: 600; font-size: 15px; }
+
+  /* ---------- Step content ---------- */
+  h2 { font-size: 28px; line-height: 1.2; margin: 0; }
+  h2:focus { outline: none; }
+  .titlerow { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 16px 0 14px; }
+  .poschip { flex: none; display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--dim); }
+  .poschip svg { width: 18px; height: 18px; fill: none; stroke: var(--accent); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  .poschip.close { color: var(--warn); }
+  .poschip.close svg { stroke: var(--warn); }
+  .lead { color: var(--dim); margin: -6px 0 18px; font-size: 16px; }
+  figure { margin: 0 0 16px; }
+  /* The guides are pictures of the TV screen: a frame keeps a mostly white one
+     (Contrast) from merging into a light page. */
+  figure img { width: 100%; display: block; border-radius: 12px; border: 2px solid var(--img-frame); background: #000; }
+  figcaption { font-size: 14px; color: var(--dim); margin-top: 8px; }
+  .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .pair figcaption { text-align: center; color: var(--text); }
+
+  .box { border-radius: 16px; padding: 20px; margin-bottom: 12px; }
+  .q { background: var(--panel); border: 1px solid var(--line); }
+  .q .ask { font-size: 21px; line-height: 1.3; font-weight: 600; margin: 0 0 18px; }
+  .answers { display: grid; gap: 10px; }
+  .answers.two { grid-template-columns: 1fr 1fr; }
+  .answers button, .brands button { padding: 16px 10px; border-radius: 14px; border: 1px solid var(--line2); background: var(--panel2); font-weight: 600; font-size: 17px; }
+  .act { background: var(--act-bg); border: 1px solid var(--act-line); display: grid; gap: 16px; }
+  .act .label { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--accent); }
+  .act .doing { display: flex; align-items: center; gap: 16px; }
+  .act .key { flex: none; width: 68px; height: 68px; border-radius: 50%; border: 2px solid var(--accent); display: grid; place-items: center; }
+  .act .key svg { width: 30px; height: 30px; fill: none; stroke: var(--accent); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+  .act .do { font-size: 22px; line-height: 1.25; font-weight: 600; margin: 0; }
+  .act .sub { color: var(--act-dim); font-size: 15px; margin: 0; }
+  .stuck { display: flex; align-items: center; gap: 10px; margin: 0 0 12px; padding: 10px 12px 10px 14px; border-radius: 12px;
+    background: var(--warn-bg); border: 1px solid var(--warn-line); color: var(--warn-text); font-size: 15px; }
+  .stuck span { flex: 1; }
+  .skiprow { display: flex; justify-content: center; flex-wrap: wrap; gap: 4px 20px; margin-top: 8px; }
+  .linkish { background: none; border: none; color: var(--accent); padding: 10px 4px; font-weight: 500; font-size: 15px; text-decoration: underline; }
+  .skiprow .linkish { color: var(--dim); }
+
+  .fin { min-height: calc(100vh - 260px); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 16px; padding: 24px 12px; }
+  .fin .badge { width: 84px; height: 84px; border-radius: 50%; display: grid; place-items: center; border: 2px solid var(--accent); background: var(--act-bg); }
+  .fin .badge.good { border-color: var(--ok); background: var(--ok-bg); }
+  .fin .badge svg { width: 40px; height: 40px; fill: none; stroke: var(--accent); stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+  .fin .badge.good svg { stroke: var(--ok); }
+  .fin h3 { font-size: 26px; line-height: 1.2; margin: 0; }
+  .fin p { margin: 0; color: var(--dim); font-size: 17px; }
+  .fin .step-name { font-size: 13px; font-weight: 600; letter-spacing: .5px; text-transform: uppercase; color: var(--dim); }
+
+  .brands { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .brands button.on { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  .brands.attn { animation: attn .9s ease-in-out 2; border-radius: 16px; }
+  @keyframes attn { 50% { box-shadow: 0 0 0 3px var(--ring); } }
+  .note { font-size: 14px; color: var(--dim); margin: 14px 0 0; }
+
+  .cards { display: grid; gap: 10px; }
+  .card { display: flex; gap: 14px; align-items: flex-start; background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 16px; }
+  .card svg { flex: none; width: 28px; height: 28px; fill: none; stroke: var(--accent); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  .tipline { font-size: 14px; color: var(--dim); margin: 16px 0 0; }
+  .okline { display: flex; gap: 10px; align-items: center; margin: 0 0 14px; color: var(--ok); font-size: 15px; }
+
+  .conn { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 18px; }
+  .conn .detected { margin: 0 0 14px; font-size: 15px; color: var(--dim); }
+  .conn .detected b { color: var(--text); }
+  .conn > .linkish { display: block; margin: 8px auto 0; }
+
+  .check { list-style: none; padding: 0; margin: 0 0 12px; }
+  .check li { margin-bottom: 8px; }
+  .check li.sect { padding: 14px 2px 2px; margin: 0; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; color: var(--dim); }
+  .check button { width: 100%; text-align: left; display: flex; gap: 14px; align-items: flex-start; background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 15px; }
+  .check button[aria-checked=true] { background: var(--ok-bg); border-color: var(--ok-line); }
+  .check .tick { flex: none; width: 24px; height: 24px; border-radius: 6px; border: 2px solid var(--dim); display: grid; place-items: center; margin-top: 1px; }
+  .check [aria-checked=true] .tick { background: var(--ok); border-color: var(--ok); }
+  .check [aria-checked=true] .tick::after { content: ""; width: 10px; height: 6px; border-left: 3px solid var(--tick-ink); border-bottom: 3px solid var(--tick-ink); transform: rotate(-45deg) translate(1px, -1px); }
+  .check .t { display: block; font-weight: 600; }
+  .check .d { display: block; font-size: 14px; color: var(--dim); }
+  /* Compact checklist (Devices and room): one line per tip, details behind an arrow. */
+  .check.compact li:not(.sect) { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; margin-bottom: 6px; }
+  .check.compact li.on { background: var(--ok-bg); border-color: var(--ok-line); }
+  .check.compact .rowtop { display: flex; align-items: center; }
+  .check.compact button[data-check] { flex: 1; min-width: 0; align-items: center; background: none; border: none; padding: 9px 4px 9px 14px; }
+  .check.compact .t { font-size: 16px; }
+  .check.compact .tick { margin-top: 0; }
+  .check.compact button.more-i { flex: none; width: 48px; height: 44px; display: grid; place-items: center; border: none; background: none; color: var(--dim); padding: 0; }
+  .check.compact button.more-i svg { width: 20px; height: 20px; transition: transform .15s; }
+  .check.compact button.more-i[aria-expanded=true] svg { transform: rotate(180deg); }
+  .check.compact .d { padding: 0 16px 14px 54px; }
+  .check.compact .d[hidden] { display: none; }
+  .check.compact li.sect { padding: 8px 2px 4px; }
+  .check.compact li.sect:first-child { padding-top: 0; }
+  details.also { border: 1px dashed var(--line2); border-radius: 14px; padding: 0 14px; margin-bottom: 12px; }
+  details.also > summary { padding: 14px 0; cursor: pointer; font-size: 15px; list-style: none; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+  details.also > summary > span { flex: 1; color: var(--text); }
+  details.also > summary > span span { color: var(--dim); }
+  details.also > summary span { color: var(--dim); }
+  details.also > summary::-webkit-details-marker { display: none; }
+  details.also > summary::after { content: "+"; color: var(--dim); font-size: 20px; line-height: 1; }
+  details.also[open] > summary::after { content: "–"; }
+
+  /* ---------- Hub ---------- */
+  .chapters { display: grid; gap: 10px; margin-bottom: 10px; }
+  .chap { width: 100%; text-align: left; display: flex; align-items: center; gap: 14px; background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 16px; }
+  .chap.cur { background: var(--act-bg); border: 2px solid var(--accent); padding: 15px; }
+  .chap.opt:not(.done):not(.cur) { background: none; border-style: dashed; border-color: var(--line2); }
+  .chap .num { flex: none; width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--line3); color: var(--dim); display: grid; place-items: center; font-weight: 700; font-size: 15px; }
+  .chap.cur .num { border-color: var(--accent); color: var(--accent); }
+  .chap.done .num { background: var(--ok); border-color: var(--ok); }
+  .chap.done .num svg { width: 16px; height: 16px; fill: none; stroke: var(--tick-ink); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+  .chap .txt { flex: 1; min-width: 0; }
+  .chap .txt b { display: block; font-size: 17px; }
+  .chap .txt b i { font-style: normal; font-size: 13px; font-weight: 500; color: var(--dim); margin-left: 4px; }
+  .chap .txt span { display: block; font-size: 14px; color: var(--dim); }
+  .chap.cur .txt span { color: var(--act-dim); }
+  .chap .right { flex: none; font-size: 13px; font-weight: 600; color: var(--accent); }
+  .chap.mini { padding: 12px 16px; }
+  .chap.mini .num { width: 28px; height: 28px; border-width: 0; }
+  .chap.mini .num svg { width: 22px; height: 22px; fill: none; stroke: var(--dim); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  .sect-h { font-size: 15px; margin: 26px 0 4px; }
+  .sect-h span { font-weight: 400; color: var(--dim); }
+  .settings { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 2px 16px; margin: 10px 0 12px; }
+  .settings label { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--line); font-size: 15px; }
+  .settings label:last-child { border-bottom: none; }
+  input[type=text] { width: 140px; background: var(--bg); border: 1px solid var(--line); color: var(--text);
+    border-radius: 8px; padding: 9px 10px; font: inherit; font-size: 16px; }
+  input::placeholder { color: var(--ph); }
+
+  /* ---------- Menu (top-left icon): app settings such as Appearance ---------- */
+  .menu { position: fixed; z-index: 20; min-width: 248px; max-width: calc(100vw - 24px); padding: 8px; border-radius: 16px;
+    background: var(--sheet); border: 1px solid var(--line2); box-shadow: 0 12px 32px var(--shadow); }
+  .menu[hidden] { display: none; }
+  .menu-h { padding: 8px 12px 6px; font-size: 13px; font-weight: 600; letter-spacing: .5px; text-transform: uppercase; color: var(--dim); }
+  .menu button { width: 100%; display: flex; align-items: center; gap: 12px; text-align: left; padding: 10px 12px; min-height: 48px;
+    border: none; border-radius: 10px; background: none; }
+  .menu button:hover, .menu button:focus-visible { background: var(--panel2); outline: none; }
+  .menu button b { display: block; font-size: 16px; font-weight: 600; }
+  .menu button small { display: block; font-size: 13px; color: var(--dim); }
+  .menu .mk { flex: none; width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--line3); display: grid; place-items: center; }
+  .menu [aria-checked=true] .mk { border-color: var(--accent); }
+  .menu [aria-checked=true] .mk::after { content: ""; width: 10px; height: 10px; border-radius: 50%; background: var(--accent); }
+  .top .icon[aria-expanded=true] { background: var(--panel2); }
+
+  /* ---------- Bottom bar ---------- */
+  .bar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 5; background: var(--bar-bg);
+    border-top: 1px solid var(--line); padding: 12px 16px calc(16px + env(safe-area-inset-bottom)); }
+  .bar .inner { max-width: 520px; margin: 0 auto; display: grid; gap: 6px; }
+  .bar button { width: 100%; padding: 16px; border-radius: 14px; font-weight: 600; font-size: 17px; border: 1px solid var(--line3); background: var(--panel2); }
+  .bar button.primary, button.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  .bar .hint { font-size: 13px; color: var(--dim); text-align: center; }
+  .more { position: fixed; left: 0; right: 0; bottom: var(--bar-h, 0px); z-index: 4; height: 64px;
+    pointer-events: none; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 10px;
+    background: linear-gradient(var(--fade0), var(--fade1)); opacity: 0; transition: opacity .2s; }
+  /* Hidden = not there at all: no taps, no highlight, no text selection.
+     visibility waits for the fade-out before switching off. */
+  .more:not(.show) { visibility: hidden; transition: opacity .2s, visibility 0s .2s; }
+  .more.show { opacity: 1; }
+  .more.show button { pointer-events: auto; }
+  .more button { pointer-events: none; user-select: none; -webkit-tap-highlight-color: transparent; font-size: 13px; font-weight: 600; padding: 6px 12px 6px 14px; border-radius: 999px;
+    background: var(--panel2); border: 1px solid var(--line); display: flex; gap: 6px; align-items: center; }
+
+  /* ---------- Bottom sheet (Help, and the TV connection) ---------- */
+  .sheet { width: 100%; max-width: 520px; max-height: 88vh; margin: auto auto 0; padding: 0; border: none; border-top: 1px solid var(--line2);
+    border-radius: 22px 22px 0 0; background: var(--sheet); color: var(--text); box-shadow: 0 -12px 32px var(--shadow); }
+  .sheet::backdrop { background: var(--backdrop); }
+  .sheet-inner { padding: 10px 20px calc(20px + env(safe-area-inset-bottom)); }
+  .grab { width: 40px; height: 5px; border-radius: 3px; background: var(--line3); margin: 0 auto 6px; }
+  .sheet-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .sheet-head h2 { font-size: 20px; }
+  .sheet-head .icon { margin-right: -10px; }
+  .tabs { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 4px; background: var(--bg); border-radius: 12px; padding: 4px; margin: 10px 0 16px; }
+  .tabs button { border: none; background: none; border-radius: 9px; padding: 10px 4px; font-size: 14px; font-weight: 600; color: var(--dim); }
+  .tabs button[aria-selected=true] { background: var(--tab-on); color: var(--text); box-shadow: 0 1px 2px var(--shadow); }
+  .help { font-size: 16px; color: var(--dim); }
+  .help p { margin: 0 0 12px; }
+  .help b, .help h3 { color: var(--text); }
+  .help h3 { font-size: 16px; margin: 18px 0 8px; }
+  .help .say { color: var(--text); }
+  .sheet-foot { display: grid; gap: 10px; margin-top: 18px; }
+  .sheet-foot button { width: 100%; padding: 14px; border-radius: 14px; font-weight: 600; font-size: 16px; border: 1px solid var(--line3); background: var(--panel2); }
+  .sheet-foot button.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  .sheet-foot button.danger { background: var(--danger); color: var(--danger-ink); border-color: var(--danger); }
+  .resetrow { text-align: center; margin: 24px 0 4px; }
+  .resetrow .linkish { color: var(--dim); }
+  .siterow { text-align: center; margin: 20px 0 4px; font-size: 15px; }
+  .siterow a { color: var(--accent); font-weight: 500; }
+
+  /* The TV connection controls: one element, moved between the connect
+     step and the TV sheet, and parked out of sight otherwise. */
+  #parking { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+  .status { font-size: 14px; color: var(--dim); margin: 0 0 12px; display: flex; gap: 8px; align-items: center; }
+  .status span:nth-child(2) { flex: 1; }
+  google-cast-launcher { width: 36px; height: 36px; display: inline-block; cursor: pointer; flex: none;
+    --connected-color: var(--accent); --disconnected-color: var(--text); }
+  #connectPanel button.wide { width: 100%; padding: 15px 16px; border-radius: 14px; border: 1px solid var(--line2); background: var(--panel2); font-weight: 600; }
+  #connectPanel button.wide.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  #connectPanel details { border: 1px solid var(--line); border-radius: 12px; padding: 0 14px; margin-top: 12px; }
+  #connectPanel summary { padding: 12px 0; cursor: pointer; font-size: 15px; list-style: none; display: flex; justify-content: space-between; }
+  #connectPanel summary::-webkit-details-marker { display: none; }
+  #connectPanel summary::after { content: "+"; color: var(--dim); font-size: 20px; line-height: 1; }
+  #connectPanel details[open] summary::after { content: "–"; }
+  #connectPanel details .inner { padding-bottom: 12px; font-size: 15px; color: var(--dim); }
+  #connectPanel details .inner p { margin: 0 0 8px; }
+  #connectPanel details b { color: var(--text); }
+  .air { display: flex; gap: 12px; align-items: center; }
+  .air video { flex: none; width: 96px; aspect-ratio: 16 / 9; border-radius: 8px; background: #000; border: 1px solid var(--line); }
+  .air > div { flex: 1; min-width: 0; }
+  .air-note { font-size: 13px; color: var(--dim); margin-top: 6px; }
+
+  #localView { position: fixed; inset: 0; background: #000; display: none; z-index: 10; }
+  #localView video { width: 100%; height: 100%; object-fit: contain; }
+  #localView button { position: absolute; top: 12px; right: 12px; opacity: .8; padding: 10px 16px; border-radius: 12px; border: 1px solid var(--line2); background: var(--panel2); font-weight: 600; }
+  @media (prefers-reduced-motion: reduce) { .brands.attn { animation: none; } }
+</style>
+</head>
+<body>
+<main>
+  <div id="top"></div>
+  <div id="banner"></div>
+  <section id="card"></section>
+</main>
+
+<div class="menu" id="menu" role="menu" aria-labelledby="menuAppearance" hidden>
+  <div class="menu-h" id="menuAppearance">Appearance</div>
+  <button role="menuitemradio" data-theme-pick="auto" aria-checked="false"><span class="mk" aria-hidden="true"></span><span><b>Auto</b><small>Match this phone’s setting</small></span></button>
+  <button role="menuitemradio" data-theme-pick="light" aria-checked="false"><span class="mk" aria-hidden="true"></span><span><b>Light</b></span></button>
+  <button role="menuitemradio" data-theme-pick="dark" aria-checked="false"><span class="mk" aria-hidden="true"></span><span><b>Dark</b></span></button>
+</div>
+
+<div class="more" id="more" aria-hidden="true"><button id="moreBtn" tabindex="-1">More below <span aria-hidden="true">↓</span></button></div>
+<div class="bar" id="bar"><div class="inner" id="barInner"></div></div>
+
+<div id="parking"><div id="connectPanel">
+  <div class="status"><span class="dot" id="dot"></span><span id="statusText"></span><google-cast-launcher title="Cast to your TV"></google-cast-launcher></div>
+  <div id="castUI" style="display:none">
+    <button id="connect" class="wide primary">Connect to TV</button>
+    <div id="lnaBox" style="display:none;margin-top:12px">
+      <button id="lnaBtn" class="wide">Let this page find my TV</button>
+      <div id="lnaStatus" style="font-size:13px;color:var(--dim);margin-top:6px"></div>
+    </div>
+    <details id="castHelp" style="display:none"><summary>TV not found?</summary><div class="inner">
+      <p>Chrome must allow this site to <b>find devices on your local network</b>. Use the button above, or tap the icon left of the web address → Site settings → Local network access → Allow.</p>
+      <p>Make sure the phone and the Chromecast are on the <b>same Wi-Fi network</b> (not a guest network, and not mobile data).</p>
+      <p>On Android 12 or later, Chrome needs the <b>Nearby devices</b> permission: Settings → Apps → Chrome → Permissions → Nearby devices → Allow. Then reload this page.</p>
+      <p>Check that casting works at all: open the YouTube app and look for its Cast icon. If YouTube can’t find the TV either, the issue is the network or the Chromecast, not this page.</p>
+    </div></details>
+  </div>
+  <div id="airBox" style="display:none">
+    <div class="air">
+      <video id="airVideo" loop playsinline x-webkit-airplay="allow" preload="metadata"></video>
+      <div>
+        <button id="airBtn" class="wide primary">AirPlay to TV</button>
+        <div id="airNote" class="air-note"></div>
+      </div>
+    </div>
+    <details id="airHelp" style="display:none"><summary>Connected, but nothing on the TV?</summary><div class="inner">
+      <p>Use the <b>AirPlay to TV</b> button on this page, not Screen Mirroring in Control Center.</p>
+      <p>Tap <b>Change AirPlay TV</b>, choose <b>iPhone</b>, then tap <b>AirPlay to TV</b> and choose the TV again.</p>
+      <p>On the TV, check that AirPlay is turned on and allows this phone (often Settings → System → AirPlay, or Apple AirPlay and HomeKit settings).</p>
+      <p>Still nothing? Reload this page in Safari and try once more.</p>
+    </div></details>
+  </div>
+</div></div>
+
+<dialog class="sheet" id="sheet" aria-labelledby="sheetTitle"><div class="sheet-inner">
+  <div class="grab" aria-hidden="true"></div>
+  <div class="sheet-head"><h2 id="sheetTitle"></h2>
+    <button class="icon" data-act="close" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+  <div id="sheetBody"></div>
+</div></dialog>
+
+<div id="localView"><video id="localVideo" muted loop playsinline></video><button id="closeLocal">Close</button></div>
+
+<script>
+const PATTERN_BASE = new URL('../patterns/', location.href).href;
+
+/* A step is either a checklist, info, or a small question flow:
+     q:   { ask, answers: [[label, nextNode], ...] }
+     act: { do, sub, then }        -> one thing to change on the TV remote, then ask again
+     ok:  { do, text }              -> this step is finished                              */
+const LOOK_TIPS = `
+  <p>Sit where you normally watch, with the lights as they usually are.</p>
+  <p>When a pattern first appears, the TV shows a title and progress bar for a few seconds. Wait for it to fade.</p>
+  <p>"Faint" really means faint: a slightly-less-black square on black. The corner marks show where each box is.</p>`;
+
+const DIMMING_HELP = `<details><summary>Does your TV have local dimming?</summary><div class="inner">
+  <p>Many LCD TVs dim parts of the backlight in dark areas (called <b>Local dimming</b>, <b>Local contrast</b>, <b>Precision dimming</b> or <b>Full array dimming</b>). OLED TVs don’t have it.</p>
+  <p>The grey frames around the boxes are there to keep the backlight on, like in a real dark scene. Judge the boxes inside the frames, not the black edges of the screen.</p>
+  <p>If box B still never appears, even after raising Brightness a lot, local dimming is hiding it. Set local dimming one level lower (for example from High to Medium) and try again. Don’t keep raising Brightness: that makes every dark scene grey.</p>
+</div></details>`;
+
+/* ---------- Brand-specific wording ----------
+   Each brand can override any part of a step (text, checklist, flow nodes).
+   Anything not overridden falls back to the generic wording in STEPS.
+   TCL names are from TCL's Google TV settings guide and reviewers' calibration
+   settings; where a name couldn't be confirmed, the generic wording is kept. */
+const BRANDS = {
+  tcl: {
+    name: 'TCL',
+    note: 'Using TCL Google TV menu names. Some older or Roku-based TCL TVs use different menus; if a name doesn’t match, look for the closest one.',
+    dimmingHelp: `<details><summary>About Local Contrast (local dimming)</summary><div class="inner">
+      <p>Many TCL TVs dim parts of the backlight in dark areas. TCL calls this <b>Local Contrast</b> (under Picture → Brightness settings).</p>
+      <p>The grey frames around the boxes keep the backlight on, like in a real dark scene. Judge the boxes inside the frames, not the black edges of the screen.</p>
+      <p>If box B still never appears, even after raising Black Level a lot, Local Contrast is hiding it. Set it one level lower (for example from High to Medium) and try again. Don’t keep raising Black Level: that makes every dark scene grey.</p>
+    </div></details>`,
+    steps: {
+      start: {
+        items: [
+          'Update your TV’s software first: Settings → System → About → System update. Updates can change picture processing or reset settings, so do it before you start.',
+          'Turn the lights down to how you normally watch.',
+          'Open the picture menu with the remote: Settings → Display &amp; Sound → Picture. You’ll use it throughout.'
+        ]
+      },
+      mode: {
+        checklist: [
+          ['Picture Mode: FILMMAKER MODE or Movie', 'Picture → Picture Mode. Either is fine; FILMMAKER MODE also turns off most extra processing.'],
+          ['Motion Clarity: Off', 'Under Motion settings. LED Motion Clear (sharper motion, but can flicker) is a personal choice; leave it off if unsure.'],
+          ['Adaptive Brightness and energy saving: Off', 'Adaptive Brightness is in the extra picture options (on some models under Eye Health Protection). Energy saving is under Settings → System → Power &amp; Energy.'],
+          ['Color Space: Auto', 'Under Color settings. If there’s no Auto, leave it at the picture mode’s default.'],
+          ['Color Saturation and Tint: default; dynamic options Off', 'Turn off Dynamic Color, Adaptive Color Temperature, Dynamic Contrast, Black Stretch and Dynamic Brightness.'],
+          ['Gamma: 2.4 in a dark room, 2.2 in a bright one', 'Under Brightness settings. If those values aren’t offered, leave it at the default.'],
+          ['Noise Reduction and Digital Noise Reduction: Off', 'Under Clarity settings. Low is fine for an old, grainy source.'],
+        ],
+        extra: `<details><summary>Where are these settings?</summary><div class="inner">
+          <p>Settings → <b>Display &amp; Sound</b> → <b>Picture</b>. The detailed controls are grouped as <b>Brightness</b>, <b>Color</b>, <b>Clarity</b> and <b>Motion</b> settings.</p>
+          <p>TCL keeps separate settings for HDR content, so the HDR steps later will check those.</p></div></details>`
+      },
+      temp: {
+        ph: 'Warm',
+        where: `<p>Picture → Color settings → <b>Color Temperature</b>. The options are usually Cool, Normal and one or more Warm settings; some models offer several Warm levels. Turn off <b>Adaptive Color Temperature</b> too.</p>`,
+        flow: {
+          set: { do: 'Set Color Temperature to its warmest Warm option', sub: 'Picture → Color settings → Color Temperature. Flick to Normal and Cool to see the difference on the white and greys, then come back.' },
+          cooler: { do: 'Go one step toward Normal', sub: 'For example the next Warm level down. Then wait a moment and look again.' }
+        }
+      },
+      fit: {
+        ph: 'Overscan Off',
+        flow: {
+          fix: { do: 'Turn Overscan off', sub: 'Display &amp; Sound → Screen settings → Overscan → Off. Also check Aspect Ratio is set to Auto.' }
+        }
+      },
+      brightness: {
+        title: 'Black Level', record: 'Black Level',
+        lead: 'This makes dark scenes look right: true black, with shadow detail still visible. On TCL this is the Black Level setting.',
+        where: `<p>On TCL, <b>Brightness</b> sets the backlight: how bright the whole screen is. For this step, use <b>Black Level</b> instead (Picture → Brightness settings → Black Level). Set Brightness itself to whatever is comfortable for your room.</p>`,
+        stuck: 'Not changing? Make sure you’re adjusting Black Level, not Brightness. If box B never appears however high you go, see “About Local Contrast” below.',
+        flow: {
+          down: { do: 'Press Black Level down by 1' },
+          up: { do: 'Press Black Level up by 1' },
+          ok: { do: 'Black Level is set.' }
+        }
+      },
+      contrast: {
+        where: `<p>Picture → Brightness settings → <b>Contrast</b>. Turn off <b>Dynamic Contrast</b> as well.</p>`,
+        stuck: 'If box C never appears, check that Dynamic Contrast is off and Peak Luminance is at its default.'
+      },
+      sharpness: {
+        where: `<p>Picture → Clarity settings → <b>Sharpness</b>. If your model has <b>Super Resolution</b> or <b>Precision Detail</b>, turn them off too.</p>`
+      },
+      hdrmode: {
+        ph: 'Movie',
+        where: `<p>While the HDR pattern plays, open Settings → Display &amp; Sound → Picture: the picture mode list switches to its HDR versions.</p>`,
+        flow: {
+          fix: { do: 'Turn on HDR for this input', sub: 'If you’re casting to the TV’s built-in Google TV, HDR switches on by itself, so check the pattern is still playing. If you use a separate Chromecast in an HDMI port: set that port’s HDMI Mode to HDMI 2.1 or Auto in the TV’s input settings, and on the Chromecast set Dynamic range to match content. Then tap Done: the pattern restarts so the TV can switch over.' },
+          mode: { do: 'Choose FILMMAKER MODE or Movie for HDR', sub: 'TCL keeps a separate picture mode for HDR. Turn off Dynamic Contrast and Adaptive Brightness here too.' }
+        }
+      },
+      hdrbright: {
+        title: 'HDR Black Level', record: 'HDR Black Level',
+        where: `<p>Use <b>Black Level</b> (Picture → Brightness settings) while HDR is playing. For HDR, set <b>Brightness</b> (the backlight) high, since HDR needs it.</p>`,
+        stuck: 'Not changing? Make sure you’re adjusting Black Level, not Brightness. If box B never appears, see “About Local Contrast” below.',
+        flow: {
+          down: { do: 'Press Black Level down by 1' },
+          up: { do: 'Press Black Level up by 1' },
+          ok: { do: 'HDR Black Level is set.' }
+        }
+      },
+      hdrhigh: {
+        record: 'Dynamic Tone Mapping', ph: 'On',
+        where: `<p><b>Dynamic Tone Mapping</b> and <b>Peak Luminance</b> are under Picture → Brightness settings. Leave <b>Contrast</b> at the HDR mode’s default.</p>`,
+        flow: {
+          tm: { do: 'Turn on Dynamic Tone Mapping', sub: 'Picture → Brightness settings → Dynamic Tone Mapping. If it’s already on, try it off. Then look at the boxes again.' }
+        }
+      },
+      hdrfinal: {
+        flow: { dark: { do: 'Press Black Level up by 1' } }
+      },
+      dv: {
+        flow: { dark: { do: 'Press Black Level down by 1', sub: 'Not Brightness, which is the backlight on TCL. Small changes only; if dark details start to disappear, go back up by 1 and stop there.' } }
+      },
+      extras: {
+        checklist: [
+          ['#', 'Your devices'],
+          ['HDMI black level: Auto', 'For anything plugged in by HDMI (game console, Blu-ray, streaming stick). Set the device’s output range to Auto, and leave the TV’s matching setting at Auto if it has one. A mismatch crushes or washes out blacks.'],
+          ['Streaming device: match content', 'On a separate Chromecast, Apple TV or Fire TV, turn on match dynamic range and match frame rate, so films play at their natural speed without judder.'],
+          ['Streaming device resolution: 4K', 'If a separate Chromecast or streaming box is plugged into a 4K TV, set its resolution to 4K or Auto (on a Chromecast with Google TV: Settings → Display &amp; Sound → Resolution). At 1080p, the TV has to upscale everything you watch. TVs with Google TV or another smart system built in don’t need this.'],
+          ['Film motion: natural cadence', 'Motion Clarity Off plays films as they were shot. If slow camera pans look jerky to you, try Motion Clarity → Custom with a little Judder Reduction.'],
+          ['Game console: game mode and HDR calibration', 'Use the TV’s game picture mode (Game Master on some TCL models) on the console’s input, then run the console’s own HDR calibration screen.'],
+          ['Copy settings to other inputs', 'In the picture options, use “Apply All Picture Settings” to copy them, or repeat the values from your summary on each input you use.'],
+          ['Streaming quality: High', 'In Netflix, YouTube and other apps, set playback or data usage to High or Best.'],
+          ['#', 'Your room'],
+          ['Brightness: set for your room', 'On TCL, Brightness is the backlight. Brighter for daytime, dimmer at night.'],
+          ['Reduce reflections', 'Close blinds or move lamps that reflect in the screen. Glare lowers contrast more than any setting.'],
+          ['Bias lighting (optional)', 'A dim, neutral-white light behind the TV (6500 K, about a tenth as bright as the screen) makes blacks look deeper and eases eye strain in a dark room.'],
+          ['Seating', 'Eyes level with about the middle of the screen, sitting straight on. LCD colour and contrast fade when viewed from an angle.'],
+        ]
+      }
+    }
+  }
+};
+
+/* Builds the overrides for a brand from a short description of its menus.
+   Used for Samsung, LG, Sony and Hisense (TCL above is written out in full). */
+function dimmingHelpFor(dimName, ctrl, extra) {
+  const label = /local dimming/i.test(dimName) ? dimName : `${dimName} (local dimming)`;
+  return `<details><summary>About ${label}</summary><div class="inner">
+    ${extra ? `<p>${extra}</p>` : ''}
+    <p>Many LCD TVs dim parts of the backlight in dark areas. On this TV it’s called <b>${dimName}</b>.</p>
+    <p>The grey frames around the boxes keep the backlight on, like in a real dark scene. Judge the boxes inside the frames, not the black edges of the screen.</p>
+    <p>If box B still never appears, even after raising ${ctrl} a lot, ${dimName} is hiding it. Set it one level lower (for example from High to Medium) and try again. Don’t keep raising ${ctrl}: that makes every dark scene grey.</p>
+  </div></details>`;
+}
+function brandFrom(t) {
+  const blkFlow = {
+    down: { do: `Press ${t.blk} down by 1` },
+    up: { do: `Press ${t.blk} up by 1` }
+  };
+  return {
+    name: t.name, note: t.note,
+    dimmingHelp: dimmingHelpFor(t.dim, t.blk, t.dimExtra),
+    steps: {
+      start: { items: [
+        `Update your TV’s software first: ${t.update}. Updates can change picture processing or reset settings, so do it before you start.`,
+        'Turn the lights down to how you normally watch.',
+        `Open the picture menu with the remote: ${t.menu}. You’ll use it throughout.`
+      ] },
+      mode: { checklist: t.modeItems, extra: `<details><summary>Where are these settings?</summary><div class="inner">${t.modeWhere}</div></details>` },
+      temp: { ph: t.tempPh, where: t.tempWhere, flow: { set: t.tempSet, cooler: t.tempCooler } },
+      fit: { ph: t.fitPh, flow: { fix: t.fitFix } },
+      brightness: Object.assign({ record: t.blkTitle, where: t.blkWhere, stuck: t.blkStuck,
+        flow: Object.assign({ ok: { do: `${t.blkTitle} is set.` } }, blkFlow) },
+        t.blkTitle !== 'Brightness' ? { title: t.blkTitle, lead: `This makes dark scenes look right: true black, with shadow detail still visible. ${t.blkLead}` } : {}),
+      contrast: { where: t.contrastWhere },
+      sharpness: Object.assign({ where: t.sharpWhere }, t.sharpFlow ? { flow: t.sharpFlow } : {}),
+      hdrmode: { ph: t.hdrPh, flow: {
+        fix: { sub: `If you’re casting to the TV’s own built-in Cast, HDR switches on by itself, so check the pattern is still playing. If you use a separate Chromecast in an HDMI port: ${t.hdrHdmi}, and on the Chromecast set Dynamic range to match content. Then tap Done: the pattern restarts so the TV can switch over.` },
+        mode: { do: t.hdrModeDo, sub: t.hdrModeSub } } },
+      hdrbright: Object.assign({ record: 'HDR ' + t.blkTitle, where: `<p>Use <b>${t.blk}</b> while HDR is playing; changes usually only affect HDR. ${t.hdrBlkNote || ''}</p>`, stuck: t.blkStuck,
+        flow: Object.assign({ ok: { do: `HDR ${t.blkTitle} is set.` } }, blkFlow) },
+        t.blkTitle !== 'Brightness' ? { title: 'HDR ' + t.blkTitle } : {}),
+      hdrhigh: { record: t.tm, ph: 'On', where: t.tmWhere, flow: { tm: { do: t.tmDo, sub: t.tmSub } } },
+      hdrfinal: { flow: { dark: { do: `Press ${t.blk} up by 1` } } },
+      // Samsung doesn't support Dolby Vision (it uses HDR10+), so its DV step just explains and moves on.
+      dv: t.noDolbyVision
+        ? { record: null, lead: `${t.name} TVs don’t use Dolby Vision.`, flow: { q: { ask: undefined, do: 'Nothing to change here.', text: t.noDolbyVision } } }
+        : { flow: { dark: { do: `Press ${t.blk} down by 1` } } },
+      extras: { checklist: [
+        ['#', 'Your devices'],
+        ['HDMI black level: Auto', t.hdmi],
+        ['Streaming device: match content', 'On a separate Chromecast, Apple TV or Fire TV, turn on match dynamic range and match frame rate, so films play at their natural speed without judder.'],
+        ['Streaming device resolution: 4K', 'If a separate Chromecast or streaming box is plugged into a 4K TV, set its resolution to 4K or Auto (on a Chromecast with Google TV: Settings → Display &amp; Sound → Resolution). At 1080p, the TV has to upscale everything you watch. TVs with Google TV or another smart system built in don’t need this.'],
+        ['Film motion: natural cadence', t.motion],
+        ['Game console: game mode and HDR calibration', t.game],
+        ['Copy settings to other inputs', t.copy],
+        ['Streaming quality: High', 'In Netflix, YouTube and other apps, set playback or data usage to High or Best.'],
+        ['#', 'Your room'],
+        [`${t.light}: set for your room`, `${t.lightNote} Brighter for daytime, dimmer at night.`],
+        ['Reduce reflections', 'Close blinds or move lamps that reflect in the screen. Glare lowers contrast more than any setting.'],
+        ['Bias lighting (optional)', 'A dim, neutral-white light behind the TV (6500 K, about a tenth as bright as the screen) makes blacks look deeper and eases eye strain in a dark room.'],
+        ['Seating', 'Eyes level with about the middle of the screen, sitting straight on. LCD colour and contrast fade when viewed from an angle.'],
+      ] }
+    }
+  };
+}
+
+BRANDS.samsung = brandFrom({
+  name: 'Samsung',
+  noDolbyVision: 'Streaming apps send the same titles in HDR10 or HDR10+, which use the HDR settings you just set, so there’s nothing more to do here.',
+  note: 'Using Samsung menu names (2022 and later, with notes for older models). If a name doesn’t match, look for the closest one.',
+  update: 'Settings → All Settings → Support → Software Update → Update Now',
+  menu: 'Settings → All Settings → Picture',
+  modeItems: [
+    ['Picture Mode: Filmmaker Mode or Movie', 'Picture → Picture Mode.'],
+    ['Picture Clarity: Off', 'Picture → Expert Settings → Picture Clarity Settings (Auto Motion Plus on older models). LED Clear Motion is a personal choice: sharper motion, but a dimmer picture. Leave it off if unsure.'],
+    ['Brightness Optimization and energy saving: Off', 'Settings → All Settings → General &amp; Privacy → Power and Energy Saving.'],
+    ['Colour Space Settings: Auto', 'Picture → Expert Settings → Colour Space Settings. Avoid Native.'],
+    ['Colour and Tint: default; Colour Booster Off', 'Also turn off Contrast Enhancer and Auto HDR Remastering if your model has them.'],
+    ['Gamma: BT.1886 in a dark room, 2.2 in a bright one', 'Picture → Expert Settings → Gamma. BT.1886 is similar to 2.4.'],
+    ['Noise reduction: Off', 'Look for Noise Reduction in Picture Clarity Settings, or Digital Clean View on older models.'],
+  ],
+  modeWhere: '<p>Settings → All Settings → <b>Picture</b> → <b>Expert Settings</b> (on 2021 and older models: Settings → Picture → Expert Settings).</p><p>Samsung keeps separate settings for HDR content, so the HDR steps later will check those.</p>',
+  tempPh: 'Warm2',
+  tempWhere: '<p>Picture → Expert Settings → <b>Colour Tone</b>. The options are Cool, Standard, Warm1 and Warm2.</p>',
+  tempSet: { do: 'Set Colour Tone to Warm2', sub: 'Picture → Expert Settings → Colour Tone. Flick to Standard and Cool to see the difference on the white and greys, then come back.' },
+  tempCooler: { do: 'Try Warm1', sub: 'It’s one step cooler. Wait a moment and look again.' },
+  fitPh: 'Fit to Screen On',
+  fitFix: { do: 'Turn on Fit to Screen', sub: 'Picture → Picture Size Settings: set Picture Size to 16:9 Standard and turn on Fit to Screen.' },
+  blk: 'Shadow Detail', blkTitle: 'Shadow Detail',
+  blkLead: 'On Samsung TVs from 2022 on, this is Shadow Detail. On older models, use Brightness.',
+  blkWhere: '<p>Picture → Expert Settings → <b>Shadow Detail</b>. On these models, <b>Brightness</b> sets the overall light output: set it for comfort.</p><p>On 2021 and older models there’s a separate <b>Backlight</b> for light output, and <b>Brightness</b> is the control for this step.</p>',
+  blkStuck: 'Not changing? On 2022 and later models use Shadow Detail (Brightness only changes the light output). On older models use Brightness. If box B never appears, see “About Local Dimming” below.',
+  dim: 'Local Dimming', dimExtra: 'Samsung OLED TVs don’t have this, so it only applies to LCD (QLED and Neo QLED) models.',
+  contrastWhere: '<p>Picture → Expert Settings → <b>Contrast</b>. Turn off <b>Contrast Enhancer</b> as well.</p>',
+  sharpWhere: '<p>Picture → Expert Settings → <b>Sharpness</b>. 0 adds no artificial sharpening on most models.</p>',
+  hdrPh: 'Filmmaker Mode',
+  hdrHdmi: 'turn on Input Signal Plus for that port (Settings → All Settings → Connection → External Device Manager)',
+  hdrModeDo: 'Choose Filmmaker Mode or Movie for HDR', hdrModeSub: 'Samsung keeps separate HDR picture settings. Check Contrast Enhancer is off here too.',
+  hdrBlkNote: 'For HDR, set Brightness (the light output) to its maximum.',
+  tm: 'HDR Tone Mapping', tmDo: 'Change HDR Tone Mapping', tmSub: 'Picture → Expert Settings → HDR Tone Mapping. Try the other option (Active or Static), then look at the boxes again.',
+  tmWhere: '<p><b>HDR Tone Mapping</b> and <b>Peak Brightness</b> are in Picture → Expert Settings (not on every model). Leave <b>Contrast</b> at the HDR mode’s default.</p>',
+  hdmi: 'For anything plugged in by HDMI: set the device’s output range to Auto, and HDMI Black Level on the TV to Auto if your model shows it (Expert Settings, HDMI inputs only). A mismatch crushes or washes out blacks.',
+  motion: 'Picture Clarity Off plays films as they were shot. If slow camera pans look jerky to you, try Picture Clarity → Custom with a little Judder Reduction.',
+  game: 'Turn on Game Mode for the console’s input (Settings → All Settings → Connection → Game Mode Settings), then run the console’s own HDR calibration screen.',
+  copy: 'Picture → Expert Settings → Apply Picture Settings → All Sources.',
+  light: 'Brightness', lightNote: 'On Samsung (2022 and later), Brightness is the light output; on older models it’s Backlight.'
+});
+
+BRANDS.lg = brandFrom({
+  name: 'LG',
+  note: 'Using LG webOS menu names (2021 and later, with notes for older models). If a name doesn’t match, look for the closest one.',
+  update: 'Settings → All Settings → Support → Software Update',
+  menu: 'Settings → All Settings → Picture',
+  modeItems: [
+    ['Picture Mode: Filmmaker Mode', 'Picture → Picture Mode. Cinema is a good second choice.'],
+    ['TruMotion: Off', 'Picture → Advanced Settings → Clarity. OLED Motion Pro (or Motion Pro) is a personal choice: sharper motion, but a dimmer picture. Leave it off if unsure.'],
+    ['Energy Saving Step and AI Brightness: Off', 'Turn off Energy Saving Step, and AI Brightness or AI Picture Pro if your model has them.'],
+    ['Color Gamut: Auto Detect', 'Picture → Advanced Settings → Color. If there’s no Auto option, leave it at the mode’s default. Avoid Native or Extended.'],
+    ['Color Depth and Tint: default; Auto Dynamic Contrast Off', 'Leave Color Depth and Tint at the picture mode’s defaults.'],
+    ['Gamma: BT.1886 or 2.4 in a dark room, 2.2 in a bright one', 'Picture → Advanced Settings → Brightness → Gamma.'],
+    ['Noise Reduction and MPEG Noise Reduction: Off', 'Picture → Advanced Settings → Clarity. Smooth Gradation can stay at its default.'],
+  ],
+  modeWhere: '<p>Settings → All Settings → <b>Picture</b> → <b>Advanced Settings</b>, which is grouped into <b>Brightness</b>, <b>Color</b> and <b>Clarity</b>.</p><p>LG keeps separate settings for HDR content, so the HDR steps later will check those.</p>',
+  tempPh: 'Warm 50',
+  tempWhere: '<p>Picture → Advanced Settings → Color → <b>Color Temperature</b>. Newer models use a scale up to <b>Warm 50</b>; older models have presets ending in <b>Warm2</b>.</p>',
+  tempSet: { do: 'Set Color Temperature to Warm 50', sub: 'Picture → Advanced Settings → Color → Color Temperature (Warm2 on older models). Slide toward the cooler end to see the difference on the white and greys, then come back.' },
+  tempCooler: { do: 'Move a few steps cooler', sub: 'For example Warm 40, or Warm1 on older models. Wait a moment and look again.' },
+  fitPh: 'Just Scan On',
+  fitFix: { do: 'Turn on Just Scan', sub: 'Picture → Aspect Ratio Settings: set Aspect Ratio to Original and turn Just Scan on.' },
+  blk: 'Screen Brightness', blkTitle: 'Screen Brightness',
+  blkLead: 'On LG this is Screen Brightness (just “Brightness” on older models).',
+  blkWhere: '<p>Picture → Advanced Settings → Brightness → <b>Screen Brightness</b> (“Brightness” on older models). <b>OLED Pixel Brightness</b> (<b>Backlight</b> on LCD models) sets the overall light output: set it for comfort.</p><p>Don’t confuse this with the setting called <b>Black Level</b>: that’s the HDMI range and should stay on Auto.</p>',
+  blkStuck: 'Not changing? Make sure you’re adjusting Screen Brightness, not OLED Pixel Brightness or Black Level. If box B never appears on an LCD model, see “About Local Dimming” below.',
+  dim: 'Local Dimming', dimExtra: 'LG OLED TVs don’t dim zones, so this only applies to LG LCD (QNED, NanoCell) models.',
+  contrastWhere: '<p>Picture → Advanced Settings → Brightness → <b>Adjust Contrast</b> (“Contrast” on older models). Turn off <b>Auto Dynamic Contrast</b> as well.</p>',
+  sharpWhere: '<p>Picture → Advanced Settings → Clarity → <b>Sharpness</b>. The default is often 10; 0 adds no artificial sharpening. Turn off <b>Super Resolution</b> too.</p>',
+  hdrPh: 'Filmmaker Mode',
+  hdrHdmi: 'turn on HDMI Deep Colour for that port (Settings → All Settings → General → Devices → HDMI Settings)',
+  hdrModeDo: 'Choose Filmmaker Mode or Cinema for HDR', hdrModeSub: 'LG keeps separate HDR picture settings. Check Auto Dynamic Contrast is off here too.',
+  hdrBlkNote: 'For HDR, OLED Pixel Brightness (Backlight on LCD) is usually best at its maximum.',
+  tm: 'Dynamic Tone Mapping', tmDo: 'Turn on Dynamic Tone Mapping', tmSub: 'Picture → Advanced Settings → Brightness → Dynamic Tone Mapping. If it’s already on, try Off. Then look at the boxes again.',
+  tmWhere: '<p><b>Dynamic Tone Mapping</b> and <b>Peak Brightness</b> are in Picture → Advanced Settings → Brightness. Leave <b>Adjust Contrast</b> at the HDR mode’s default.</p>',
+  hdmi: 'For anything plugged in by HDMI: set the device’s output range to Auto, and the TV’s Black Level setting (Picture → Advanced Settings → Brightness) to Auto. A mismatch crushes or washes out blacks.',
+  motion: 'TruMotion Off plays films as they were shot. If slow camera pans look jerky to you, try TruMotion → Cinematic Movement.',
+  game: 'Use Game Optimizer (or the Game picture mode) on the console’s input, then run the console’s own HDR calibration screen.',
+  copy: 'Look for “Apply to All Inputs” in the picture mode settings, or repeat the values from your summary on each input you use.',
+  light: 'OLED Pixel Brightness (Backlight on LCD)', lightNote: 'This is the light output on LG.'
+});
+
+BRANDS.sony = brandFrom({
+  name: 'Sony',
+  note: 'Using Sony BRAVIA Google TV menu names. Older Android TV models are similar but some names differ; look for the closest one.',
+  update: 'Settings → System → About → System software update',
+  menu: 'Settings → Display &amp; Sound → Picture',
+  modeItems: [
+    ['Picture mode: Professional, Custom or Cinema', 'Display &amp; Sound → Picture → Picture mode. Professional (on newer models) and Custom are the most accurate.'],
+    ['Motionflow: Off', 'Picture → Motion. Leave CineMotion on Auto: it helps films play smoothly.'],
+    ['Light sensor and power saving: Off', 'Light sensor is in the picture settings (with Auto luminance level on some models). Turn off power saving in the power or eco settings.'],
+    ['Color space: Auto', 'Most Sony picture modes set this automatically. If you see a Color space option, choose Auto.'],
+    ['Color and Hue: default; Live Color Off', 'Also turn off Adv. contrast enhancer and Black adjust.'],
+    ['Gamma: leave at the default', 'Sony uses numbers (−3 to +3) instead of 2.2 or 2.4. If shadows look too dark in a bright room, try one step lower.'],
+    ['Noise reduction: Off', 'Picture → Clarity: turn off Random noise reduction and Digital noise reduction. Turn Reality Creation off too.'],
+  ],
+  modeWhere: '<p>Settings → <b>Display &amp; Sound</b> → <b>Picture</b>, grouped into <b>Brightness</b>, <b>Color</b>, <b>Clarity</b> and <b>Motion</b>.</p><p>Sony keeps separate settings for HDR content, so the HDR steps later will check those.</p>',
+  tempPh: 'Expert1',
+  tempWhere: '<p>Picture → Color → <b>Color temperature</b>. The options are Cool, Natural, Warm, Expert1 and Expert2. Expert1 is the one designed to match the film standard.</p>',
+  tempSet: { do: 'Set Color temperature to Expert1', sub: 'Picture → Color → Color temperature. Flick to Natural and Cool to see the difference on the white and greys, then come back.' },
+  tempCooler: { do: 'Try Expert2', sub: 'Then wait a moment and look again. If it still looks yellow, try Natural.' },
+  fitPh: 'Full pixel',
+  fitFix: { do: 'Set Display area to Full pixel', sub: 'Look in Settings → Display &amp; Sound → Screen for Display area → Full pixel. If you see Wide mode, set it to Full.' },
+  blk: 'Black level', blkTitle: 'Black level',
+  blkLead: 'On Sony this is the Black level setting.',
+  blkWhere: '<p>Picture → Brightness → <b>Black level</b> (the default is 50). On Sony, <b>Brightness</b> sets the screen’s light output: set it for comfort.</p>',
+  blkStuck: 'Not changing? Make sure you’re adjusting Black level, not Brightness. If box B never appears, see “About Auto local dimming” below.',
+  dim: 'Auto local dimming', dimExtra: 'Sony OLED TVs don’t have this, so it only applies to LCD models.',
+  contrastWhere: '<p>Picture → Brightness → <b>Contrast</b>. Turn off <b>Adv. contrast enhancer</b> as well.</p>',
+  sharpWhere: '<p>Picture → Clarity → <b>Sharpness</b>. On Sony, <b>50 is neutral</b>: going below it softens the picture. Turn off <b>Reality Creation</b> too.</p>',
+  sharpFlow: { down: { do: 'Press Sharpness down a few steps', sub: 'But don’t go below 50, which is neutral on Sony. Then look closely at the lines again.' } },
+  hdrPh: 'Professional',
+  hdrHdmi: 'set that port’s HDMI signal format to Enhanced format (Settings → Channels &amp; Inputs → External inputs)',
+  hdrModeDo: 'Choose Professional, Custom or Cinema for HDR', hdrModeSub: 'Sony keeps separate HDR picture settings. Check Adv. contrast enhancer and Live Color are off here too.',
+  hdrBlkNote: 'For HDR, Brightness (the light output) is usually best at its maximum.',
+  tm: 'HDR tone mapping', tmDo: 'Change HDR tone mapping', tmSub: 'Picture → Brightness → HDR tone mapping. Try its other options, then look at the boxes again.',
+  tmWhere: '<p><b>HDR tone mapping</b> and <b>Peak luminance</b> are in Picture → Brightness (not on every model). Leave <b>Contrast</b> at the HDR mode’s default.</p>',
+  hdmi: 'For anything plugged in by HDMI: set the device’s output range to Auto, and HDMI video range on the TV (Picture → Video options) to Auto. A mismatch crushes or washes out blacks.',
+  motion: 'Motionflow Off with CineMotion on Auto plays films smoothly at their natural cadence.',
+  game: 'Use the Game picture mode on the console’s input, then run the console’s own HDR calibration screen.',
+  copy: 'Repeat the values from your summary on each input you use; Sony keeps picture settings per input.',
+  light: 'Brightness', lightNote: 'On Sony, Brightness is the light output.'
+});
+
+BRANDS.hisense = brandFrom({
+  name: 'Hisense',
+  note: 'Hisense TVs use either VIDAA or Google TV, and menus differ a little between them and between years. If a name doesn’t match, look for the closest one.',
+  update: 'Settings → Support → System Update on VIDAA models, or Settings → System → About → System update on Google TV models',
+  menu: 'Settings → Picture (VIDAA) or Settings → Display &amp; Sound → Picture (Google TV)',
+  modeItems: [
+    ['Picture Mode: Filmmaker Mode or Theater Night', 'Some models call it Cinema Night. Avoid the Energy Saving mode, which limits the backlight.'],
+    ['Motion Enhancement: Off', 'Under Clarity or Motion settings (Motion Smoothing on some Google TV models). Motion Clearness (sharper motion, but can flicker) is a personal choice; leave it off if unsure.'],
+    ['Automatic Light Sensor: Off', 'Often under Picture → General. Also avoid the Energy Saving picture mode.'],
+    ['Color Space: Auto', 'Under Color settings. Avoid Native.'],
+    ['Color and Tint: default; Active Contrast Off', 'Also turn off any other “dynamic” or “enhanced” picture options.'],
+    ['Gamma: 2.4 or BT1886 in a dark room, 2.2 in a bright one', 'Under Brightness settings.'],
+    ['Noise Reduction and MPEG / Digital Noise Reduction: Off', 'Under Clarity settings.'],
+  ],
+  modeWhere: '<p>VIDAA: Settings → <b>Picture</b>. Google TV: Settings → <b>Display &amp; Sound</b> → <b>Picture</b>. The detailed controls are grouped as <b>Brightness</b>, <b>Color</b>, <b>Clarity</b> and <b>Motion</b> (some under <b>Advanced Settings</b>).</p><p>Hisense keeps separate settings for HDR content, so the HDR steps later will check those.</p>',
+  tempPh: 'Warm2',
+  tempWhere: '<p>Picture → Color (or Advanced Settings) → <b>Color Temperature</b>. The options are usually Cool, Standard or Medium, Warm1 and Warm2.</p>',
+  tempSet: { do: 'Set Color Temperature to Warm2', sub: 'Picture → Color → Color Temperature. Flick to the cooler options to see the difference on the white and greys, then come back.' },
+  tempCooler: { do: 'Try Warm1', sub: 'It’s one step cooler. Wait a moment and look again.' },
+  fitPh: 'Overscan Off',
+  fitFix: { do: 'Turn Overscan off', sub: 'Look for Overscan in the Picture or Advanced settings (on some models under Picture Size or Aspect Ratio) and set it to Off.' },
+  blk: 'Brightness', blkTitle: 'Brightness',
+  blkWhere: '<p>Most Hisense TVs have both <b>Backlight</b> (overall light output) and <b>Brightness</b> (black level): use <b>Brightness</b> for this step and set Backlight for comfort.</p><p>If yours has <b>no Backlight</b> setting, Brightness is the light output instead: look for a <b>Black Level</b> setting for this step.</p>',
+  blkStuck: 'Not changing? If your Hisense has no separate Backlight setting, Brightness may be changing the light output; look for Black Level instead. If box B never appears, see “About Local Dimming” below.',
+  dim: 'Local Dimming',
+  contrastWhere: '<p>Picture → Brightness → <b>Contrast</b>. Turn off <b>Active Contrast</b> as well.</p>',
+  sharpWhere: '<p>Picture → Clarity → <b>Sharpness</b>.</p>',
+  hdrPh: 'Filmmaker Mode',
+  hdrHdmi: 'set that port’s HDMI Format to Enhanced (Settings → Channels &amp; Inputs → Inputs)',
+  hdrModeDo: 'Choose Filmmaker Mode or HDR Theater for HDR', hdrModeSub: 'Hisense keeps separate HDR picture settings. Check Active Contrast is off here too.',
+  hdrBlkNote: 'For HDR, Backlight is usually best at its maximum.',
+  tm: 'Dynamic Tone Mapping', tmDo: 'Turn on Dynamic Tone Mapping', tmSub: 'Usually under Picture → Advanced Settings. If it’s already on, try Off. Then look at the boxes again.',
+  tmWhere: '<p><b>Dynamic Tone Mapping</b> is usually in Picture → Advanced Settings, and <b>Peak Brightness</b> in Picture → Brightness. Leave <b>Contrast</b> at the HDR mode’s default.</p>',
+  hdmi: 'For anything plugged in by HDMI: set the device’s output range to Auto, and HDMI Dynamic Range on the TV to Auto. A mismatch crushes or washes out blacks.',
+  motion: 'Motion Enhancement Off plays films as they were shot. If slow camera pans look jerky to you, try Motion Enhancement → Film.',
+  game: 'Use the Game picture mode on the console’s input, then run the console’s own HDR calibration screen.',
+  copy: 'Repeat the values from your summary on each input you use.',
+  light: 'Backlight', lightNote: 'On most Hisense TVs, Backlight is the light output.'
+});
+
+const STEPS = [
+  /* The hub is the home screen: chapter cards, plus the settings summary. */
+  { id: 'hub', title: 'TV Picture Setup', pattern: null, hub: true },
+  { id: 'brand', chapter: 'setup', title: 'What brand is your TV?', pattern: null, brandPick: true,
+    lead: 'So the steps use your TV’s menu names.' },
+  { id: 'connect', chapter: 'setup', title: 'Show the test patterns on your TV', pattern: null, connect: true,
+    lead: 'Your phone and the TV need to be on the same Wi-Fi.' },
+  {
+    id: 'start', chapter: 'setup', title: 'Get ready', pattern: null,
+    lead: 'About 10 minutes. You’ll answer simple questions about what you see, and change settings with your TV remote.',
+    /* items[0] is the software-update advice, shown as a one-line tip; the
+       other two are shown as cards. Brands override all three. */
+    items: [
+      'Update your TV’s software first (usually Settings → System or Support → Software update). Updates can change picture processing or reset settings, so do it before you start.',
+      'Turn the lights down to how you normally watch.',
+      'Open your TV’s picture settings menu with the remote. You’ll use it throughout.'
+    ]
+  },
+  {
+    id: 'mode', chapter: 'basics', pos: 'any', title: 'Quick settings first', pattern: null, record: 'Picture mode',
+    lead: 'These three make the biggest difference. Tap each one when it’s done.',
+    checklist: [
+      ['Picture mode: Filmmaker, Movie or Cinema', 'If you have Filmmaker Mode, use it. Otherwise Movie, Cinema or Calibrated.'],
+      ['Motion smoothing: Off', 'Also called TruMotion, Auto Motion Plus, MotionFlow or Motion Interpolation.'],
+      ['Energy saving and light sensor: Off', 'Also called Eco, Power saving, Ambient light detection or Adaptive brightness.'],
+      ['Colour space: Auto', 'Also called Colour gamut. Avoid Native or Wide: they make ordinary shows look oversaturated.'],
+      ['Colour and Tint: leave at default', 'Turn off any Colour enhancer, Live colour or Vivid colour option. The picture mode’s defaults are the most accurate.'],
+      ['Gamma: 2.4 in a dark room, 2.2 in a bright one', 'Sometimes shown as BT.1886 (similar to 2.4). It sets how quickly the picture brightens out of black. If your TV has no Gamma setting, skip this.'],
+      ['Noise reduction: Off', 'Also called MPEG noise reduction, Smooth gradation or Noise filter. It smears fine detail in streaming shows. Low is fine for an old, grainy source.'],
+    ],
+    extra: `<details><summary>Where are these settings?</summary><div class="inner">
+      <p>Usually Settings → <b>Picture</b>, then <b>Expert</b> or <b>Advanced</b> settings. Make the changes on the HDMI input the Chromecast is plugged into; most TVs remember settings per input.</p></div></details>`
+  },
+  {
+    id: 'fit', chapter: 'basics', pos: 'seat', title: 'Fit to screen', pattern: '01-fit', record: 'Picture size', ph: 'Just Scan',
+    lead: 'Look at the edges of your TV.',
+    caption: 'There’s a thin white border around the very edge, with arrows in each corner.',
+    flow: {
+      start: 'q',
+      q: { ask: 'Can you see the white border on all four edges, with arrows touching the corners?', answers: [['Yes', 'ok'], ['No', 'fix']] },
+      fix: { do: 'Change Picture size to the option that shows the whole picture',
+             sub: 'It’s called Just Scan, Screen Fit, Fit to Screen, Full Pixel or Original, depending on the brand. It may be under Picture → Aspect ratio.', then: 'q' },
+      ok: { do: 'The picture fits.', text: 'Nothing is being cut off or stretched.' }
+    }
+  },
+  {
+    id: 'brightness', chapter: 'basics', pos: 'seat', title: 'Brightness', pattern: '02-brightness', record: 'Brightness',
+    lead: 'This makes dark scenes look right: true black, with shadow detail still visible.',
+    caption: 'Look inside the grey frames. When it’s right, box A is completely gone and box B is a very faint grey square. (Brightened here so you can see it.)',
+    where: `<p>Use the setting called <b>Brightness</b>. On some TVs, Brightness changes the backlight (the whole screen gets lighter or dimmer but the boxes don’t change). If so, use <b>Black level</b> or <b>Shadow detail</b> instead.</p>`,
+    dimming: true,
+    stuck: 'Not changing? Your TV may call this setting Black level or Shadow detail. “Brightness” on some TVs only changes the backlight. If box B never appears however high you go, see “Does your TV have local dimming?” below.',
+    flow: {
+      start: 'qa',
+      qa: { ask: 'Can you see box A (on the left) at all?', answers: [['Yes, I can see it', 'down'], ['No, it’s gone', 'qb']] },
+      down: { do: 'Press Brightness down by 1', sub: 'Then look at box A again.', then: 'qa' },
+      qb: { ask: 'Can you see box B (on the right), even faintly?', answers: [['Yes, just', 'ok'], ['No', 'up']] },
+      up: { do: 'Press Brightness up by 1', sub: 'Then look at the boxes again.', then: 'qa' },
+      ok: { do: 'Brightness is set.', text: 'Blacks are black, and shadow detail is still visible.' }
+    }
+  },
+  {
+    id: 'contrast', chapter: 'basics', pos: 'seat', title: 'Contrast', pattern: '03-contrast', record: 'Contrast',
+    lead: 'This makes bright scenes look right, without losing detail in clouds, snow or white shirts.',
+    caption: 'When it’s right, you can see all three boxes. A is easy, B is lighter, C is very faint. (Darkened here so you can see them.)',
+    where: `<p>Use the setting called <b>Contrast</b>. Don’t confuse it with <b>Dynamic contrast</b> or <b>Contrast enhancer</b>, which should be off.</p>`,
+    stuck: 'If box C never appears, also check that Dynamic contrast and any “HDR effect” or “Peak brightness” boost are off.',
+    flow: {
+      start: 'q',
+      q: { ask: 'Can you see box C (on the right), even faintly?', answers: [['Yes', 'ok'], ['No', 'down']] },
+      down: { do: 'Press Contrast down by 1', sub: 'Then look for box C again.', then: 'q' },
+      ok: { do: 'Contrast is set.', text: 'Bright areas keep their detail. If you changed contrast, go back one step and check Brightness again.' }
+    }
+  },
+  {
+    id: 'sharpness', chapter: 'fine', pos: 'close', title: 'Sharpness', pattern: '04-sharpness', record: 'Sharpness',
+    lead: 'Most TVs add fake outlines to make the picture look crisper. Here’s the difference:',
+    compare: true,
+    where: `<p>Use the setting called <b>Sharpness</b>. Also turn off <b>Edge enhancement</b>, <b>Super resolution</b> or <b>Reality creation</b> if you have them.</p>
+      <p>On some TVs (often Sony), the neutral point is in the middle of the range. Going below it softens the picture, so stop as soon as the outlines disappear.</p>`,
+    flow: {
+      start: 'q',
+      q: { ask: 'Walk up close to the TV. Do the black lines have bright outlines beside them, like the “Halos” example?', answers: [['Yes', 'down'], ['No, they look clean', 'ok']] },
+      down: { do: 'Press Sharpness down a few steps', sub: 'Then look closely at the lines again.', then: 'q' },
+      ok: { do: 'Sharpness is set.', text: 'No artificial outlines. Go back to your usual seat for the next step.' }
+    }
+  },
+  {
+    id: 'temp', chapter: 'fine', pos: 'seat', title: 'Colour temperature', pattern: '06-temp', record: 'Colour temperature', ph: 'Warm 2',
+    lead: 'Switch between the colour temperature options while watching the TV. The white and grey areas show the difference most clearly: cooler options look bluish, warmer ones look yellowish.',
+    caption: 'The TV is showing white, greys, skin tones, foliage and sky.',
+    where: `<p>Usually Picture → Expert or Advanced settings → <b>Colour temperature</b> (sometimes <b>Colour tone</b> or <b>White balance</b>). Options are often Cool, Standard, Warm 1 and Warm 2; LG uses a scale up to Warm 50, and Sony uses Expert 1 and Expert 2.</p>`,
+    flow: {
+      start: 'set',
+      set: { do: 'Start with the warmest option', sub: 'Warm 2 on most TVs, Warm 50 on LG, Expert 1 on Sony. Flick back and forth to the other options to see the difference on the white and greys, then come back to it.', then: 'q' },
+      q: { ask: 'Give your eyes 30 seconds to adjust. Do the white and grey areas still look clearly yellow or orange?', answers: [['No, they look neutral', 'ok'], ['Yes, still yellow', 'cooler']] },
+      cooler: { do: 'Go one step cooler', sub: 'For example Warm 1 instead of Warm 2. Then wait a moment and look again.', then: 'q' },
+      ok: { do: 'Colour temperature is set.', text: 'Skin tones should look natural, not pink or orange.' }
+    }
+  },
+  {
+    id: 'final', chapter: 'fine', pos: 'seat', title: 'Final check', pattern: '05-final',
+    lead: 'Look at the row of grey squares at the top.',
+    caption: 'The squares go from dark grey to white. Each should look plain grey, with no colour.',
+    flow: {
+      start: 'q',
+      q: { ask: 'Do the grey squares look plain grey?', answers: [['Yes', 'ok'], ['They look bluish', 'blue'], ['Another tint', 'other']] },
+      blue: { do: 'Choose a warmer Colour temperature', sub: 'Try Warm 2, or a higher “Warm” number. Then look at the squares again.', then: 'q' },
+      other: { do: 'That’s OK to leave.', text: 'Fixing a green or pink tint precisely needs a measuring instrument, and the effect is usually small. Make sure Colour and Tint are at the defaults for this picture mode.' },
+      ok: { do: 'SDR is done.', text: 'That covers everyday TV and most streaming. Next: an optional check for HDR.' }
+    }
+  },
+  {
+    id: 'hdr', chapter: 'hdr', title: 'HDR (optional)', pattern: null,
+    lead: 'Movies and shows in HDR or Dolby Vision use separate picture settings on most TVs. This checks them in a few minutes.',
+    flow: {
+      start: 'q',
+      q: { ask: 'Do you watch HDR content? For example 4K HDR or Dolby Vision on Netflix, Disney+, Prime Video or Apple TV.', answers: [['Yes', 'ok'], ['Not sure', 'ok'], ['No, skip HDR', '@hub']] },
+      ok: { do: 'Let’s check HDR.', text: 'Tap Next. The TV will switch into HDR for the next few patterns.' }
+    }
+  },
+  {
+    id: 'hdrmode', chapter: 'hdr', pos: 'any', title: 'Is HDR on?', pattern: 'h1-black', record: 'HDR picture mode', ph: 'HDR Filmmaker',
+    lead: 'Look at the TV just after the pattern starts.',
+    caption: 'This is the next pattern. First, check the TV switched into HDR.',
+    where: `<p>Press the <b>Info</b> or <b>Settings</b> button while the pattern plays: the picture mode name usually shows “HDR” (for example HDR Filmmaker, HDR Movie or HDR Cinema).</p>`,
+    flow: {
+      start: 'q',
+      q: { ask: 'Did the TV switch into HDR? Look for an “HDR” badge, or a picture mode name that includes HDR.', answers: [['Yes', 'mode'], ['No', 'fix'], ['Can’t tell', 'unsure']] },
+      fix: { do: 'Turn on HDR for this input',
+             sub: 'If your Chromecast plugs into HDMI: turn on the TV’s enhanced format for that HDMI port (called HDMI UHD Color, Input Signal Plus or HDMI Enhanced Format, depending on brand). On the Chromecast, set Display & Sound → Dynamic range → match content. Then tap Done: the pattern restarts so the TV can switch over.', then: 'q2', replay: true },
+      mode: { do: 'Choose the HDR picture mode: Filmmaker, Movie or Cinema', sub: 'HDR has its own picture mode and settings. Turn off dynamic contrast and energy saving here too.', then: 'ok' },
+      q2: { ask: 'Did the TV switch into HDR this time?', answers: [['Yes, it’s HDR now', 'mode'], ['Still no', 'nohdr']] },
+      nohdr: { do: 'Your setup isn’t showing HDR', skipHdr: true,
+               text: 'That’s fine: everything you watch in SDR, which is most TV, is already set. Your TV, streaming device or HDMI connection may not support HDR10. If that changes later, open HDR from the home screen.' },
+      unsure: { do: 'Carry on.', text: 'If the next pattern looks washed out, with grey instead of black, HDR is probably off. Come back here and tap No.' },
+      ok: { do: 'HDR is on.', text: 'The next steps adjust the HDR settings.' }
+    }
+  },
+  {
+    id: 'hdrbright', chapter: 'hdr', pos: 'seat', title: 'HDR brightness', pattern: 'h1-black', record: 'HDR brightness',
+    lead: 'Same as before, but for HDR. Most TVs keep a separate Brightness setting for HDR.',
+    caption: 'Look inside the grey frames. When it’s right, box A is gone and box B is a very faint grey square. (Brightened here so you can see it.)',
+    where: `<p>Use <b>Brightness</b> (or <b>Black level</b> / <b>Shadow detail</b>) while HDR is playing. Changes here usually only affect HDR.</p>`,
+    dimming: true,
+    stuck: 'Not changing? Your TV may call this setting Black level or Shadow detail. If box B never appears, see “Does your TV have local dimming?” below.',
+    flow: {
+      start: 'qa',
+      qa: { ask: 'Can you see box A (on the left) at all?', answers: [['Yes, I can see it', 'down'], ['No, it’s gone', 'qb']] },
+      down: { do: 'Press Brightness down by 1', sub: 'Then look at box A again.', then: 'qa' },
+      qb: { ask: 'Can you see box B (on the right), even faintly?', answers: [['Yes, just', 'ok'], ['No', 'up']] },
+      up: { do: 'Press Brightness up by 1', sub: 'Then look at the boxes again.', then: 'qa' },
+      ok: { do: 'HDR brightness is set.', text: 'Dark HDR scenes will keep their shadow detail.' }
+    }
+  },
+  {
+    id: 'hdrhigh', chapter: 'hdr', pos: 'seat', title: 'HDR highlights', pattern: 'h2-highlights', record: 'HDR tone mapping', ph: 'On',
+    lead: 'Four bright boxes, from bright (A) to very bright (D). Most TVs can’t reach the brightest levels, so they compress them. This checks they do it gracefully.',
+    caption: 'When it’s right, you can tell all four boxes apart, each a little brighter than the last.',
+    where: `<p>Look for <b>Dynamic Tone Mapping</b>, <b>HDR Tone Mapping</b>, <b>Dynamic HDR</b> or <b>HDR Brightness</b> in the picture menu. Names vary a lot by brand.</p>
+      <p>Leave <b>Contrast</b> at the HDR mode’s default (often the maximum). Turning it down dims all HDR.</p>`,
+    flow: {
+      start: 'q',
+      q: { ask: 'Can you tell all four boxes A, B, C and D apart?', answers: [['Yes', 'ok'], ['No, some look the same', 'tm']] },
+      tm: { do: 'Turn on HDR tone mapping', sub: 'Look for Dynamic Tone Mapping, HDR Tone Mapping or Dynamic HDR. If it’s already on, try its other options. Then look at the boxes again.', then: 'q2' },
+      q2: { ask: 'Can you tell all four apart now?', answers: [['Yes', 'ok'], ['Still no', 'limit']] },
+      limit: { do: 'That’s a limit of your TV.', text: 'Many TVs can’t separate the very brightest highlights. Use whichever tone mapping setting looked best and move on.' },
+      ok: { do: 'Highlights look right.', text: 'Bright HDR details like sunlight and reflections keep their detail.' }
+    }
+  },
+  {
+    id: 'hdrfinal', chapter: 'hdr', pos: 'seat', title: 'HDR final check', pattern: 'h3-steps',
+    lead: 'A row of grey bars, from nearly black on the left to very bright on the right.',
+    caption: 'Each bar should be a little brighter than the one before.',
+    flow: {
+      start: 'q',
+      q: { ask: 'Does every bar look different from the one next to it?', answers: [['Yes', 'ok'], ['Dark end merges', 'dark'], ['Bright end merges', 'bright']] },
+      dark: { do: 'Press Brightness up by 1', sub: 'Then look at the darkest bars again. If box A from the earlier step would come back, stop and leave it.', then: 'q' },
+      bright: { do: 'That’s normal on most TVs.', text: 'The brightest bars are beyond what most TVs can show. As long as the rest step up evenly, you’re done.' },
+      ok: { do: 'All done.', text: 'Your TV is set up for SDR and HDR. Next: Dolby Vision, if your TV has it.' }
+    }
+  },
+  /* Dolby Vision tone maps itself from the TV's factory panel data and the
+     video's scene-by-scene metadata, and DV test patterns need Dolby's licensed
+     encoder, so this is a guidance step with no pattern: pick the accurate mode,
+     keep the defaults, and only fix black level if dark areas look grey. */
+  {
+    id: 'dv', chapter: 'hdr', pos: 'any', title: 'Dolby Vision (optional)', pattern: null, record: 'Dolby Vision picture mode', ph: 'Dolby Vision Dark',
+    lead: 'Dolby Vision adjusts the picture to your TV scene by scene, so there’s no pattern to tune. A few settings still matter, and most TVs keep them separate from the HDR ones you just set.',
+    flow: {
+      start: 'q',
+      q: { ask: 'Does your TV play Dolby Vision? Streaming apps show a “Dolby Vision” label on titles that use it.', answers: [['Yes', 'play'], ['Not sure', 'play'], ['No, skip', '@extras']] },
+      play: { do: 'Start a Dolby Vision film or show, then pause it on a normal scene',
+              sub: 'Look for the Dolby Vision label in Netflix, Disney+, Prime Video or Apple TV. The TV only shows its Dolby Vision settings while Dolby Vision is playing, and changes you make now only affect Dolby Vision.', then: 'on' },
+      on: { ask: 'Open the picture mode list. Do the names include “Dolby Vision”, or did the TV show a Dolby Vision badge?', answers: [['Yes', 'mode'], ['No', 'fix'], ['Can’t tell', 'mode']] },
+      fix: { do: 'Make sure Dolby Vision reaches the TV',
+             sub: 'Some streaming plans and older devices only send HDR10. If you use a separate Chromecast in an HDMI port: turn on the TV’s enhanced HDMI format for that port, and on the Chromecast set Dynamic range to match content. Then start the title again. If it still doesn’t show, your setup plays it as HDR10, which the HDR steps already covered.', then: 'on' },
+      mode: { do: 'Choose Dolby Vision Dark (or Filmmaker / Cinema if there’s no Dark)',
+              sub: 'Dark is the most accurate. Bright and Vivid boost everything. IQ modes follow the room light, which is fine for daytime viewing in a bright room.', then: 'clean' },
+      clean: { do: 'Turn off the extras and leave the rest at default',
+               sub: 'Turn off dynamic contrast, colour enhancers, motion smoothing and energy saving here too. Leave Contrast, Colour and Gamma at this mode’s defaults: Dolby Vision is already fitting the picture to your TV.', then: 'q2' },
+      q2: { ask: 'Find a dark scene. Do black areas, like letterbox bars or a night sky, look grey or glowing?', answers: [['No, they look black', 'ok'], ['Yes, greyish', 'dark']] },
+      dark: { do: 'Press Brightness down by 1', sub: 'Small changes only. If dark details start to disappear, go back up by 1 and stop there.', then: 'q2' },
+      ok: { do: 'Dolby Vision is set.', text: 'Dolby Vision films and shows will use these settings automatically.' }
+    }
+  },
+  {
+    id: 'extras', chapter: 'tips', title: 'Your devices and room', pattern: null, compact: true,
+    lead: 'Optional. Tick what you’ve done; the arrow shows details.',
+    checklist: [
+      ['#', 'Your devices'],
+      ['HDMI black level: Auto', 'For anything plugged in by HDMI (game console, Blu-ray, streaming stick). Also called RGB range or HDMI Black Level. Set Auto on both the TV and the device. A mismatch crushes or washes out blacks.'],
+      ['Streaming device: match content', 'On a Chromecast, Apple TV or Fire TV, turn on match dynamic range and match frame rate, so films play at their natural speed without judder.'],
+      ['Streaming device resolution: 4K', 'If a separate Chromecast or streaming box is plugged into a 4K TV, set its resolution to 4K or Auto (on a Chromecast with Google TV: Settings → Display &amp; Sound → Resolution). At 1080p, the TV has to upscale everything you watch. TVs with Google TV or another smart system built in don’t need this.'],
+      ['Film motion: natural 24p', 'If your TV has Real Cinema, Cinematic Movement or a 24p setting, turn it on. It smooths camera pans without the “soap opera” look.'],
+      ['Game console: Game mode and HDR calibration', 'Use Game mode (and HGIG if offered) on the console’s input, then run the console’s own HDR calibration screen. PS5 and Xbox both have one in their display settings.'],
+      ['Copy settings to other inputs', 'Look for “Apply to all inputs” or “Apply picture settings: All sources”. Otherwise, repeat the values from your summary on each input you use.'],
+      ['Streaming quality: High', 'In Netflix, YouTube and other apps, set playback or data usage to High or Best.'],
+      ['#', 'Your room'],
+      ['Backlight: set for your room', 'Brighter for daytime, dimmer at night. If your TV lets you save two custom modes, keep a Day and a Night version with only the backlight different.'],
+      ['Reduce reflections', 'Close blinds or move lamps that reflect in the screen. Glare lowers contrast more than any setting.'],
+      ['Bias lighting (optional)', 'A dim, neutral-white light behind the TV (6500 K, about a tenth as bright as the screen) makes blacks look deeper and eases eye strain in a dark room.'],
+      ['Seating', 'Eyes level with about the middle of the screen, sitting straight on. LCD colour and contrast fade when viewed from an angle.'],
+    ]
+  }
+];
+
+const store = {
+  get(k) { try { return JSON.parse(localStorage.getItem('tvcal2.' + k)); } catch (e) { return null; } },
+  set(k, v) { try { localStorage.setItem('tvcal2.' + k, JSON.stringify(v)); } catch (e) {} }
+};
+
+/* ---------- Chapters ----------
+   Steps are grouped into chapters. The hub (home screen) lists them; inside a
+   chapter the top row shows "Basics · 3 of 4". Steps and chapters remember
+   whether they were done or skipped. */
+const CHAPTERS = {
+  setup:  { name: 'Setup', desc: 'Your TV and how to connect' },
+  basics: { name: 'Basics', desc: 'Picture mode, fit, brightness, contrast' },
+  fine:   { name: 'Fine-tune', desc: 'Sharpness, colour temperature, grey check' },
+  hdr:    { name: 'HDR', desc: 'For 4K HDR and Dolby Vision shows', optional: true },
+  tips:   { name: 'Devices and room', desc: 'Tips outside the picture menu', optional: true }
+};
+const MAIN_CHAPTERS = ['setup', 'basics', 'fine', 'hdr'];
+// Short names for "Next: …" buttons, where the step title is a sentence.
+const SHORT = { connect: 'Connect to TV', start: 'Get ready', mode: 'Quick settings', hdr: 'HDR', dv: 'Dolby Vision', extras: 'Devices and room' };
+// Steps without a test pattern of their own that still show one on the TV, so it's clear the TV is connected.
+const TV_PATTERN = { connect: '01-fit', start: '01-fit' };
+
+function ID(id) { return STEPS.findIndex(x => x.id === id); }
+const HUB = ID('hub');
+const IOS = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+// Safari (iPhone, iPad, Mac) can AirPlay a video; everything else uses Cast from Chrome.
+const SAFARI_AIRPLAY = !!window.WebKitPlaybackTargetAvailabilityEvent;
+
+let brand = store.get('brand');   // a key of BRANDS, 'other', or null (not chosen yet)
+function brandInfo() { return BRANDS[brand] || null; }
+let link = store.get('link') || (IOS || SAFARI_AIRPLAY ? 'airplay' : 'cast');
+let idx = Math.max(0, ID(store.get('stepId')));
+if (!brand && STEPS[idx].chapter && STEPS[idx].chapter !== 'setup') idx = HUB;
+// The site's brand guides link here as setup/?brand=lg, so the brand is already chosen.
+(function () {
+  const b = new URLSearchParams(location.search).get('brand');
+  if (!b) return;
+  if (BRANDS[b] || b === 'other') { brand = b; store.set('brand', b); }
+  history.replaceState(null, '', location.pathname + location.hash);
+})();
+const status = store.get('status') || {};   // step id -> 'done' | 'skipped'
+
+/* ---------- Appearance ----------
+   Auto follows the phone's light or dark setting; Light and Dark force one.
+   The <head> script applies a saved choice before the page first draws. */
+let theme = store.get('theme') || 'auto';
+const lightQuery = window.matchMedia ? matchMedia('(prefers-color-scheme: light)') : null;
+function applyTheme() {
+  const root = document.documentElement;
+  if (theme === 'auto') delete root.dataset.theme; else root.dataset.theme = theme;
+  const dark = theme === 'dark' || (theme === 'auto' && !(lightQuery && lightQuery.matches));
+  document.querySelector('meta[name=theme-color]').content = dark ? '#111113' : '#f4f4f6';
+}
+if (lightQuery && lightQuery.addEventListener) lightQuery.addEventListener('change', applyTheme);
+applyTheme();
+function saveStatus() { store.set('status', status); }
+
+// The step as shown: generic step with the chosen brand's overrides on top.
+function S(i) {
+  const base = STEPS[i], o = brandInfo() && brandInfo().steps[base.id];
+  if (!o) return base;
+  const m = Object.assign({}, base, o);
+  if (base.flow && o.flow) {
+    m.flow = Object.assign({}, base.flow);
+    for (const k in o.flow) m.flow[k] = Object.assign({}, base.flow[k], o.flow[k]);
+  }
+  return m;
+}
+function allSteps() { return STEPS.map((_, i) => S(i)); }
+function patternFor(i) { const s = S(i); return s.pattern || TV_PATTERN[s.id] || null; }
+const values = store.get('values') || {};
+const checks = store.get('checks') || {};
+let node = null, loops = 0;
+
+function chSteps(ch) { return STEPS.filter(x => x.chapter === ch); }
+function chState(ch) {
+  const st = chSteps(ch).map(x => status[x.id]);
+  if (st.every(Boolean)) return st.every(v => v === 'skipped') ? 'skipped' : 'done';
+  return st.some(Boolean) ? 'started' : 'new';
+}
+function nextChapter() { return MAIN_CHAPTERS.find(c => !['done', 'skipped'].includes(chState(c))); }
+function chapterEntry(ch) {
+  const list = chSteps(ch);
+  if (ch !== 'setup' && !brand) return ID('brand');
+  return ID((list.find(x => !status[x.id]) || list[0]).id);
+}
+
+const $ = id => document.getElementById(id);
+const card = $('card'), top_ = $('top'), banner = $('banner'), bar = $('bar'), barInner = $('barInner');
+const sheet = $('sheet'), sheetBody = $('sheetBody'), sheetTitle = $('sheetTitle');
+const panel = $('connectPanel'), parking = $('parking');
+const menuEl = $('menu');
+const menuItems = () => [...menuEl.querySelectorAll('button')];
+function openMenu() {
+  menuItems().forEach(b => b.setAttribute('aria-checked', String(b.dataset.themePick === theme)));
+  menuEl.hidden = false;
+  const r = $('menuBtn').getBoundingClientRect();
+  menuEl.style.top = (r.bottom + 6) + 'px';
+  menuEl.style.left = Math.max(12, r.left) + 'px';
+  $('menuBtn').setAttribute('aria-expanded', 'true');
+  (menuItems().find(b => b.getAttribute('aria-checked') === 'true') || menuItems()[0]).focus();
+}
+function closeMenu(refocus) {
+  if (menuEl.hidden) return;
+  menuEl.hidden = true;
+  const b = $('menuBtn');
+  if (b) { b.setAttribute('aria-expanded', 'false'); if (refocus) b.focus(); }
+}
+// Arrow keys move between choices; Escape closes and returns to the menu icon.
+menuEl.addEventListener('keydown', e => {
+  const items = menuItems(), i = items.indexOf(document.activeElement);
+  if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+    e.preventDefault();
+    items[(i + (e.key === 'ArrowDown' ? 1 : items.length - 1)) % items.length].focus();
+  } else if (e.key === 'Escape') { e.preventDefault(); closeMenu(true); }
+  else if (e.key === 'Tab') closeMenu();
+});
+
+function esc(s) { return String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+// Help text written as collapsible <details> becomes a heading and paragraphs inside the Help sheet.
+function unfold(html) {
+  return String(html || '').replace(/<details><summary>([\s\S]*?)<\/summary><div class="inner">/g, '<h3>$1</h3><div>')
+    .replace(/<\/div><\/details>/g, '</div>');
+}
+
+const svg = (d, cls) => `<svg viewBox="0 0 24 24" ${cls ? `class="${cls}"` : ''} fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
+const ICON = {
+  back: svg('<path d="M15 5l-7 7 7 7"/>'),
+  home: svg('<rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/>'),
+  tick: svg('<path d="M5 12l5 5 9-10"/>'),
+  info: svg('<circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/>'),
+  minus: svg('<path d="M5 12h14"/>'),
+  plus: svg('<path d="M5 12h14M12 5v14"/>'),
+  remote: svg('<rect x="7" y="2" width="10" height="20" rx="3"/><circle cx="12" cy="7" r="1.5"/><path d="M10 12h4M10 15h4"/>'),
+  bulb: svg('<path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-4 10.5c.7.7 1 1.5 1 2.5h6c0-1 .3-1.8 1-2.5A6 6 0 0 0 12 3z"/>'),
+  tips: svg('<path d="M4 6h16M4 12h16M4 18h10"/>'),
+  menu: svg('<path d="M4 7h16M4 12h16M4 17h16"/>'),
+  chevron: svg('<path d="M6 9l6 6 6-6"/>')
+};
+
+/* Where the viewer should be for each step. Judging the picture is done from
+   the usual seat (distance, angle and eye adaptation all change what you see);
+   sharpness halos are fine detail, so that check is done up close. */
+const POSITIONS = {
+  seat:  { chip: 'From your seat', label: 'From your usual seat, straight on', note: 'Distance, viewing angle and how used your eyes are to the room all change what you see.',
+           icon: '<path d="M4 11V8a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v3"/><path d="M2 12a2 2 0 0 1 4 0v2h12v-2a2 2 0 0 1 4 0v5H2z"/><path d="M5 17v2M19 17v2"/>' },
+  close: { chip: 'Up close, about 1 m', label: 'Up close: about 1 m (3 ft) from the screen', note: 'This detail is too fine to judge from a sofa.',
+           icon: '<rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M12 19v-3M9 21h6"/><path d="M8 10h8M13 7l3 3-3 3"/>' },
+  any:   { chip: 'Settings only', label: 'Anywhere you can see the TV menu', note: 'This step is just settings.',
+           icon: '<rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M7 8h10M7 12h6"/><path d="M12 19v-3M9 21h6"/>' }
+};
+function posChip(k) {
+  const p = POSITIONS[k];
+  return `<span class="poschip ${k}"><svg viewBox="0 0 24 24" aria-hidden="true">${p.icon}</svg>${p.chip}</span>`;
+}
+
+function tvName() {
+  const b = brandInfo() ? brandInfo().name : '';
+  return [b, values.model].filter(Boolean).join(' ') || (brand === 'other' ? 'other brand' : '');
+}
+function connected() {
+  if (link === 'cast') return !!session();
+  if (link === 'airplay') return airOn();
+  return false;
+}
+
+/* ---------- Navigation ----------
+   Back retraces the steps actually visited (so skipping HDR and pressing Back
+   returns to the HDR question, not the last HDR step). */
+const trail = store.get('trailIds') || [];
+function go(i, back) {
+  if (!back && i !== idx) { trail.push(STEPS[idx].id); if (trail.length > 60) trail.shift(); }
+  idx = i; node = null; loops = 0;
+  store.set('trailIds', trail); store.set('stepId', STEPS[idx].id);
+  closeSheet(); closeMenu(); render(); window.scrollTo(0, 0); requestAnimationFrame(updateMore);
+  const h = card.querySelector('h2'); if (h) h.focus({ preventScroll: true });
+}
+function goBack() {
+  let id, i = -1;
+  while (trail.length && i < 0) { id = trail.pop(); i = ID(id); }
+  go(i < 0 ? HUB : i, true);
+}
+function nextIdx() { return idx + 1 < STEPS.length ? idx + 1 : HUB; }
+function finishStep(how) { status[STEPS[idx].id] = how || 'done'; saveStatus(); go(nextIdx()); }
+function nextLabel() {
+  const n = nextIdx();
+  if (n === HUB) return 'Finish';
+  const ns = S(n);
+  if (ns.chapter !== STEPS[idx].chapter) return 'Next: ' + CHAPTERS[ns.chapter].name;
+  return 'Next: ' + (SHORT[ns.id] || ns.title);
+}
+
+/* ---------- Rendering ----------
+   Each screen is one focused card: a title, the picture to look at, one
+   question or one remote action, and the button to go on. Everything else
+   (where a setting is, what to look for, what to do when stuck) is in the
+   Help sheet. */
+function render() {
+  const s = S(idx);
+  if (node === null) { node = s.flow ? s.flow.start : null; loops = 0; }
+  if (card.contains(panel)) parking.appendChild(panel);   // keep the connection controls alive
+  card.innerHTML = cardHtml(s);
+  const slot = $('connSlot');
+  if (slot && !sheet.open) slot.appendChild(panel);
+  renderChrome();
+  showPattern(patternFor(idx));
+}
+// The parts that change with the TV connection: top row, banner and bottom bar.
+function renderChrome() {
+  const s = S(idx);
+  top_.innerHTML = topHtml(s);
+  const judging = !s.flow || !!(s.flow[node].ask || s.flow[node].then);
+  const pat = patternFor(idx);
+  if (playError && playError === pat && connected()) {
+    const hdr = pat[0] === 'h';
+    banner.innerHTML = `<div class="banner" role="alert"><span>${hdr
+      ? 'The TV couldn’t play this HDR pattern. Your TV or streaming device may not support HDR10.'
+      : 'The TV couldn’t play this pattern.'}</span><button data-act="${hdr && s.chapter === 'hdr' ? 'skip-hdr' : 'retry'}">${hdr && s.chapter === 'hdr' ? 'Skip HDR' : 'Try again'}</button></div>`;
+  } else banner.innerHTML = s.pattern && judging && !connected() && !localOpen()
+    ? `<div class="banner" role="status"><span>The test pattern isn’t showing on the TV.</span><button data-act="tv">Connect</button></div>` : '';
+  const b = barHtml(s);
+  barInner.innerHTML = b;
+  bar.style.display = b ? '' : 'none';
+  syncBar();
+}
+// Called on every connection status message. The connect and Get ready
+// screens mention the connection, so they're redrawn when it changes.
+let chromeTimer, lastConn = null;
+let playError = null;   // pattern the TV failed to play, shown as a banner
+function refreshChrome() {
+  clearTimeout(chromeTimer);
+  chromeTimer = setTimeout(() => {
+    const c = connected(), changed = c !== lastConn;
+    lastConn = c;
+    if (changed && (S(idx).connect || S(idx).id === 'start') && !sheet.open) render();
+    else renderChrome();
+  }, 60);
+}
+
+function menuBtn() {
+  return `<button class="icon" id="menuBtn" data-act="menu" aria-label="Menu" aria-haspopup="menu" aria-controls="menu" aria-expanded="${!menuEl.hidden}">${ICON.menu}</button>`;
+}
+function topHtml(s) {
+  if (s.hub) {
+    return `<div class="top">${menuBtn()}<div class="app-name">TV Picture Setup</div>
+      <button class="chip" data-act="tv"><span class="dot${connected() ? ' on' : ''}"></span>${esc(brandInfo() ? brandInfo().name : 'TV')} · ${connected() ? 'Connected' : 'Not connected'}</button></div>`;
+  }
+  const list = chSteps(s.chapter), k = list.findIndex(x => x.id === s.id);
+  const segs = list.length > 1 ? `<div class="segs" style="width:${Math.min(40 * list.length, 220)}px">${list.map((x, i) => `<span class="${i <= k ? 'on' : ''}"></span>`).join('')}</div>` : '';
+  const label = list.length > 1 ? `${CHAPTERS[s.chapter].name} · ${k + 1} of ${list.length}` : CHAPTERS[s.chapter].name;
+  return `<div class="top">${menuBtn()}
+    <button class="icon" data-act="back" aria-label="Back">${ICON.back}</button>
+    <div class="where"><div class="where-label">${label}</div>${segs}</div>
+    <button class="icon" data-act="hub" aria-label="All steps">${ICON.home}</button>
+    ${helpTabs(s).length ? `<button class="pill" data-act="help">Help</button>` : ''}
+  </div>`;
+}
+
+function barHtml(s) {
+  const btn = (act, label, primary, extra) => `<button class="${primary ? 'primary' : ''}" data-act="${act}" ${extra || ''}>${label}</button>`;
+  if (s.hub) {
+    const ch = nextChapter();
+    if (!ch) return '';
+    return btn('chapter', ch === 'setup' && chState('setup') === 'new' ? 'Start' : 'Continue: ' + CHAPTERS[ch].name, true, `data-ch="${ch}"`);
+  }
+  if (s.connect) return connected() ? btn('next', nextLabel(), true) : btn('skip', 'Skip for now', false);
+  if (s.flow) {
+    const n = s.flow[node];
+    if (n.ask) return '';
+    if (n.then) return btn('then', 'Done', true, `data-to="${n.then}"`);
+    if (n.skipHdr) return btn('skip-hdr', 'Skip the rest of HDR', true) + `<button data-go="${s.flow.start}">Try again</button>`;
+    const last = nextIdx() !== HUB && S(nextIdx()).chapter !== s.chapter && s.chapter !== 'setup'
+      ? `<div class="hint">Last step in ${CHAPTERS[s.chapter].name}</div>` : '';
+    return btn('next', nextLabel(), true) + last;
+  }
+  if (s.id === 'start') return btn('next', 'Start: ' + CHAPTERS.basics.name, true);
+  return btn('next', nextLabel(), true);
+}
+
+function cardHtml(s) {
+  if (s.hub) return hubHtml();
+  const n = s.flow ? s.flow[node] : null;
+  if (n && !n.ask && !n.then) return doneHtml(s, n);
+  let h = `<div class="titlerow"><h2 tabindex="-1">${s.title}</h2>${s.pos ? posChip(s.pos) : ''}</div>`;
+  const firstNode = n && node === s.flow.start;
+  // Steps with a pattern show the "where to look" picture; their background is in Help.
+  if (s.lead && (!s.pattern || s.compare || (n && n.then && firstNode)) && (!n || firstNode)) h += `<p class="lead">${s.lead}</p>`;
+
+  if (n && n.ask) {
+    if (s.compare) {
+      h += `<div class="pair"><figure><img src="../patterns/sharpness-clean.png" alt="Clean lines"><figcaption>✓ Clean</figcaption></figure>
+        <figure><img src="../patterns/sharpness-halo.png" alt="Lines with bright halos"><figcaption>✗ Halos</figcaption></figure></div>`;
+    } else if (s.pattern) {
+      h += `<figure><img src="../patterns/${s.pattern}.png" alt="Where to look on the TV"><figcaption>${s.caption}</figcaption></figure>`;
+    }
+    const two = n.answers.length === 2 ? ' two' : '';
+    h += `<div class="box q"><p class="ask">${n.ask}</p><div class="answers${two}">
+      ${n.answers.map(([label, to]) => `<button data-go="${to}">${label}</button>`).join('')}</div></div>`;
+    h += stuckHtml(s);
+    h += `<div class="skiprow"><button class="linkish" data-act="skip">Skip this step</button>${
+      s.chapter === 'hdr' && s.id !== 'hdr' ? '<button class="linkish" data-act="skip-hdr">Skip the rest of HDR</button>' : ''}</div>`;
+    return h;
+  }
+  if (n && n.then) {
+    const key = /\bdown\b/i.test(n.do) ? ICON.minus : /\bup\b/i.test(n.do) ? ICON.plus : ICON.remote;
+    h += `<div class="box act"><div class="label">On your TV remote</div>
+      <div class="doing"><span class="key">${key}</span><p class="do">${n.do}</p></div>
+      ${n.sub ? `<p class="sub">${n.sub}</p>` : ''}</div>`;
+    h += stuckHtml(s);
+    return h;
+  }
+  if (s.brandPick) {
+    const opt = (k, label) => `<button class="${brand === k ? 'on' : ''}" aria-pressed="${brand === k}" data-brand="${k}">${label}</button>`;
+    const note = brandInfo() ? brandInfo().note
+      : brand === 'other' ? 'Using general names that work on most TVs. Your TV may use slightly different words.' : '';
+    return h + `<div class="brands" id="brands">${Object.keys(BRANDS).sort((a, b) => BRANDS[a].name.localeCompare(BRANDS[b].name)).map(k => opt(k, BRANDS[k].name)).join('')}${opt('other', 'Another brand')}</div>
+      ${note ? `<p class="note">${note}</p>` : ''}`;
+  }
+  if (s.connect) {
+    return h + `<div class="conn"><p class="detected">${linkSentence()}</p><div id="connSlot"></div>
+      <button class="linkish" data-act="switch-link">${link === 'cast' ? 'Use AirPlay instead' : 'Use Chromecast instead'}</button></div>`;
+  }
+  if (s.items) {
+    const [update, ...todo] = s.items;
+    return h + (connected() ? `<p class="okline">${ICON.tick} The TV is showing a test picture, so it’s connected.</p>` : '') +
+      `<div class="cards">${todo.map((t, i) => `<div class="card">${i ? ICON.remote : ICON.bulb}<span>${t}</span></div>`).join('')}</div>
+      <p class="tipline">Tip: ${update.replace(/ first:/, ': ').replace(/ first /, ' ')}</p>`;
+  }
+  if (s.checklist) {
+    const item = ([t, d], i) => {
+      if (t === '#') return `<li class="sect">${d}</li>`;
+      const key = s.id + ':' + i;
+      return `<li><button role="checkbox" aria-checked="${!!checks[key]}" data-check="${key}"><span class="tick"></span><span><span class="t">${t}</span><span class="d">${d}</span></span></button></li>`;
+    };
+    if (s.id === 'mode') {
+      // The three settings that matter most first; the rest behind "Also check".
+      const main = s.checklist.slice(0, 3), rest = s.checklist.slice(3);
+      const names = rest.map(([t]) => t.split(':')[0].replace(/ and .*/, '').toLowerCase()).join(', ');
+      return h + `<ul class="check">${main.map(item).join('')}</ul>
+        <details class="also"><summary><span>Also check <span>· ${esc(names)}</span></span></summary>
+        <ul class="check">${rest.map((x, i) => item(x, i + 3)).join('')}</ul></details>`;
+    }
+    if (s.compact) {
+      const row = ([t, d], i) => {
+        if (t === '#') return `<li class="sect">${d}</li>`;
+        const key = s.id + ':' + i, did = 'tip-' + i;
+        return `<li class="${checks[key] ? 'on' : ''}"><div class="rowtop">
+            <button role="checkbox" aria-checked="${!!checks[key]}" data-check="${key}"><span class="tick"></span><span class="t">${t}</span></button>
+            <button class="more-i" data-more="${did}" aria-expanded="false" aria-controls="${did}" aria-label="Details: ${esc(t.replace(/<[^>]+>/g, ''))}">${ICON.chevron}</button>
+          </div><div class="d" id="${did}" hidden>${d}</div></li>`;
+      };
+      // Within each section, tips marked "(optional)" go last. Each keeps its
+      // original index, so saved ticks stay on the right tip.
+      const ordered = [], optional = [];
+      const flush = () => { ordered.push(...optional); optional.length = 0; };
+      s.checklist.forEach((x, i) => {
+        if (x[0] === '#') { flush(); ordered.push([x, i]); }
+        else if (/\(optional\)/i.test(x[0])) optional.push([x, i]);
+        else ordered.push([x, i]);
+      });
+      flush();
+      return h + `<ul class="check compact">${ordered.map(([x, i]) => row(x, i)).join('')}</ul>`;
+    }
+    return h + `<ul class="check">${s.checklist.map(item).join('')}</ul>`;
+  }
+  return h;
+}
+
+function stuckHtml(s) {
+  if (loops < 3 || !helpTabs(s).some(([k]) => k === 'stuck')) return '';
+  return `<div class="stuck" role="status"><span>Not changing?</span><button data-act="help" data-tab="stuck">Get help</button></div>`;
+}
+
+function doneHtml(s, n) {
+  const good = node === 'ok' || !s.flow.ok;
+  return `<div class="fin"><div class="step-name">${s.title}</div>
+    <div class="badge${good ? ' good' : ''}">${good ? ICON.tick : ICON.info}</div>
+    <h3 tabindex="-1">${n.do.replace(/\.$/, '')}</h3><p>${n.text}</p></div>`;
+}
+
+function linkSentence() {
+  if (link === 'cast') {
+    if (IOS) return 'An iPhone or iPad can’t cast to a Chromecast from a web page. Open this page in Chrome on an Android phone or a computer on the same Wi-Fi, or use AirPlay if your TV has it.';
+    if (castFailed) return 'Casting isn’t available in this browser. Open this page in Chrome on an Android phone or a computer.';
+    return 'We’ll use <b>Google Cast</b>, for a Chromecast or a TV with Google TV built in. Tap <b>Connect to TV</b> and choose your TV.';
+  }
+  if (!SAFARI_AIRPLAY) return 'AirPlay works from Safari on an iPhone, iPad or Mac. Open this page there.';
+  return 'We’ll use <b>AirPlay</b>, for an Apple TV or a TV with AirPlay built in. Tap <b>AirPlay to TV</b> and choose your TV. A separate Chromecast won’t appear in that list.';
+}
+
+/* ---------- Hub ---------- */
+function hubHtml() {
+  const ch = nextChapter(), allDone = !ch;
+  let h = `<div class="titlerow"><h2 tabindex="-1">${allDone ? 'Your picture is set' : 'Let’s make your TV look right'}</h2></div>
+    <p class="lead">${allDone ? 'Write down the values you ended on if you’d like a record, for example to set the same values on another input.'
+      : 'About 10 minutes. You answer simple questions about what you see, and change settings with your TV remote.'}</p>
+    <div class="chapters">${MAIN_CHAPTERS.map((c, i) => chapterCard(c, i + 1, c === ch)).join('')}</div>
+    <button class="chap mini${chState('tips') === 'done' ? ' done' : ''}" data-act="chapter" data-ch="tips">
+      <span class="num">${chState('tips') === 'done' ? ICON.tick : ICON.tips}</span>
+      <span class="txt"><b>${CHAPTERS.tips.name} <i>optional</i></b><span>${CHAPTERS.tips.desc}</span></span></button>`;
+  if (chState('basics') !== 'new') {
+    h += `<h3 class="sect-h">Your settings <span>· optional</span></h3>
+      <div class="settings">
+        <label>TV model<input type="text" data-record="model" value="${esc(values.model || '')}" placeholder="e.g. 55Q750G"
+          autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false"></label>
+        ${allSteps().filter(x => x.record).map(x => `<label>${x.record}<input type="text" data-record="${x.id}" value="${esc(values[x.id] || '')}" placeholder="${esc(x.ph ? 'e.g. ' + x.ph : 'value')}"></label>`).join('')}
+      </div>
+      <div class="answers"><button data-act="copy">Copy my settings</button></div>`;
+  }
+  if (hasSaved()) h += `<div class="resetrow"><button class="linkish" data-act="reset">Reset the tool</button></div>`;
+  h += `<p class="siterow"><a href="../">Guides, troubleshooting and test patterns</a></p>`;
+  return h;
+}
+// Anything a reset would clear: progress, ticks, brand, written-down settings.
+function hasSaved() {
+  return !!brand || Object.keys(status).length > 0 || Object.values(checks).some(Boolean) || Object.values(values).some(Boolean);
+}
+function chapterCard(c, num, current) {
+  const st = chState(c), info = CHAPTERS[c], list = chSteps(c);
+  const mark = st === 'done' ? ICON.tick : st === 'skipped' ? '–' : num;
+  let sub = st === 'done' ? 'Done' : st === 'skipped' ? 'Skipped' : info.desc;
+  if (c === 'setup' && st === 'done' && tvName()) sub = 'Done · ' + esc(tvName());
+  const count = st === 'started' ? `${list.filter(x => status[x.id]).length} of ${list.length}` : '';
+  return `<button class="chap ${st}${current ? ' cur' : ''}${info.optional ? ' opt' : ''}" data-act="chapter" data-ch="${c}">
+    <span class="num">${mark}</span>
+    <span class="txt"><b>${info.name}${info.optional ? ' <i>optional</i>' : ''}</b><span>${sub}</span></span>
+    ${count ? `<span class="right">${count}</span>` : ''}</button>`;
+}
+
+/* ---------- Help sheet ---------- */
+const APPLE_TV_TIP = `<details><summary>Using an Apple TV?</summary><div class="inner">
+  <p>On the Apple TV: Settings → Video and Audio → <b>Match Content</b> → turn on <b>Match Dynamic Range</b>.
+  Otherwise the patterns may be shown in HDR or Dolby Vision and look washed out.</p>
+  <p>Make the picture changes on the HDMI input the Apple TV is plugged into.</p></div></details>`;
+const CHROMECAST_TIP = `<details><summary>Using a separate Chromecast?</summary><div class="inner">
+  <p>On the Chromecast: Settings → Display &amp; Sound → Advanced display settings → <b>Dynamic range</b> → turn on <b>match content</b>.
+  Otherwise the patterns may be shown in HDR and look washed out.</p>
+  <p>Make the picture changes on the HDMI input the Chromecast is plugged into.</p></div></details>`;
+
+function helpTabs(s) {
+  const tabs = [];
+  if (s.pattern) {
+    let look = s.lead ? `<p class="say">${s.lead}</p>` : '';
+    if (s.caption) look += `<p class="say"><b>${s.caption}</b></p>`;
+    if (s.pos) look += `<h3>${POSITIONS[s.pos].label}</h3><p>${POSITIONS[s.pos].note}</p>`;
+    look += `<h3>Tips</h3>${LOOK_TIPS}`;
+    tabs.push(['look', 'What to see', look, true]);
+  }
+  let where = s.where || '';
+  if (s.extra) where += unfold(s.extra);
+  if (s.id === 'mode') where += unfold(link === 'airplay' ? APPLE_TV_TIP : CHROMECAST_TIP);
+  if (where) tabs.push(['where', 'Where is it?', where]);
+  let stuck = s.stuck ? `<p class="say">${s.stuck}</p>` : '';
+  if (s.dimming) stuck += unfold((brandInfo() && brandInfo().dimmingHelp) || DIMMING_HELP);
+  if (stuck) tabs.push(['stuck', 'Not changing?', stuck]);
+  return tabs;
+}
+let helpTab = null;
+function openHelp(tab) {
+  const tabs = helpTabs(S(idx));
+  if (!tabs.length) return;
+  helpTab = tabs.some(t => t[0] === tab) ? tab : tabs[0][0];
+  sheet.dataset.mode = 'help';
+  sheetTitle.textContent = 'Help with ' + S(idx).title.replace(/ \(optional\)$/, '');
+  fillHelp();
+  showSheet();
+}
+function fillHelp() {
+  const tabs = helpTabs(S(idx)), cur = tabs.find(t => t[0] === helpTab) || tabs[0];
+  sheetBody.innerHTML = (tabs.length > 1 ? `<div class="tabs" role="tablist">${tabs.map(([k, label]) =>
+      `<button role="tab" aria-selected="${k === cur[0]}" data-tab="${k}">${label}</button>`).join('')}</div>` : '<div style="height:12px"></div>') +
+    `<div class="help" role="tabpanel">${cur[2]}</div>
+    <div class="sheet-foot">${cur[3] ? '<button data-act="local">See the pattern on this phone</button>' : ''}
+      <button class="primary" data-act="close">Back to the step</button></div>`;
+}
+
+/* ---------- TV sheet: the connection controls, from any screen ---------- */
+function openTV() {
+  sheet.dataset.mode = 'tv';
+  sheetTitle.textContent = 'Your TV';
+  sheetBody.innerHTML = `<p class="help" style="margin:8px 0 14px">${linkSentence()}</p><div id="tvSlot"></div>
+    <div class="sheet-foot">
+      <button data-act="switch-link">${link === 'cast' ? 'Use AirPlay instead' : 'Use Chromecast instead'}</button>
+      ${patternFor(idx) ? '<button data-act="local">See the pattern on this phone</button>' : ''}
+      <button class="primary" data-act="close">Done</button></div>`;
+  $('tvSlot').appendChild(panel);
+  showSheet();
+}
+/* ---------- Reset ----------
+   Clears everything the tool has saved on this phone except Appearance (and
+   which Cast devices can't play 4K), then reloads to a fresh start. The TV's
+   own picture settings are never touched. */
+function openReset() {
+  sheet.dataset.mode = 'confirm';
+  sheetTitle.textContent = 'Reset the tool?';
+  const written = Object.values(values).some(Boolean);
+  sheetBody.innerHTML = `<div class="help" style="margin-top:10px">
+      <p class="say">This starts again from the beginning. It clears your progress, ticks, TV brand and connection choice${written ? ', and the settings you wrote down' : ''}.</p>
+      <p>Your TV’s own picture settings aren’t changed.</p>
+      ${written ? '<p>To keep a record of your written-down settings, copy them first.</p>' : ''}
+    </div>
+    <div class="sheet-foot">
+      ${written ? '<button data-act="copy">Copy my settings</button>' : ''}
+      <button class="danger" data-act="reset-now">Reset</button>
+      <button data-act="close">Cancel</button>
+    </div>`;
+  showSheet();
+}
+function resetAll() {
+  try {
+    Object.keys(localStorage)
+      .filter(k => k.startsWith('tvcal2.') && k !== 'tvcal2.theme' && !k.startsWith('tvcal2.no4k:'))
+      .forEach(k => localStorage.removeItem(k));
+  } catch (e) {}
+  closeLocal();
+  if (session()) { const m = session().getMediaSession(); if (m) m.stop(null, () => {}, () => {}); }
+  airRelease();
+  location.replace(location.pathname + location.search);   // fresh start, at the top of the hub
+}
+function showSheet() { if (!sheet.open) { if (sheet.showModal) sheet.showModal(); else sheet.setAttribute('open', ''); } }
+function closeSheet() { if (sheet.open) { if (sheet.close) sheet.close(); else { sheet.removeAttribute('open'); onSheetClosed(); } } }
+function onSheetClosed() {
+  if (sheet.contains(panel)) {
+    parking.appendChild(panel);
+    const slot = $('connSlot'); if (slot) slot.appendChild(panel);
+  }
+  renderChrome();
+}
+sheet.addEventListener('close', onSheetClosed);
+// A tap on the dimmed area above the sheet closes it.
+sheet.addEventListener('click', e => { if (e.target === sheet) closeSheet(); });
+
+/* ---------- Taps ---------- */
+document.addEventListener('click', e => {
+  if (!menuEl.hidden && !e.target.closest('#menu, #menuBtn')) closeMenu();
+  const t = e.target.closest('button');
+  if (!t || t.closest('#connectPanel')) return;
+  const d = t.dataset;
+  if (d.brand) { brand = d.brand; store.set('brand', brand); render(); return; }
+  if (d.themePick) { theme = d.themePick; store.set('theme', theme); applyTheme(); closeMenu(true); return; }
+  if (d.check) {
+    checks[d.check] = !checks[d.check]; store.set('checks', checks);
+    t.setAttribute('aria-checked', String(!!checks[d.check]));
+    if (t.closest('.compact')) t.closest('li').classList.toggle('on', !!checks[d.check]);
+    return;
+  }
+  if (d.more) {
+    const open = t.getAttribute('aria-expanded') !== 'true', el = $(d.more);
+    t.setAttribute('aria-expanded', String(open)); el.hidden = !open;
+    return;
+  }
+  if (d.tab && !d.act) { helpTab = d.tab; fillHelp(); return; }
+  if (d.go) {
+    const to = d.go;
+    if (to[0] === '@') {
+      const target = to.slice(1), ch = STEPS[idx].chapter;
+      status[STEPS[idx].id] = 'skipped';
+      // Skipping out of a chapter (for example "No, skip HDR") skips the rest of it.
+      if (target === 'hub') chSteps(ch).forEach(x => { if (!status[x.id]) status[x.id] = 'skipped'; });
+      saveStatus(); go(ID(target)); return;
+    }
+    node = to; render(); window.scrollTo(0, 0); requestAnimationFrame(updateMore); return;
+  }
+  switch (d.act) {
+    case 'menu': if (menuEl.hidden) openMenu(); else closeMenu(true); break;
+    case 'back': goBack(); break;
+    case 'hub': go(HUB); break;
+    case 'help': openHelp(d.tab); break;
+    case 'tv': openTV(); break;
+    case 'close': closeSheet(); break;
+    case 'local': closeSheet(); openLocal(); break;
+    case 'then': {
+      const replay = S(idx).flow[node].replay;
+      loops++; node = d.to; render(); window.scrollTo(0, 0); requestAnimationFrame(updateMore);
+      if (replay) showPattern(patternFor(idx), true);   // restart it, so the TV re-detects HDR
+      break;
+    }
+    case 'skip-hdr':
+      // Leave HDR gracefully: mark what's left of it skipped and go home, where it shows as Skipped.
+      chSteps('hdr').forEach(x => { if (!status[x.id]) status[x.id] = 'skipped'; });
+      if (status[STEPS[idx].id] !== 'done') status[STEPS[idx].id] = 'skipped';
+      saveStatus(); go(HUB); break;
+    case 'retry': playError = null; showPattern(patternFor(idx), true); renderChrome(); break;
+    case 'skip': finishStep('skipped'); break;
+    case 'next':
+      if (S(idx).brandPick && !brand) {   // ask for the brand before going on
+        const b = $('brands'); b.classList.remove('attn'); void b.offsetWidth; b.classList.add('attn'); return;
+      }
+      finishStep(); break;
+    case 'chapter': go(chapterEntry(d.ch)); break;
+    case 'switch-link': {
+      const inSheet = sheet.open;
+      setLink(link === 'cast' ? 'airplay' : 'cast');
+      if (inSheet) openTV(); else render();
+      break;
+    }
+    case 'copy': {
+      const text = 'My TV picture settings' + (tvName() ? ' (' + tvName() + ')' : '') + '\n' + allSteps().filter(x => x.record).map(x => `${x.record}: ${values[x.id] || '-'}`).join('\n');
+      (navigator.clipboard ? navigator.clipboard.writeText(text) : Promise.reject())
+        .then(() => { t.textContent = 'Copied'; }, () => { t.textContent = 'Copy failed'; });
+      break;
+    }
+    case 'reset': openReset(); break;
+    case 'reset-now': resetAll(); break;
+  }
+});
+document.addEventListener('input', e => {
+  const k = e.target.dataset && e.target.dataset.record;
+  if (k) { values[k] = e.target.value.trim(); store.set('values', values); }
+});
+
+/* ---------- Casting (Google's Default Media Receiver) ---------- */
+let castReady = false, castFailed = false, lastCast, castMsg = ['Loading Cast support…'];
+const dot = document.getElementById('dot'), statusText = document.getElementById('statusText');
+function setStatus(text, on) { statusText.textContent = text; dot.classList.toggle('on', !!on); refreshChrome(); }
+// Cast messages are remembered, and shown only while Chromecast is the chosen connection.
+function castStatus(text, on) { castMsg = [text, on]; if (link === 'cast') setStatus(text, on); }
+function session() { return castReady && link === 'cast' ? cast.framework.CastContext.getInstance().getCurrentSession() : null; }
+
+// Patterns with a native 4K version. The 4K file is tried first; if the Cast
+// device can't play it (for example an older 1080p Chromecast), the 1080p file
+// is used instead, and that device is remembered so it isn't retried.
+const UHD = { '04-sharpness': '04-sharpness-4k' };
+let lastFile;
+function no4kKey(sess) { return 'no4k:' + sess.getCastDevice().friendlyName; }
+
+function showPattern(name, force) {
+  if (localOpen()) playLocal(name);
+  if (airOn()) airLoad(name, force);
+  else if (AIRPLAY && link === 'airplay' && airReleased && name) airStatus('Tap “AirPlay to TV” to show the patterns on the TV again.');
+  const sess = session();
+  if (!sess || (name === lastCast && !force)) return;
+  lastCast = name;
+  if (!name) { const m = sess.getMediaSession(); if (m) m.stop(null, () => {}, () => {}); return; }
+  const want4k = UHD[name] && !store.get(no4kKey(sess));
+  castFile(sess, name, want4k ? UHD[name] : name);
+}
+
+function castFile(sess, name, file) {
+  lastFile = file;
+  const s = STEPS.find(x => x.pattern === name);
+  const info = new chrome.cast.media.MediaInfo(PATTERN_BASE + file + '.mp4', 'video/mp4');
+  info.streamType = chrome.cast.media.StreamType.BUFFERED;
+  info.metadata = new chrome.cast.media.GenericMediaMetadata();
+  info.metadata.title = s ? s.title : 'Test pattern';
+  const item = new chrome.cast.media.QueueItem(info);
+  item.autoplay = true;
+  const req = new chrome.cast.media.QueueLoadRequest([item]);
+  req.repeatMode = chrome.cast.media.RepeatMode.SINGLE;
+  castStatus('Loading pattern on the TV…', true);
+  sess.getSessionObj().queueLoad(req,
+    () => { playError = null; castStatus('Showing on ' + sess.getCastDevice().friendlyName + (file !== name ? ' (4K)' : ''), true); },
+    err => {
+      if (file !== name) { fallbackFrom4k(sess, name); return; }
+      lastCast = undefined; playError = name;
+      castStatus('The TV couldn’t play the pattern (' + (err && err.code) + ').', true);
+    });
+}
+
+function fallbackFrom4k(sess, name) {
+  store.set(no4kKey(sess), true);
+  castFile(sess, name, name);
+}
+
+window['__onGCastApiAvailable'] = function (available) {
+  if (!available) { castUnavailable(); return; }
+  const ctx = cast.framework.CastContext.getInstance();
+  ctx.setOptions({ receiverApplicationId: chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID,
+                   autoJoinPolicy: chrome.cast.AutoJoinPolicy.ORIGIN_SCOPED });
+  castReady = true;
+  applyLink();
+  // Safety net: if a pattern video ever reaches its end, load it again, so the
+  // TV never sits idle (the Cast player ends the session after idling).
+  const rp = new cast.framework.RemotePlayer(), rpc = new cast.framework.RemotePlayerController(rp);
+  rpc.addEventListener(cast.framework.RemotePlayerEventType.PLAYER_STATE_CHANGED, () => {
+    const sess = session(), m = sess && sess.getMediaSession();
+    const current = patternFor(idx);
+    if (rp.playerState === 'IDLE' && m && m.idleReason === 'FINISHED' && current) showPattern(current, true);
+    if (rp.playerState === 'IDLE' && m && m.idleReason === 'ERROR' && current && lastFile && lastFile !== current) fallbackFrom4k(sess, current);
+  });
+  const connectBtn = document.getElementById('connect'), help = document.getElementById('castHelp');
+  connectBtn.onclick = () => {
+    if (ctx.getCurrentSession()) { ctx.endCurrentSession(true); return; }
+    ctx.requestSession().catch(err => {
+      if (err === 'cancel') return;
+      castStatus(err === chrome.cast.ErrorCode.RECEIVER_UNAVAILABLE || err === 'receiver_unavailable'
+        ? 'No TV found. See “TV not found?” below.' : 'Couldn’t connect (' + err + ').');
+      help.style.display = 'block'; showLna();
+    });
+  };
+  const CS = cast.framework.CastState;
+  const onCastState = st => {
+    connectBtn.textContent = st === CS.CONNECTED ? 'Disconnect from TV' : 'Connect to TV';
+    connectBtn.classList.toggle('primary', st !== CS.CONNECTED);
+    if (st === CS.NO_DEVICES_AVAILABLE) { castStatus('Looking for your TV… none found yet.'); help.style.display = 'block'; showLna(); }
+    else if (st === CS.NOT_CONNECTED) { castStatus('TV found. Tap “Connect to TV”.'); help.style.display = 'none'; lnaBox.style.display = 'none'; }
+    else if (st === CS.CONNECTING) castStatus('Connecting…', true);
+  };
+  ctx.addEventListener(cast.framework.CastContextEventType.CAST_STATE_CHANGED, e => onCastState(e.castState));
+  ctx.addEventListener(cast.framework.CastContextEventType.SESSION_STATE_CHANGED, e => {
+    const S = cast.framework.SessionState;
+    if (e.sessionState === S.SESSION_STARTED || e.sessionState === S.SESSION_RESUMED) {
+      lastCast = undefined;
+      castStatus('Connected to ' + ctx.getCurrentSession().getCastDevice().friendlyName, true);
+      showPattern(patternFor(idx), true);
+    } else if (e.sessionState === S.SESSION_ENDED) {
+      lastCast = undefined;
+    }
+  });
+  onCastState(ctx.getCastState());
+  lnaState().then(st => {
+    if (st === 'prompt' || st === 'denied') {
+      connectBtn.style.display = 'none';
+      lnaBtn.classList.add('primary');
+      showLna().then(() => { castStatus('First, let this page find your TV.'); help.style.display = 'none'; });
+    }
+  });
+};
+setTimeout(() => {
+  if (!castReady && !castFailed) castUnavailable('Cast support didn’t load. Casting needs Chrome on Android or a computer, and an internet connection.');
+}, 6000);
+
+/* ---------- Chrome "Local network access" site permission ----------
+   Chrome (142+) asks per site before a page may contact devices on the home
+   network. Making a request to a private address is what triggers the prompt. */
+const lnaBox = document.getElementById('lnaBox'), lnaBtn = document.getElementById('lnaBtn'), lnaStatus = document.getElementById('lnaStatus');
+const LNA_NAMES = ['local-network-access', 'local-network'];
+async function lnaState() {
+  if (!navigator.permissions) return 'unsupported';
+  for (const name of LNA_NAMES) {
+    try { return (await navigator.permissions.query({ name })).state; } catch (e) {}
+  }
+  return 'unsupported';
+}
+async function showLna() {
+  const st = await lnaState();
+  lnaBox.style.display = 'block';
+  lnaBtn.style.display = st === 'granted' ? 'none' : 'block';
+  lnaStatus.textContent = {
+    granted: 'This site is allowed to find your TV.',
+    denied: 'This site was blocked from finding devices. Tap the icon left of the web address → Site settings → Local network access → Allow, then reload the page.',
+    prompt: 'Chrome will ask to let this site find devices on your network. Choose Allow.',
+    unsupported: 'This browser doesn’t use a per-site local network permission.'
+  }[st] || ('Local network access: ' + st);
+  return st;
+}
+lnaBtn.onclick = async () => {
+  lnaStatus.textContent = 'Asking Chrome… answer the prompt if one appears.';
+  try {
+    // Any private address triggers the permission check. 192.168.0.1 is a common
+    // router address; whether it answers doesn't matter.
+    await fetch('http://192.168.0.1/', { mode: 'no-cors', cache: 'no-store',
+      targetAddressSpace: 'local', signal: AbortSignal.timeout(15000) });
+  } catch (e) { /* unreachable or refused is fine; we only need the prompt */ }
+  const st = await showLna();
+  if (st === 'granted') lnaStatus.textContent = 'Allowed. Reloading to look for your TV again…', setTimeout(() => location.reload(), 1200);
+};
+
+/* ---------- AirPlay (Safari on iPhone, iPad and Mac) ----------
+   Safari can't use Google Cast, but it can send a <video> to an AirPlay
+   receiver (Apple TV, or a TV with AirPlay 2 built in) while this page stays
+   usable on the phone. The small preview video is the one that gets AirPlayed;
+   each step swaps its source, and the AirPlay connection follows the element. */
+const AIRPLAY = !!window.WebKitPlaybackTargetAvailabilityEvent;
+const airBox = document.getElementById('airBox'), airVideo = document.getElementById('airVideo');
+const airBtn = document.getElementById('airBtn'), airNote = document.getElementById('airNote');
+let airName;   // pattern loaded on the AirPlay video (undefined = nothing yet)
+
+function airOn() { return AIRPLAY && link === 'airplay' && !!airVideo.webkitCurrentPlaybackTargetIsWireless; }
+
+// Over AirPlay the 1080p files are always used: many AirPlay TVs can't play
+// the 4K HEVC sharpness file, and there's no reliable error to fall back on.
+// The video plays UNMUTED (its audio track is silence): iOS only hands real,
+// audible media to an AirPlay TV, so a muted or audio-less video connects but
+// never appears on the TV. Unmuted playback must start from a tap, so play()
+// is always called straight from a button handler (AirPlay to TV, Next, Back).
+let airReleased = false;   // true once the TV was let go after the last pattern
+const AIR_IDLE = '00-idle';  // "Follow the steps on your phone" screen
+// Is there a pattern still to come? On the hub, any pattern step not yet done
+// or skipped counts; elsewhere, any pattern step later in the order.
+function patternsAhead() {
+  if (S(idx).hub) return STEPS.some((x, i) => patternFor(i) && !status[x.id]);
+  return STEPS.some((x, i) => i > idx && patternFor(i));
+}
+// Show this screen's pattern on the AirPlay TV.
+function airLoad(name, force) {
+  if (!name) {
+    // With no pattern left (Dolby Vision, devices, or the hub once every
+    // pattern chapter is finished) the TV is released; Dolby Vision also
+    // needs the TV free to play a title from its own apps.
+    if (!patternsAhead()) { airRelease('Patterns finished. The TV is free again.'); return; }
+    // Other screens without a pattern (Quick settings, the HDR question, the
+    // hub between chapters) show the idle screen. Pausing would leave the
+    // last pattern frozen on the TV, and unloading could end the connection.
+    name = AIR_IDLE;
+  }
+  airShow(name, force);
+}
+function airShow(name, force) {
+  if (name === airName && !force) { if (airVideo.paused) airPlay(); return; }
+  airName = name; airReleased = false;
+  const url = PATTERN_BASE + name + '.mp4';
+  if (airVideo.getAttribute('src') !== url) airVideo.src = url;   // not currentSrc: it keeps the old URL after an unload
+  airPlay();
+  try {
+    const s = STEPS.find(x => x.pattern === name);
+    if ('mediaSession' in navigator) navigator.mediaSession.metadata = new MediaMetadata({
+      title: s ? s.title : 'Follow the steps on your phone', artist: 'TV Picture Setup' });
+  } catch (e) {}
+}
+// Stop playback and unload the video, which ends the picture on the TV.
+function airRelease(msg) {
+  if (!airVideo.getAttribute('src')) return;
+  airReleased = true; airName = null;
+  airVideo.pause();
+  airVideo.removeAttribute('src');
+  airVideo.load();
+  try { if ('mediaSession' in navigator) navigator.mediaSession.metadata = null; } catch (e) {}
+  if (msg) airStatus(msg);
+}
+function airPlay() {
+  airVideo.muted = false;
+  airVideo.play().catch(err => {
+    if (airOn()) airStatus('Tap Next or Back to start the pattern on the TV.', true);
+  });
+}
+
+if (AIRPLAY) {
+  airNote.textContent = 'Looking for AirPlay TVs on your Wi-Fi…';
+
+  airVideo.addEventListener('webkitplaybacktargetavailabilitychanged', e => {
+    if (airOn()) return;
+    airNote.textContent = e.availability === 'available'
+      ? 'Works with Apple TV and TVs with AirPlay built in.'
+      : 'No AirPlay TV found yet. Check the phone and TV are on the same Wi-Fi, and that AirPlay is turned on in the TV’s settings. A separate Chromecast won’t appear here.';
+  });
+
+  airBtn.onclick = () => {
+    // Start the video from this tap, so iOS treats it as real playback:
+    // this screen's pattern, or the idle screen, which confirms the connection.
+    airShow(patternFor(idx) || AIR_IDLE);
+    airVideo.webkitShowPlaybackTargetPicker();
+  };
+
+  airVideo.addEventListener('webkitcurrentplaybacktargetiswirelesschanged', () => {
+    if (airOn()) {
+      airBtn.textContent = 'Change AirPlay TV';
+      airBtn.classList.remove('primary');
+      airNote.textContent = 'To stop, tap Change AirPlay TV and choose this phone.';
+      airStatus('Connected. Starting the pattern on the TV…', true);
+      document.getElementById('airHelp').style.display = 'block';
+      // Keep playing what the tap started: this step's pattern, or on a step
+      // without one, the idle screen, which also confirms the TV is connected.
+      if (airVideo.paused) airPlay();
+    } else {
+      airBtn.textContent = 'AirPlay to TV';
+      airBtn.classList.add('primary');
+      airNote.textContent = 'Works with Apple TV and TVs with AirPlay built in.';
+      airStatus(airReleased ? 'Patterns finished. The TV is free again. To show patterns again, tap “AirPlay to TV”.'
+                            : 'AirPlay stopped. Tap “AirPlay to TV” to reconnect.');
+      document.getElementById('airHelp').style.display = 'none';
+      airVideo.pause();
+    }
+  });
+
+  airVideo.addEventListener('error', () => {
+    if (!airOn() || !airVideo.getAttribute('src')) return;
+    const hdr = airName && airName[0] === 'h';
+    playError = airName === AIR_IDLE ? null : airName; airName = undefined;
+    airStatus(hdr
+      ? 'The TV couldn’t play this HDR pattern over AirPlay. It needs an Apple TV 4K or a TV that plays HEVC HDR10.'
+      : 'The TV couldn’t play the pattern over AirPlay.', true);
+  });
+  // Leaving or closing the page releases the TV right away. (Not on
+  // visibilitychange: the phone may lock mid-step while the TV keeps playing.)
+  window.addEventListener('pagehide', () => airRelease());
+  airVideo.addEventListener('playing', () => { playError = null; if (airOn()) airStatus(airName === AIR_IDLE ? 'Connected to your AirPlay TV' : 'Showing on your AirPlay TV', true); });
+  airVideo.addEventListener('waiting', () => { if (airOn()) airStatus('Loading the pattern on the TV…', true); });
+}
+
+/* ---------- Which connection is in use ----------
+   The start screen asks whether the patterns go to a Chromecast or over
+   AirPlay; only that connection's controls and messages are shown. */
+let airMsg = ['Tap “AirPlay to TV” and choose your TV.'];
+function airStatus(text, on) { airMsg = [text, on]; if (link === 'airplay') setStatus(text, on); }
+function castUnavailable(msg) {
+  castFailed = true;
+  castStatus(msg || 'Casting isn’t available in this browser. Use Chrome on an Android phone or a computer.');
+  if (S(idx).connect) render();   // update the note on the connect screen
+  applyLink();
+}
+function setLink(k) {
+  if (k === link) return;
+  if (link === 'cast' && session()) cast.framework.CastContext.getInstance().endCurrentSession(true);
+  if (link === 'airplay' && AIRPLAY) airVideo.pause();
+  link = k; store.set('link', k);
+  lastCast = undefined; airName = undefined;
+  applyLink();
+}
+function applyLink() {
+  const useCast = link === 'cast', useAir = link === 'airplay';
+  document.getElementById('castUI').style.display = useCast && castReady ? '' : 'none';
+  document.querySelector('google-cast-launcher').style.display = useCast && castReady ? '' : 'none';
+  airBox.style.display = useAir && AIRPLAY ? 'block' : 'none';
+  if (useCast) setStatus(...(IOS ? ['Chromecast needs Chrome on an Android phone or a computer.'] : castMsg));
+  else if (useAir) setStatus(...(AIRPLAY ? airMsg : ['AirPlay needs Safari on an iPhone, iPad or Mac.']));
+  else setStatus('Choose how you’ll connect to the TV below.');
+}
+
+/* ---------- Pattern on this screen ---------- */
+const localView = document.getElementById('localView'), localVideo = document.getElementById('localVideo');
+function localOpen() { return localView.style.display === 'block'; }
+function playLocal(name) { if (!name) { closeLocal(); return; } localVideo.src = '../patterns/' + name + '.mp4'; localVideo.play().catch(() => {}); }
+function openLocal() {
+  localView.style.display = 'block';
+  playLocal(STEPS[idx].pattern || '01-fit');
+  if (localView.requestFullscreen) localView.requestFullscreen().catch(() => {});
+}
+function closeLocal() {
+  localView.style.display = 'none';
+  localVideo.pause(); localVideo.removeAttribute('src'); localVideo.load();
+  if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+}
+document.getElementById('closeLocal').onclick = closeLocal;
+document.addEventListener('fullscreenchange', () => { if (!document.fullscreenElement && localOpen()) closeLocal(); });
+
+/* ---------- Scroll hint ---------- */
+const more = $('more');
+function updateMore() {
+  const left = document.documentElement.scrollHeight - (window.scrollY + window.innerHeight);
+  more.classList.toggle('show', left > 24);
+}
+function syncBar() {
+  document.documentElement.style.setProperty('--bar-h', (bar.style.display === 'none' ? 0 : bar.offsetHeight) + 'px');
+  updateMore();
+}
+if (window.ResizeObserver) { new ResizeObserver(syncBar).observe(bar); new ResizeObserver(updateMore).observe(document.querySelector('main')); }
+window.addEventListener('scroll', updateMore, { passive: true });
+window.addEventListener('resize', syncBar);
+document.addEventListener('toggle', updateMore, true);            // <details> opened/closed
+document.addEventListener('load', updateMore, true);              // images finished loading
+$('moreBtn').onclick = () => window.scrollBy({ top: window.innerHeight * 0.6, behavior: 'smooth' });
+
+applyLink();
+render();
+</script>
+<script src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1"></script>
+</body>
+</html>

@@ -1,0 +1,48 @@
+<!--{"title": "Brightness isn’t how bright your TV is", "path": "learn/brightness/", "nav": "learn", "description": "On most TVs the Brightness control sets where black sits, not how bright the picture is. What brightness, backlight and contrast each do, with an interactive demo."}-->
+<article class="wrap narrow" style="padding-top: 40px; padding-bottom: 40px">
+  <nav class="crumbs" aria-label="Breadcrumb"><a href="{{root}}learn/">Learn</a> <span aria-hidden="true">›</span> Basics</nav>
+  <h1 class="page-title">Brightness isn’t how bright your TV is</h1>
+  <p class="lead" style="margin-bottom: 36px">On many TVs, the control called Brightness doesn’t make the picture brighter. It decides where black sits. The control that makes the whole picture brighter usually has another name.</p>
+
+  <figure class="demo" data-demo>
+    <div class="demo-ramp" role="img" aria-label="Grey scale from black to white in eleven steps"></div>
+    <div class="demo-controls">
+      <div>
+        <label for="demo-black"><b>Black level</b><span class="mono muted" data-out="black">0</span></label>
+        <input id="demo-black" type="range" min="-10" max="10" step="1" value="0">
+      </div>
+      <div>
+        <label for="demo-light"><b>Backlight</b><span class="mono muted" data-out="light">80</span></label>
+        <input id="demo-light" type="range" min="20" max="100" step="5" value="80">
+      </div>
+    </div>
+    <figcaption>Move the sliders to see the difference. (The demo needs JavaScript.)</figcaption>
+  </figure>
+
+  <div class="prose">
+  <h2 class="section-h">Three controls, three jobs</h2>
+  <p>Try the sliders above. Black level moves the dark end of the scale. Backlight turns the whole thing up and down without changing which steps you can tell apart.</p>
+  <div class="settings-table" style="margin-bottom: 40px">
+    <div class="settings-row"><div class="k"><strong>Black level</strong></div><div class="v"><span>Where black sits. Set it once with a test pattern and leave it.</span></div></div>
+    <div class="settings-row"><div class="k"><strong>Backlight or light output</strong></div><div class="v"><span>How bright the whole picture is. Change it to suit the room: brighter by day, dimmer at night.</span></div></div>
+    <div class="settings-row"><div class="k"><strong>Contrast</strong></div><div class="v"><span>Where white sits. Too high, and the brightest details merge into flat white.</span></div></div>
+  </div>
+
+  <h2 class="section-h">Your TV may use different names</h2>
+  <p>The black-level control has a different name on almost every brand:</p>
+  </div>
+  {{blackNames}}
+
+  <div class="card highlight" style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 18px">
+    <div style="flex: 1 1 320px; min-width: 0">
+      <h2 style="margin: 0 0 6px; font-size: 22px">Set yours with a pattern</h2>
+      <p style="margin: 0">Your phone shows the pattern on the TV and tells you which button to press.</p>
+    </div>
+    <a class="btn btn-primary" href="{{root}}setup/">Start setup</a>
+  </div>
+
+  <nav class="article-nav" aria-label="More articles">
+    <a href="{{root}}learn/">All articles</a>
+    <a href="{{root}}troubleshoot/grey-blacks/">Blacks look grey? →</a>
+  </nav>
+</article>

@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#111113">
+<script>
+  // Apply the saved Appearance (shared with the setup tool) before the page draws.
+  try { var t = JSON.parse(localStorage.getItem('tvcal2.theme')); if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t; } catch (e) {}
+</script>
+<title>Troubleshoot · tvcal</title>
+<meta name="description" content="Fix common TV picture problems, starting from what you see: grey blacks, dark HDR, orange faces, banding and more.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20rx%3D%226%22%20fill%3D%22%23111113%22%2F%3E%3Crect%20x%3D%225%22%20y%3D%227%22%20width%3D%225%22%20height%3D%2218%22%20fill%3D%22%233a3a3a%22%2F%3E%3Crect%20x%3D%2211%22%20y%3D%227%22%20width%3D%225%22%20height%3D%2218%22%20fill%3D%22%237a7a7a%22%2F%3E%3Crect%20x%3D%2217%22%20y%3D%227%22%20width%3D%225%22%20height%3D%2218%22%20fill%3D%22%23bdbdbd%22%2F%3E%3Crect%20x%3D%2223%22%20y%3D%227%22%20width%3D%224%22%20height%3D%2218%22%20fill%3D%22%23f2f2f2%22%2F%3E%3C%2Fsvg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&amp;family=IBM+Plex+Sans:wght@400;500;600;700&amp;display=swap">
+<link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-header">
+  <div class="wrap">
+    <a class="logo" href="../"><span class="logo-mark" aria-hidden="true"><span></span><span></span><span></span><span></span></span>tvcal</a>
+    <nav class="nav" aria-label="Main">
+      <a href="../setup/">Setup</a>
+      <a href="../guides/">Brand guides</a>
+      <a href="../troubleshoot/" aria-current="page">Troubleshoot</a>
+      <a href="../test-patterns/">Test patterns</a>
+      <a href="../learn/">Learn</a>
+    </nav>
+  </div>
+</header>
+<main id="main">
+<div class="wrap narrow">
+<div class="page-head">
+  <p class="eyebrow">Troubleshoot</p>
+  <h1 class="page-title">Something look wrong?</h1>
+  <p class="lead">Start from what you see. Each page lists the likely causes, most common first, and links to the step that fixes it.</p>
+</div>
+<section class="section" style="padding-top: 32px" aria-label="Problems">
+  <div class="rows">
+    <a class="row-link" href="../troubleshoot/grey-blacks/">Blacks look grey or washed out <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></a>
+    <div class="row-link soon">HDR looks too dark <span class="tag">Coming soon</span></div>
+    <div class="row-link soon">Faces look orange or pink <span class="tag">Coming soon</span></div>
+    <div class="row-link soon">Bands or steps in skies <span class="tag">Coming soon</span></div>
+    <div class="row-link soon">Edges have a halo or outline <span class="tag">Coming soon</span></div>
+    <div class="row-link soon">Films look like a soap opera <span class="tag">Coming soon</span></div>
+  </div>
+  <p class="muted small" style="margin-top: 24px">Seeing something not listed? <a href="https://github.com/vantuvt/tvcal/issues/new">Tell us your TV and what you see</a>.</p>
+</section>
+</div>
+</main>
+<footer class="site-footer">
+  <div class="wrap">
+    <span>tvcal · free and open source</span>
+    <div class="links">
+      <a href="https://github.com/vantuvt/tvcal">GitHub</a>
+      <a href="https://github.com/vantuvt/tvcal/issues/new">Report a problem</a>
+      <label>Appearance
+        <select id="appearance">
+          <option value="auto">Auto</option>
+          <option value="light">Light</option>
+          <option value="dark">Dark</option>
+        </select>
+      </label>
+    </div>
+  </div>
+</footer>
+<script src="../assets/site.js" defer></script>
+</body>
+</html>
