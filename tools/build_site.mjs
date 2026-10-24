@@ -68,7 +68,6 @@ const NAV = [
   ['setup', 'Setup', 'setup/'],
   ['guides', 'Brand guides', 'guides/'],
   ['troubleshoot', 'Troubleshoot', 'troubleshoot/'],
-  ['patterns', 'Test patterns', 'test-patterns/'],
   ['learn', 'Learn', 'learn/'],
 ];
 
@@ -151,38 +150,18 @@ ${BRAND_KEYS.map(k => `  <li class="card" style="padding: 14px 16px"><span class
 </ul>`;
 }
 
-const PATTERNS = [
-  ['SDR', [
-    ['01-fit.mp4', 'Fit to screen', 'A thin white border with arrows in each corner. Checks nothing is cut off.'],
-    ['02-brightness.mp4', 'Brightness (black level)', 'Box A below black should vanish; box B should be faintly visible.'],
-    ['03-contrast.mp4', 'Contrast', 'Three near-white boxes. All three should stay visible.'],
-    ['04-sharpness.mp4', 'Sharpness, 1080p', 'Fine lines. Lower sharpness until the bright outlines go.'],
-    ['04-sharpness-4k.mp4', 'Sharpness, native 4K', 'The same pattern at 3840×2160, so the TV doesn’t upscale it.'],
-    ['06-temp.mp4', 'Colour temperature', 'White, greys, skin, foliage and sky, for comparing the Warm options.'],
-    ['05-final.mp4', 'Final grey check', 'Grey squares from dark to white. Each should look plain grey.'],
-  ]],
-  ['HDR10', [
-    ['h1-black.mp4', 'HDR black level', 'The black-level boxes in HDR10 (PQ, BT.2020).'],
-    ['h2-highlights.mp4', 'HDR highlights', 'Four boxes from 400 to 1000 nits on a 100-nit background. Tests tone mapping.'],
-    ['h3-steps.mp4', 'HDR grey steps', 'Twelve grey steps from 0.05 to 1000 nits.'],
-  ]],
-];
-function patternFiles(root) {
-  return PATTERNS.map(([group, files]) => {
-    const items = files.map(([f, name, desc]) => {
-      let size = '';
-      try { size = (fs.statSync(rel('patterns', f)).size / 1048576).toFixed(1) + ' MB'; } catch (e) { return ''; }
-      return `  <li><div class="f-name"><strong>${esc(name)}</strong><span>${esc(desc)}</span></div><span class="f-meta">${f} · ${size}</span><a class="btn btn-ghost" href="${root}patterns/${f}" download>Download</a></li>`;
-    }).filter(Boolean).join('\n');
-    return `<h2 class="section-h" id="${group.toLowerCase()}" style="font-size: 26px; margin-top: 40px">${group}</h2>\n<ul class="files">\n${items}\n</ul>`;
-  }).join('\n');
-}
+// Display names for the patterns the guides mention. The pattern files are
+// only shown on the TV by the setup tool; the site doesn't offer them for download.
+const PATTERN_TITLE = {
+  '01-fit': 'fit-to-screen', '02-brightness': 'brightness', '03-contrast': 'contrast',
+  '04-sharpness': 'sharpness', '06-temp': 'colour temperature', '05-final': 'grey check',
+  'h1-black': 'HDR black level', 'h2-highlights': 'HDR highlights', 'h3-steps': 'HDR grey steps',
+};
 
 function fill(body, root) {
   return body
     .replaceAll('{{brandCards}}', brandCards(root))
     .replaceAll('{{blackNames}}', blackNames())
-    .replaceAll('{{patternFiles}}', patternFiles(root))
     .replaceAll('{{icon.arrow}}', ICON.arrow)
     .replaceAll('{{icon.chevron}}', ICON.chevron)
     .replaceAll('{{icon.info}}', ICON.info)
@@ -190,7 +169,6 @@ function fill(body, root) {
 }
 
 /* ---------- Brand guides ---------- */
-const PATTERN_TITLE = Object.fromEntries(PATTERNS.flatMap(([, f]) => f.map(([file, name]) => [file.replace('.mp4', ''), name])));
 
 function doBlock(node) {
   if (!node || !node.do) return '';
@@ -203,7 +181,7 @@ function checklist(items) {
 }
 function usesPattern(step, root) {
   if (!step.pattern) return '';
-  return `<p class="uses-pattern">Uses the <a href="${root}test-patterns/">${esc(PATTERN_TITLE[step.pattern] || step.pattern)} pattern</a>. The guided setup shows it on your TV for you.</p>`;
+  return `<p class="uses-pattern">Uses the ${esc(PATTERN_TITLE[step.pattern] || step.pattern)} test pattern. <a href="${root}setup/">The guided setup</a> shows it on your TV for you.</p>`;
 }
 
 function brandGuide(key) {
@@ -260,7 +238,7 @@ ${hb.where || ''}
 <p>${hh.lead}</p>
 ${hh.where || ''}
 ${doBlock(Object.assign({}, hh.flow.tm, { do: 'If some boxes look the same: ' + hh.flow.tm.do.charAt(0).toLowerCase() + hh.flow.tm.do.slice(1) }))}
-<p class="uses-pattern">Uses the <a href="${root}test-patterns/#hdr10">HDR10 patterns</a>.</p>`, true);
+<p class="uses-pattern">Uses the HDR test patterns. <a href="${root}setup/">The guided setup</a> shows them on your TV for you.</p>`, true);
 
   const dv = S('dv');
   const dvInner = dv.flow.q && dv.flow.q.text
