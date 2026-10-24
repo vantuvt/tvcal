@@ -1712,26 +1712,37 @@ function airOn() { return AIRPLAY && link === 'airplay' && !!airVideo.webkitCurr
 // never appears on the TV. Unmuted playback must start from a tap, so play()
 // is always called straight from a button handler (AirPlay to TV, Next, Back).
 let airReleased = false;   // true once the TV was let go after the last pattern
+const AIR_IDLE = '00-idle';  // "Follow the steps on your phone" screen
+// Is there a pattern still to come? On the hub, any pattern step not yet done
+// or skipped counts; elsewhere, any pattern step later in the order.
+function patternsAhead() {
+  if (S(idx).hub) return STEPS.some((x, i) => patternFor(i) && !status[x.id]);
+  return STEPS.some((x, i) => i > idx && patternFor(i));
+}
+// Show this screen's pattern on the AirPlay TV.
 function airLoad(name, force) {
-  if (name === airName && !force) { if (name && airVideo.paused) airPlay(); return; }
-  airName = name;
-  // Steps without a pattern pause instead of unloading, so the AirPlay
-  // connection stays up and the next pattern appears without reconnecting.
-  // Past the last pattern step (Dolby Vision, devices, summary) there's
-  // nothing more to show, so the TV is released instead of left on a frozen
-  // frame; Dolby Vision needs the TV free to play a title from its own apps.
   if (!name) {
-    if (STEPS.slice(idx + 1).some(x => x.pattern)) airVideo.pause();
-    else airRelease('Patterns finished. The TV is free again.');
-    return;
+    // With no pattern left (Dolby Vision, devices, or the hub once every
+    // pattern chapter is finished) the TV is released; Dolby Vision also
+    // needs the TV free to play a title from its own apps.
+    if (!patternsAhead()) { airRelease('Patterns finished. The TV is free again.'); return; }
+    // Other screens without a pattern (Quick settings, the HDR question, the
+    // hub between chapters) show the idle screen. Pausing would leave the
+    // last pattern frozen on the TV, and unloading could end the connection.
+    name = AIR_IDLE;
   }
-  airReleased = false;
+  airShow(name, force);
+}
+function airShow(name, force) {
+  if (name === airName && !force) { if (airVideo.paused) airPlay(); return; }
+  airName = name; airReleased = false;
   const url = PATTERN_BASE + name + '.mp4';
   if (airVideo.getAttribute('src') !== url) airVideo.src = url;   // not currentSrc: it keeps the old URL after an unload
   airPlay();
   try {
     const s = STEPS.find(x => x.pattern === name);
-    if ('mediaSession' in navigator) navigator.mediaSession.metadata = new MediaMetadata({ title: s ? s.title : 'Test pattern', artist: 'TV Picture Setup' });
+    if ('mediaSession' in navigator) navigator.mediaSession.metadata = new MediaMetadata({
+      title: s ? s.title : 'Follow the steps on your phone', artist: 'TV Picture Setup' });
   } catch (e) {}
 }
 // Stop playback and unload the video, which ends the picture on the TV.
@@ -1762,9 +1773,9 @@ if (AIRPLAY) {
   });
 
   airBtn.onclick = () => {
-    // The picker needs a video to send, so load one if nothing is loaded yet.
-    // Start the video from this tap, so iOS treats it as real playback.
-    airLoad(patternFor(idx) || airName || '01-fit');
+    // Start the video from this tap, so iOS treats it as real playback:
+    // this screen's pattern, or the idle screen, which confirms the connection.
+    airShow(patternFor(idx) || AIR_IDLE);
     airVideo.webkitShowPlaybackTargetPicker();
   };
 
@@ -1776,7 +1787,7 @@ if (AIRPLAY) {
       airStatus('Connected. Starting the pattern on the TV…', true);
       document.getElementById('airHelp').style.display = 'block';
       // Keep playing what the tap started: this step's pattern, or on a step
-      // without one, the connection pattern so it's clear the TV is connected.
+      // without one, the idle screen, which also confirms the TV is connected.
       if (airVideo.paused) airPlay();
     } else {
       airBtn.textContent = 'AirPlay to TV';
@@ -1792,7 +1803,7 @@ if (AIRPLAY) {
   airVideo.addEventListener('error', () => {
     if (!airOn() || !airVideo.getAttribute('src')) return;
     const hdr = airName && airName[0] === 'h';
-    playError = airName; airName = undefined;
+    playError = airName === AIR_IDLE ? null : airName; airName = undefined;
     airStatus(hdr
       ? 'The TV couldn’t play this HDR pattern over AirPlay. It needs an Apple TV 4K or a TV that plays HEVC HDR10.'
       : 'The TV couldn’t play the pattern over AirPlay.', true);
@@ -1800,7 +1811,7 @@ if (AIRPLAY) {
   // Leaving or closing the page releases the TV right away. (Not on
   // visibilitychange: the phone may lock mid-step while the TV keeps playing.)
   window.addEventListener('pagehide', () => airRelease());
-  airVideo.addEventListener('playing', () => { playError = null; if (airOn()) airStatus('Showing on your AirPlay TV', true); });
+  airVideo.addEventListener('playing', () => { playError = null; if (airOn()) airStatus(airName === AIR_IDLE ? 'Connected to your AirPlay TV' : 'Showing on your AirPlay TV', true); });
   airVideo.addEventListener('waiting', () => { if (airOn()) airStatus('Loading the pattern on the TV…', true); });
 }
 
