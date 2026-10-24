@@ -4,25 +4,25 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#111113">
-<script>
-  // Apply the saved Appearance before the page draws, so there is no flash of the other theme.
-  try { const t = JSON.parse(localStorage.getItem('tvcal2.theme')); if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t; } catch (e) {}
-</script>
+<!-- Appearance, shared with the site: applies the saved choice before the page draws. -->
+<script src="../assets/theme.js"></script>
 <title>TV Picture Setup · tvcal</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;700&amp;display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600;700&amp;display=swap">
+<link rel="stylesheet" href="../assets/shared.css">
 <style>
   /* Colours are theme tokens. Dark is the default; light follows the phone's
-     setting (Auto), or is forced with data-theme on <html> from the hub's
-     Appearance switch. */
+     setting (Auto), or is forced with data-theme on <html> by ../assets/theme.js
+     (the Appearance choice, shared with the site). Amber accent, as on the site:
+     --accent fills buttons, --accent-text is the readable version for text and lines. */
   :root {
     color-scheme: dark;
     --bg: #111113; --panel: #1b1b1f; --panel2: #232329; --line: #2e2e36; --line2: #3a3a45; --line3: #4a4a56;
     --text: #ececf1; --dim: #9a9aa6; --ph: #6e6e7a; --dot-off: #555;
-    --accent: #7db3ff; --accent-ink: #0b1a2e; --ring: rgba(125,179,255,.45);
+    --accent: #f2b544; --accent-ink: #111113; --accent-text: #f2b544; --ring: rgba(242,181,68,.45);
     --ok: #6fd39a; --ok-bg: #12291d; --ok-line: #245a3c; --tick-ink: #0d2418;
-    --act-bg: #14243a; --act-line: #23406a; --act-dim: #b9c8de;
+    --act-bg: #232329; --act-line: #4a4a56; --act-dim: #c4c4cd;
     --warn-bg: #2a2214; --warn-line: #5a4620; --warn: #f0c46a; --warn-text: #f0d9a8;
     --sheet: #1c1c22; --bar-bg: #16161a; --tab-on: #2e2e36;
     --fade0: rgba(17,17,19,0); --fade1: rgba(17,17,19,.92);
@@ -34,9 +34,9 @@
     color-scheme: light;
     --bg: #f4f4f6; --panel: #ffffff; --panel2: #ebebf0; --line: #dcdce3; --line2: #c8c8d1; --line3: #a9a9b5;
     --text: #17171b; --dim: #5b5b66; --ph: #8a8a95; --dot-off: #b4b4bf;
-    --accent: #1f62d1; --accent-ink: #ffffff; --ring: rgba(31,98,209,.35);
+    --accent: #f2b544; --accent-ink: #111113; --accent-text: #8a5a00; --ring: rgba(138,90,0,.35);
     --ok: #17773f; --ok-bg: #e2f4e9; --ok-line: #9fd3b2; --tick-ink: #ffffff;
-    --act-bg: #e9f0fc; --act-line: #b6cbf0; --act-dim: #3b4d6b;
+    --act-bg: #ffffff; --act-line: #a9a9b5; --act-dim: #3e3e48;
     --warn-bg: #fff3da; --warn-line: #e5c27f; --warn: #835400; --warn-text: #5a420f;
     --sheet: #ffffff; --bar-bg: #ffffff; --tab-on: #ffffff;
     --fade0: rgba(244,244,246,0); --fade1: rgba(244,244,246,.94);
@@ -48,9 +48,9 @@
     color-scheme: light;
     --bg: #f4f4f6; --panel: #ffffff; --panel2: #ebebf0; --line: #dcdce3; --line2: #c8c8d1; --line3: #a9a9b5;
     --text: #17171b; --dim: #5b5b66; --ph: #8a8a95; --dot-off: #b4b4bf;
-    --accent: #1f62d1; --accent-ink: #ffffff; --ring: rgba(31,98,209,.35);
+    --accent: #f2b544; --accent-ink: #111113; --accent-text: #8a5a00; --ring: rgba(138,90,0,.35);
     --ok: #17773f; --ok-bg: #e2f4e9; --ok-line: #9fd3b2; --tick-ink: #ffffff;
-    --act-bg: #e9f0fc; --act-line: #b6cbf0; --act-dim: #3b4d6b;
+    --act-bg: #ffffff; --act-line: #a9a9b5; --act-dim: #3e3e48;
     --warn-bg: #fff3da; --warn-line: #e5c27f; --warn: #835400; --warn-text: #5a420f;
     --sheet: #ffffff; --bar-bg: #ffffff; --tab-on: #ffffff;
     --fade0: rgba(244,244,246,0); --fade1: rgba(244,244,246,.94);
@@ -65,32 +65,6 @@
   button { font: inherit; color: inherit; cursor: pointer; touch-action: manipulation; }
   button:active { transform: scale(.98); }
 
-  /* ---------- Site header ----------
-     The same header as the rest of the site (markup written by
-     tools/build_site.mjs), shown on the hub only so the steps stay focused.
-     Styles mirror assets/site.css, scoped here so the two don't clash. */
-  .site-header { border-bottom: 1px solid var(--line); font-family: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
-  .site-header[hidden] { display: none; }
-  .site-header .wrap { max-width: 1200px; margin: 0 auto; padding: 14px 24px; display: flex; flex-wrap: wrap; align-items: center;
-    justify-content: space-between; gap: 8px 24px; }
-  .site-header .logo { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; color: var(--text); text-decoration: none;
-    font-weight: 700; font-size: 20px; letter-spacing: -0.01em; }
-  .site-header .logo-mark { display: flex; gap: 2px; }
-  .site-header .logo-mark span { width: 8px; height: 22px; display: block; }
-  .site-header .logo-mark span:nth-child(1) { background: #3a3a3a; }
-  .site-header .logo-mark span:nth-child(2) { background: #7a7a7a; }
-  .site-header .logo-mark span:nth-child(3) { background: #bdbdbd; }
-  .site-header .logo-mark span:nth-child(4) { background: #f2f2f2; box-shadow: inset 0 0 0 1px rgba(0,0,0,.12); }
-  .site-header .nav { display: flex; flex-wrap: wrap; gap: 0 22px; font-size: 15px; }
-  .site-header .nav a { color: var(--text); text-decoration: none; padding: 10px 0; }
-  .site-header .nav a:hover { color: var(--site-accent-hover); }
-  .site-header .nav a[aria-current=page] { color: var(--site-accent); }
-  .site-header a:focus-visible { outline: 2px solid var(--site-accent); outline-offset: 3px; border-radius: 4px; }
-  /* The site's amber, for the current-page link (darker in light mode so it reads on white). */
-  :root { --site-accent: #f2b544; --site-accent-hover: #ffd27a; }
-  @media (prefers-color-scheme: light) { :root:not([data-theme=dark]) { --site-accent: #8a5a00; --site-accent-hover: #6b4500; } }
-  :root[data-theme=light] { --site-accent: #8a5a00; --site-accent-hover: #6b4500; }
-
   /* ---------- Top row: back, chapter progress, all steps, help ---------- */
   .top { display: flex; align-items: center; gap: 8px; min-height: 52px; margin: 0 -8px 4px; }
   .icon { flex: none; width: 44px; height: 44px; display: grid; place-items: center; border: none; background: none; padding: 0; border-radius: 12px; }
@@ -99,7 +73,7 @@
   .where-label { font-size: 13px; font-weight: 600; letter-spacing: .5px; text-transform: uppercase; color: var(--dim); }
   .segs { display: flex; gap: 4px; margin-top: 6px; max-width: 100%; }
   .segs span { flex: 1; height: 4px; border-radius: 2px; background: var(--line); }
-  .segs span.on { background: var(--accent); }
+  .segs span.on { background: var(--accent-text); }
   .pill { flex: none; height: 40px; padding: 0 16px; border-radius: 999px; border: 1px solid var(--line); background: var(--panel); font-size: 15px; font-weight: 600; }
   .chip { display: flex; align-items: center; gap: 8px; min-height: 40px; padding: 6px 14px; border-radius: 999px; border: 1px solid var(--line);
     background: none; font-size: 14px; color: var(--dim); }
@@ -116,7 +90,7 @@
   h2:focus { outline: none; }
   .titlerow { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 16px 0 14px; }
   .poschip { flex: none; display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--dim); }
-  .poschip svg { width: 18px; height: 18px; fill: none; stroke: var(--accent); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  .poschip svg { width: 18px; height: 18px; fill: none; stroke: var(--accent-text); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
   .poschip.close { color: var(--warn); }
   .poschip.close svg { stroke: var(--warn); }
   .lead { color: var(--dim); margin: -6px 0 18px; font-size: 16px; }
@@ -135,23 +109,23 @@
   .answers.two { grid-template-columns: 1fr 1fr; }
   .answers button, .brands button { padding: 16px 10px; border-radius: 14px; border: 1px solid var(--line2); background: var(--panel2); font-weight: 600; font-size: 17px; }
   .act { background: var(--act-bg); border: 1px solid var(--act-line); display: grid; gap: 16px; }
-  .act .label { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--accent); }
+  .act .label { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--accent-text); }
   .act .doing { display: flex; align-items: center; gap: 16px; }
-  .act .key { flex: none; width: 68px; height: 68px; border-radius: 50%; border: 2px solid var(--accent); display: grid; place-items: center; }
-  .act .key svg { width: 30px; height: 30px; fill: none; stroke: var(--accent); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+  .act .key { flex: none; width: 68px; height: 68px; border-radius: 50%; border: 2px solid var(--accent-text); display: grid; place-items: center; }
+  .act .key svg { width: 30px; height: 30px; fill: none; stroke: var(--accent-text); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
   .act .do { font-size: 22px; line-height: 1.25; font-weight: 600; margin: 0; }
   .act .sub { color: var(--act-dim); font-size: 15px; margin: 0; }
   .stuck { display: flex; align-items: center; gap: 10px; margin: 0 0 12px; padding: 10px 12px 10px 14px; border-radius: 12px;
     background: var(--warn-bg); border: 1px solid var(--warn-line); color: var(--warn-text); font-size: 15px; }
   .stuck span { flex: 1; }
   .skiprow { display: flex; justify-content: center; flex-wrap: wrap; gap: 4px 20px; margin-top: 8px; }
-  .linkish { background: none; border: none; color: var(--accent); padding: 10px 4px; font-weight: 500; font-size: 15px; text-decoration: underline; }
+  .linkish { background: none; border: none; color: var(--accent-text); padding: 10px 4px; font-weight: 500; font-size: 15px; text-decoration: underline; }
   .skiprow .linkish { color: var(--dim); }
 
   .fin { min-height: calc(100vh - 260px); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 16px; padding: 24px 12px; }
-  .fin .badge { width: 84px; height: 84px; border-radius: 50%; display: grid; place-items: center; border: 2px solid var(--accent); background: var(--act-bg); }
+  .fin .badge { width: 84px; height: 84px; border-radius: 50%; display: grid; place-items: center; border: 2px solid var(--accent-text); background: var(--act-bg); }
   .fin .badge.good { border-color: var(--ok); background: var(--ok-bg); }
-  .fin .badge svg { width: 40px; height: 40px; fill: none; stroke: var(--accent); stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+  .fin .badge svg { width: 40px; height: 40px; fill: none; stroke: var(--accent-text); stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
   .fin .badge.good svg { stroke: var(--ok); }
   .fin h3 { font-size: 26px; line-height: 1.2; margin: 0; }
   .fin p { margin: 0; color: var(--dim); font-size: 17px; }
@@ -165,7 +139,7 @@
 
   .cards { display: grid; gap: 10px; }
   .card { display: flex; gap: 14px; align-items: flex-start; background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 16px; }
-  .card svg { flex: none; width: 28px; height: 28px; fill: none; stroke: var(--accent); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  .card svg { flex: none; width: 28px; height: 28px; fill: none; stroke: var(--accent-text); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
   .tipline { font-size: 14px; color: var(--dim); margin: 16px 0 0; }
   .okline { display: flex; gap: 10px; align-items: center; margin: 0 0 14px; color: var(--ok); font-size: 15px; }
 
@@ -210,10 +184,10 @@
   /* ---------- Hub ---------- */
   .chapters { display: grid; gap: 10px; margin-bottom: 10px; }
   .chap { width: 100%; text-align: left; display: flex; align-items: center; gap: 14px; background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 16px; }
-  .chap.cur { background: var(--act-bg); border: 2px solid var(--accent); padding: 15px; }
+  .chap.cur { background: var(--act-bg); border: 2px solid var(--accent-text); padding: 15px; }
   .chap.opt:not(.done):not(.cur) { background: none; border-style: dashed; border-color: var(--line2); }
   .chap .num { flex: none; width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--line3); color: var(--dim); display: grid; place-items: center; font-weight: 700; font-size: 15px; }
-  .chap.cur .num { border-color: var(--accent); color: var(--accent); }
+  .chap.cur .num { border-color: var(--accent-text); color: var(--accent-text); }
   .chap.done .num { background: var(--ok); border-color: var(--ok); }
   .chap.done .num svg { width: 16px; height: 16px; fill: none; stroke: var(--tick-ink); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
   .chap .txt { flex: 1; min-width: 0; }
@@ -221,7 +195,7 @@
   .chap .txt b i { font-style: normal; font-size: 13px; font-weight: 500; color: var(--dim); margin-left: 4px; }
   .chap .txt span { display: block; font-size: 14px; color: var(--dim); }
   .chap.cur .txt span { color: var(--act-dim); }
-  .chap .right { flex: none; font-size: 13px; font-weight: 600; color: var(--accent); }
+  .chap .right { flex: none; font-size: 13px; font-weight: 600; color: var(--accent-text); }
   .chap.mini { padding: 12px 16px; }
   .chap.mini .num { width: 28px; height: 28px; border-width: 0; }
   .chap.mini .num svg { width: 22px; height: 22px; fill: none; stroke: var(--dim); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
@@ -234,29 +208,17 @@
     border-radius: 8px; padding: 9px 10px; font: inherit; font-size: 16px; }
   input::placeholder { color: var(--ph); }
 
-  /* ---------- Menu (top-left icon): app settings such as Appearance ---------- */
-  .menu { position: fixed; z-index: 20; min-width: 248px; max-width: calc(100vw - 24px); padding: 8px; border-radius: 16px;
-    background: var(--sheet); border: 1px solid var(--line2); box-shadow: 0 12px 32px var(--shadow); }
-  .menu[hidden] { display: none; }
-  .menu-h { padding: 8px 12px 6px; font-size: 13px; font-weight: 600; letter-spacing: .5px; text-transform: uppercase; color: var(--dim); }
-  .menu button { width: 100%; display: flex; align-items: center; gap: 12px; text-align: left; padding: 10px 12px; min-height: 48px;
-    border: none; border-radius: 10px; background: none; }
-  .menu a { display: flex; align-items: center; gap: 12px; padding: 10px 12px; min-height: 48px; border-radius: 10px; color: inherit; text-decoration: none; }
-  .menu button:hover, .menu button:focus-visible, .menu a:hover, .menu a:focus-visible { background: var(--panel2); outline: none; }
-  .menu button b, .menu a b { display: block; font-size: 16px; font-weight: 600; }
-  .menu button small, .menu a small { display: block; font-size: 13px; color: var(--dim); }
-  .menu-sep { height: 1px; margin: 6px 4px; background: var(--line); }
-  /* The site's logo: four grey bars. Links back to the website from the tool. */
-  .site-mark { flex: none; display: flex; gap: 2px; }
-  .site-mark span { width: 5px; height: 18px; display: block; }
+  /* ---------- Menu (top-left icon, step screens): back to the site, Appearance ----------
+     Looks come from .ap-menu in ../assets/shared.css, shared with the site header. */
+  .menu { position: fixed; }
+  /* The site's logo, small, for the menu's link back to the site. */
+  .site-mark { flex: none; display: flex; gap: 2px; width: 22px; justify-content: center; }
+  .site-mark span { width: 4px; height: 18px; display: block; }
   .site-mark span:nth-child(1) { background: #3a3a3a; }
   .site-mark span:nth-child(2) { background: #7a7a7a; }
   .site-mark span:nth-child(3) { background: #bdbdbd; }
   .site-mark span:nth-child(4) { background: #f2f2f2; box-shadow: inset 0 0 0 1px rgba(0,0,0,.15); }
   .app-name { flex: 1; padding-left: 2px; font-size: 15px; font-weight: 600; color: var(--dim); }
-  .menu .mk { flex: none; width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--line3); display: grid; place-items: center; }
-  .menu [aria-checked=true] .mk { border-color: var(--accent); }
-  .menu [aria-checked=true] .mk::after { content: ""; width: 10px; height: 10px; border-radius: 50%; background: var(--accent); }
   .top .icon[aria-expanded=true] { background: var(--panel2); }
 
   /* ---------- Bottom bar ---------- */
@@ -301,7 +263,7 @@
   .resetrow { text-align: center; margin: 24px 0 4px; }
   .resetrow .linkish { color: var(--dim); }
   .siterow { text-align: center; margin: 20px 0 4px; font-size: 15px; }
-  .siterow a { color: var(--accent); font-weight: 500; }
+  .siterow a { color: var(--accent-text); font-weight: 500; }
 
   /* The TV connection controls: one element, moved between the connect
      step and the TV sheet, and parked out of sight otherwise. */
@@ -309,7 +271,7 @@
   .status { font-size: 14px; color: var(--dim); margin: 0 0 12px; display: flex; gap: 8px; align-items: center; }
   .status span:nth-child(2) { flex: 1; }
   google-cast-launcher { width: 36px; height: 36px; display: inline-block; cursor: pointer; flex: none;
-    --connected-color: var(--accent); --disconnected-color: var(--text); }
+    --connected-color: var(--accent-text); --disconnected-color: var(--text); }
   #connectPanel button.wide { width: 100%; padding: 15px 16px; border-radius: 14px; border: 1px solid var(--line2); background: var(--panel2); font-weight: 600; }
   #connectPanel button.wide.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
   #connectPanel details { border: 1px solid var(--line); border-radius: 12px; padding: 0 14px; margin-top: 12px; }
@@ -342,6 +304,19 @@
       <a href="../troubleshoot/">Troubleshoot</a>
       <a href="../learn/">Learn</a>
     </nav>
+    <div class="ap">
+      <button type="button" class="ap-btn" data-ap-btn aria-haspopup="menu" aria-expanded="false" aria-controls="ap-menu" aria-label="Appearance">
+        <svg class="i-auto" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path class="fill" d="M12 4a8 8 0 0 1 0 16z"/></svg>
+        <svg class="i-light" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6l1.4 1.4M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4L6 18M18 6l1.4-1.4"/></svg>
+        <svg class="i-dark" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg>
+      </button>
+      <div class="ap-menu" id="ap-menu" role="menu" aria-label="Appearance" hidden>
+        <div class="ap-h" aria-hidden="true">Appearance</div>
+        <button type="button" class="ap-item" role="menuitemradio" data-theme-pick="auto" aria-checked="false"><span class="ap-mk" aria-hidden="true"></span><span><b>Auto</b><small>Match your device</small></span></button>
+        <button type="button" class="ap-item" role="menuitemradio" data-theme-pick="light" aria-checked="false"><span class="ap-mk" aria-hidden="true"></span><span><b>Light</b></span></button>
+        <button type="button" class="ap-item" role="menuitemradio" data-theme-pick="dark" aria-checked="false"><span class="ap-mk" aria-hidden="true"></span><span><b>Dark</b></span></button>
+      </div>
+    </div>
   </div>
 </header>
 <!-- site-header:end -->
@@ -351,13 +326,15 @@
   <section id="card"></section>
 </main>
 
-<div class="menu" id="menu" role="menu" aria-label="Menu" hidden>
-  <a href="../" role="menuitem" class="menu-site"><span class="site-mark" aria-hidden="true"><span></span><span></span><span></span><span></span></span><span><b>Back to the tvcal site</b><small>Guides and troubleshooting. Your progress is saved.</small></span></a>
-  <div class="menu-sep" role="separator"></div>
-  <div class="menu-h" id="menuAppearance">Appearance</div>
-  <button role="menuitemradio" data-theme-pick="auto" aria-checked="false"><span class="mk" aria-hidden="true"></span><span><b>Auto</b><small>Match this phone’s setting</small></span></button>
-  <button role="menuitemradio" data-theme-pick="light" aria-checked="false"><span class="mk" aria-hidden="true"></span><span><b>Light</b></span></button>
-  <button role="menuitemradio" data-theme-pick="dark" aria-checked="false"><span class="mk" aria-hidden="true"></span><span><b>Dark</b></span></button>
+<div class="menu ap-menu" id="menu" role="menu" aria-label="Menu" hidden>
+  <a href="../" role="menuitem" class="ap-item"><span class="site-mark" aria-hidden="true"><span></span><span></span><span></span><span></span></span><span><b>Back to the tvcal site</b><small>Guides and troubleshooting. Your progress is saved.</small></span></a>
+  <div class="ap-sep" role="separator"></div>
+  <div class="ap-h" aria-hidden="true">Appearance</div>
+  <!-- appearance-items:start (written by tools/build_site.mjs, same as the site header's) -->
+  <button type="button" class="ap-item" role="menuitemradio" data-theme-pick="auto" aria-checked="false"><span class="ap-mk" aria-hidden="true"></span><span><b>Auto</b><small>Match your device</small></span></button>
+  <button type="button" class="ap-item" role="menuitemradio" data-theme-pick="light" aria-checked="false"><span class="ap-mk" aria-hidden="true"></span><span><b>Light</b></span></button>
+  <button type="button" class="ap-item" role="menuitemradio" data-theme-pick="dark" aria-checked="false"><span class="ap-mk" aria-hidden="true"></span><span><b>Dark</b></span></button>
+  <!-- appearance-items:end -->
 </div>
 
 <div class="more" id="more" aria-hidden="true"><button id="moreBtn" tabindex="-1">More below <span aria-hidden="true">↓</span></button></div>
@@ -1040,19 +1017,7 @@ if (!brand && STEPS[idx].chapter && STEPS[idx].chapter !== 'setup') idx = HUB;
 })();
 const status = store.get('status') || {};   // step id -> 'done' | 'skipped'
 
-/* ---------- Appearance ----------
-   Auto follows the phone's light or dark setting; Light and Dark force one.
-   The <head> script applies a saved choice before the page first draws. */
-let theme = store.get('theme') || 'auto';
-const lightQuery = window.matchMedia ? matchMedia('(prefers-color-scheme: light)') : null;
-function applyTheme() {
-  const root = document.documentElement;
-  if (theme === 'auto') delete root.dataset.theme; else root.dataset.theme = theme;
-  const dark = theme === 'dark' || (theme === 'auto' && !(lightQuery && lightQuery.matches));
-  document.querySelector('meta[name=theme-color]').content = dark ? '#111113' : '#f4f4f6';
-}
-if (lightQuery && lightQuery.addEventListener) lightQuery.addEventListener('change', applyTheme);
-applyTheme();
+/* Appearance (Auto, Light, Dark) is handled by ../assets/theme.js, shared with the site. */
 function saveStatus() { store.set('status', status); }
 
 // The step as shown: generic step with the chosen brand's overrides on top.
@@ -1093,7 +1058,7 @@ const panel = $('connectPanel'), parking = $('parking');
 const menuEl = $('menu');
 const menuItems = () => [...menuEl.querySelectorAll('a, button')];
 function openMenu() {
-  menuEl.querySelectorAll('[data-theme-pick]').forEach(b => b.setAttribute('aria-checked', String(b.dataset.themePick === theme)));
+  window.tvcalTheme.sync();
   menuEl.hidden = false;
   const r = $('menuBtn').getBoundingClientRect();
   menuEl.style.top = (r.bottom + 6) + 'px';
@@ -1244,7 +1209,7 @@ function menuBtn() {
 }
 function topHtml(s) {
   if (s.hub) {
-    return `<div class="top">${menuBtn()}<div class="app-name">Picture setup</div>
+    return `<div class="top"><div class="app-name">Picture setup</div>
       <button class="chip" data-act="tv"><span class="dot${connected() ? ' on' : ''}"></span>${esc(brandInfo() ? brandInfo().name : 'TV')} · ${connected() ? 'Connected' : 'Not connected'}</button></div>`;
   }
   const list = chSteps(s.chapter), k = list.findIndex(x => x.id === s.id);
@@ -1539,7 +1504,7 @@ document.addEventListener('click', e => {
   if (!t || t.closest('#connectPanel')) return;
   const d = t.dataset;
   if (d.brand) { brand = d.brand; store.set('brand', brand); render(); return; }
-  if (d.themePick) { theme = d.themePick; store.set('theme', theme); applyTheme(); closeMenu(true); return; }
+  if (d.themePick) { if (t.closest('#menu')) { window.tvcalTheme.set(d.themePick); closeMenu(true); } return; }
   if (d.check) {
     checks[d.check] = !checks[d.check]; store.set('checks', checks);
     t.setAttribute('aria-checked', String(!!checks[d.check]));

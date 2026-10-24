@@ -81,8 +81,30 @@ function headerHtml(root, nav) {
     <nav class="nav" aria-label="Main">
       ${navHtml}
     </nav>
+    ${appearanceHtml()}
   </div>
 </header>`;
+}
+
+// The Appearance button and its menu. Behaviour is in assets/theme.js,
+// styles in assets/shared.css; the tool's step-screen menu uses the same items.
+const AP_CHOICES = [['auto', 'Auto', 'Match your device'], ['light', 'Light', ''], ['dark', 'Dark', '']];
+function appearanceItems() {
+  return AP_CHOICES.map(([k, label, sub]) =>
+    `<button type="button" class="ap-item" role="menuitemradio" data-theme-pick="${k}" aria-checked="false"><span class="ap-mk" aria-hidden="true"></span><span><b>${label}</b>${sub ? `<small>${sub}</small>` : ''}</span></button>`).join('\n        ');
+}
+function appearanceHtml() {
+  return `<div class="ap">
+      <button type="button" class="ap-btn" data-ap-btn aria-haspopup="menu" aria-expanded="false" aria-controls="ap-menu" aria-label="Appearance">
+        <svg class="i-auto" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path class="fill" d="M12 4a8 8 0 0 1 0 16z"/></svg>
+        <svg class="i-light" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6l1.4 1.4M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4L6 18M18 6l1.4-1.4"/></svg>
+        <svg class="i-dark" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg>
+      </button>
+      <div class="ap-menu" id="ap-menu" role="menu" aria-label="Appearance" hidden>
+        <div class="ap-h" aria-hidden="true">Appearance</div>
+        ${appearanceItems()}
+      </div>
+    </div>`;
 }
 
 function layout({ title, description, nav, body, root }) {
@@ -93,16 +115,14 @@ function layout({ title, description, nav, body, root }) {
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#111113">
-<script>
-  // Apply the saved Appearance (shared with the setup tool) before the page draws.
-  try { var t = JSON.parse(localStorage.getItem('tvcal2.theme')); if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t; } catch (e) {}
-</script>
+<script src="${root}assets/theme.js"></script>
 <title>${esc(fullTitle)}</title>
 <meta name="description" content="${esc(description || '')}">
 <link rel="icon" href="${FAVICON}">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&amp;family=IBM+Plex+Sans:wght@400;500;600;700&amp;display=swap">
+<link rel="stylesheet" href="${root}assets/shared.css">
 <link rel="stylesheet" href="${root}assets/site.css">
 </head>
 <body>
@@ -114,15 +134,6 @@ ${body.trim()}
 <footer class="site-footer">
   <div class="wrap">
     <span>${SITE_NAME}</span>
-    <div class="links">
-      <label>Appearance
-        <select id="appearance">
-          <option value="auto">Auto</option>
-          <option value="light">Light</option>
-          <option value="dark">Dark</option>
-        </select>
-      </label>
-    </div>
   </div>
 </footer>
 <script src="${root}assets/site.js" defer></script>
@@ -315,7 +326,10 @@ for (const k of ALL_KEYS) written.push(brandGuide(k));
   const tool = fs.readFileSync(toolPath, 'utf8');
   const re = /(<!-- site-header:start[^>]*-->)[\s\S]*?(<!-- site-header:end -->)/;
   if (!re.test(tool)) throw new Error('setup/index.html: missing the site-header markers');
-  const next = tool.replace(re, (_, a, b) => a + '\n' + headerHtml('../', 'setup') + '\n' + b);
+  let next = tool.replace(re, (_, a, b) => a + '\n' + headerHtml('../', 'setup') + '\n' + b);
+  const reItems = /(<!-- appearance-items:start[^>]*-->)[\s\S]*?(<!-- appearance-items:end -->)/;
+  if (!reItems.test(next)) throw new Error('setup/index.html: missing the appearance-items markers');
+  next = next.replace(reItems, (_, a, b) => a + '\n  ' + appearanceItems().replace(/\n {8}/g, '\n  ') + '\n  ' + b);
   if (next !== tool) { fs.writeFileSync(toolPath, next); written.push('setup/index.html (header)'); }
 }
 console.log(written.map(w => '  ' + w).join('\n'));
