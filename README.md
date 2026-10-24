@@ -56,7 +56,11 @@ dimming still hides box B.
 HDR set (10-bit PQ code values): black A = 56 (below black), B = 80 (≈0.007 nits);
 highlights A–D = 400/600/800/1000 nits on a 100-nit background (tests tone mapping);
 final check = 12 grey steps from 0.05 to 1000 nits. The HDR pass is optional and
-comes after the SDR steps.
+comes after the SDR steps. Leaving it is always one tap: every HDR question has
+"Skip the rest of HDR"; if the TV still doesn't switch to HDR after one retry,
+the phone says so and offers to skip; and if the TV can't play an HDR pattern,
+a banner offers Skip HDR. Skipped HDR shows as Skipped on the hub and can be
+opened again from there.
 
 Dolby Vision (optional, after HDR) is a guidance step with no pattern: Dolby Vision
 tone maps itself, and DV test videos need Dolby's licensed encoder. The phone has

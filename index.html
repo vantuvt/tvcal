@@ -113,7 +113,7 @@
   .stuck { display: flex; align-items: center; gap: 10px; margin: 0 0 12px; padding: 10px 12px 10px 14px; border-radius: 12px;
     background: var(--warn-bg); border: 1px solid var(--warn-line); color: var(--warn-text); font-size: 15px; }
   .stuck span { flex: 1; }
-  .skiprow { text-align: center; margin-top: 8px; }
+  .skiprow { display: flex; justify-content: center; flex-wrap: wrap; gap: 4px 20px; margin-top: 8px; }
   .linkish { background: none; border: none; color: var(--accent); padding: 10px 4px; font-weight: 500; font-size: 15px; text-decoration: underline; }
   .skiprow .linkish { color: var(--dim); }
 
@@ -433,7 +433,7 @@ const BRANDS = {
         ph: 'Movie',
         where: `<p>While the HDR pattern plays, open Settings → Display &amp; Sound → Picture: the picture mode list switches to its HDR versions.</p>`,
         flow: {
-          fix: { do: 'Turn on HDR for this input', sub: 'If you’re casting to the TV’s built-in Google TV, HDR switches on by itself, so check the pattern is still playing. If you use a separate Chromecast in an HDMI port: set that port’s HDMI Mode to HDMI 2.1 or Auto in the TV’s input settings, and on the Chromecast set Dynamic range to match content. Then go Back one step and Next again.' },
+          fix: { do: 'Turn on HDR for this input', sub: 'If you’re casting to the TV’s built-in Google TV, HDR switches on by itself, so check the pattern is still playing. If you use a separate Chromecast in an HDMI port: set that port’s HDMI Mode to HDMI 2.1 or Auto in the TV’s input settings, and on the Chromecast set Dynamic range to match content. Then tap Done: the pattern restarts so the TV can switch over.' },
           mode: { do: 'Choose FILMMAKER MODE or Movie for HDR', sub: 'TCL keeps a separate picture mode for HDR. Turn off Dynamic Contrast and Adaptive Brightness here too.' }
         }
       },
@@ -515,7 +515,7 @@ function brandFrom(t) {
       contrast: { where: t.contrastWhere },
       sharpness: Object.assign({ where: t.sharpWhere }, t.sharpFlow ? { flow: t.sharpFlow } : {}),
       hdrmode: { ph: t.hdrPh, flow: {
-        fix: { sub: `If you’re casting to the TV’s own built-in Cast, HDR switches on by itself, so check the pattern is still playing. If you use a separate Chromecast in an HDMI port: ${t.hdrHdmi}, and on the Chromecast set Dynamic range to match content. Then go Back one step and Next again.` },
+        fix: { sub: `If you’re casting to the TV’s own built-in Cast, HDR switches on by itself, so check the pattern is still playing. If you use a separate Chromecast in an HDMI port: ${t.hdrHdmi}, and on the Chromecast set Dynamic range to match content. Then tap Done: the pattern restarts so the TV can switch over.` },
         mode: { do: t.hdrModeDo, sub: t.hdrModeSub } } },
       hdrbright: Object.assign({ record: 'HDR ' + t.blkTitle, where: `<p>Use <b>${t.blk}</b> while HDR is playing; changes usually only affect HDR. ${t.hdrBlkNote || ''}</p>`, stuck: t.blkStuck,
         flow: Object.assign({ ok: { do: `HDR ${t.blkTitle} is set.` } }, blkFlow) },
@@ -840,8 +840,11 @@ const STEPS = [
       start: 'q',
       q: { ask: 'Did the TV switch into HDR? Look for an “HDR” badge, or a picture mode name that includes HDR.', answers: [['Yes', 'mode'], ['No', 'fix'], ['Can’t tell', 'unsure']] },
       fix: { do: 'Turn on HDR for this input',
-             sub: 'If your Chromecast plugs into HDMI: turn on the TV’s enhanced format for that HDMI port (called HDMI UHD Color, Input Signal Plus or HDMI Enhanced Format, depending on brand). On the Chromecast, set Display & Sound → Dynamic range → match content. Then go Back one step and Next again to restart the pattern.', then: 'q' },
+             sub: 'If your Chromecast plugs into HDMI: turn on the TV’s enhanced format for that HDMI port (called HDMI UHD Color, Input Signal Plus or HDMI Enhanced Format, depending on brand). On the Chromecast, set Display & Sound → Dynamic range → match content. Then tap Done: the pattern restarts so the TV can switch over.', then: 'q2', replay: true },
       mode: { do: 'Choose the HDR picture mode: Filmmaker, Movie or Cinema', sub: 'HDR has its own picture mode and settings. Turn off dynamic contrast and energy saving here too.', then: 'ok' },
+      q2: { ask: 'Did the TV switch into HDR this time?', answers: [['Yes, it’s HDR now', 'mode'], ['Still no', 'nohdr']] },
+      nohdr: { do: 'Your setup isn’t showing HDR', skipHdr: true,
+               text: 'That’s fine: everything you watch in SDR, which is most TV, is already set. Your TV, streaming device or HDMI connection may not support HDR10. If that changes later, open HDR from the home screen.' },
       unsure: { do: 'Carry on.', text: 'If the next pattern looks washed out, with grey instead of black, HDR is probably off. Come back here and tap No.' },
       ok: { do: 'HDR is on.', text: 'The next steps adjust the HDR settings.' }
     }
@@ -1139,7 +1142,13 @@ function renderChrome() {
   const s = S(idx);
   top_.innerHTML = topHtml(s);
   const judging = !s.flow || !!(s.flow[node].ask || s.flow[node].then);
-  banner.innerHTML = s.pattern && judging && !connected() && !localOpen()
+  const pat = patternFor(idx);
+  if (playError && playError === pat && connected()) {
+    const hdr = pat[0] === 'h';
+    banner.innerHTML = `<div class="banner" role="alert"><span>${hdr
+      ? 'The TV couldn’t play this HDR pattern. Your TV or streaming device may not support HDR10.'
+      : 'The TV couldn’t play this pattern.'}</span><button data-act="${hdr && s.chapter === 'hdr' ? 'skip-hdr' : 'retry'}">${hdr && s.chapter === 'hdr' ? 'Skip HDR' : 'Try again'}</button></div>`;
+  } else banner.innerHTML = s.pattern && judging && !connected() && !localOpen()
     ? `<div class="banner" role="status"><span>The test pattern isn’t showing on the TV.</span><button data-act="tv">Connect</button></div>` : '';
   const b = barHtml(s);
   barInner.innerHTML = b;
@@ -1149,6 +1158,7 @@ function renderChrome() {
 // Called on every connection status message. The connect and Get ready
 // screens mention the connection, so they're redrawn when it changes.
 let chromeTimer, lastConn = null;
+let playError = null;   // pattern the TV failed to play, shown as a banner
 function refreshChrome() {
   clearTimeout(chromeTimer);
   chromeTimer = setTimeout(() => {
@@ -1190,6 +1200,7 @@ function barHtml(s) {
     const n = s.flow[node];
     if (n.ask) return '';
     if (n.then) return btn('then', 'Done', true, `data-to="${n.then}"`);
+    if (n.skipHdr) return btn('skip-hdr', 'Skip the rest of HDR', true) + `<button data-go="${s.flow.start}">Try again</button>`;
     const last = nextIdx() !== HUB && S(nextIdx()).chapter !== s.chapter && s.chapter !== 'setup'
       ? `<div class="hint">Last step in ${CHAPTERS[s.chapter].name}</div>` : '';
     return btn('next', nextLabel(), true) + last;
@@ -1218,7 +1229,8 @@ function cardHtml(s) {
     h += `<div class="box q"><p class="ask">${n.ask}</p><div class="answers${two}">
       ${n.answers.map(([label, to]) => `<button data-go="${to}">${label}</button>`).join('')}</div></div>`;
     h += stuckHtml(s);
-    h += `<div class="skiprow"><button class="linkish" data-act="skip">Skip this step</button></div>`;
+    h += `<div class="skiprow"><button class="linkish" data-act="skip">Skip this step</button>${
+      s.chapter === 'hdr' && s.id !== 'hdr' ? '<button class="linkish" data-act="skip-hdr">Skip the rest of HDR</button>' : ''}</div>`;
     return h;
   }
   if (n && n.then) {
@@ -1452,7 +1464,18 @@ document.addEventListener('click', e => {
     case 'tv': openTV(); break;
     case 'close': closeSheet(); break;
     case 'local': closeSheet(); openLocal(); break;
-    case 'then': loops++; node = d.to; render(); window.scrollTo(0, 0); requestAnimationFrame(updateMore); break;
+    case 'then': {
+      const replay = S(idx).flow[node].replay;
+      loops++; node = d.to; render(); window.scrollTo(0, 0); requestAnimationFrame(updateMore);
+      if (replay) showPattern(patternFor(idx), true);   // restart it, so the TV re-detects HDR
+      break;
+    }
+    case 'skip-hdr':
+      // Leave HDR gracefully: mark what's left of it skipped and go home, where it shows as Skipped.
+      chSteps('hdr').forEach(x => { if (!status[x.id]) status[x.id] = 'skipped'; });
+      if (status[STEPS[idx].id] !== 'done') status[STEPS[idx].id] = 'skipped';
+      saveStatus(); go(HUB); break;
+    case 'retry': playError = null; showPattern(patternFor(idx), true); renderChrome(); break;
     case 'skip': finishStep('skipped'); break;
     case 'next':
       if (S(idx).brandPick && !brand) {   // ask for the brand before going on
@@ -1524,11 +1547,11 @@ function castFile(sess, name, file) {
   req.repeatMode = chrome.cast.media.RepeatMode.SINGLE;
   castStatus('Loading pattern on the TV…', true);
   sess.getSessionObj().queueLoad(req,
-    () => castStatus('Showing on ' + sess.getCastDevice().friendlyName + (file !== name ? ' (4K)' : ''), true),
+    () => { playError = null; castStatus('Showing on ' + sess.getCastDevice().friendlyName + (file !== name ? ' (4K)' : ''), true); },
     err => {
       if (file !== name) { fallbackFrom4k(sess, name); return; }
-      lastCast = undefined;
-      castStatus('The TV couldn’t play the pattern (' + (err && err.code) + '). Go back and forward to retry.', true);
+      lastCast = undefined; playError = name;
+      castStatus('The TV couldn’t play the pattern (' + (err && err.code) + ').', true);
     });
 }
 
@@ -1730,15 +1753,15 @@ if (AIRPLAY) {
   airVideo.addEventListener('error', () => {
     if (!airOn() || !airVideo.getAttribute('src')) return;
     const hdr = airName && airName[0] === 'h';
-    airName = undefined;
+    playError = airName; airName = undefined;
     airStatus(hdr
-      ? 'The TV couldn’t play this HDR pattern over AirPlay. It needs an Apple TV 4K or a TV that plays HEVC HDR10. You can skip the HDR steps.'
-      : 'The TV couldn’t play the pattern over AirPlay. Go back and forward to retry.', true);
+      ? 'The TV couldn’t play this HDR pattern over AirPlay. It needs an Apple TV 4K or a TV that plays HEVC HDR10.'
+      : 'The TV couldn’t play the pattern over AirPlay.', true);
   });
   // Leaving or closing the page releases the TV right away. (Not on
   // visibilitychange: the phone may lock mid-step while the TV keeps playing.)
   window.addEventListener('pagehide', () => airRelease());
-  airVideo.addEventListener('playing', () => { if (airOn()) airStatus('Showing on your AirPlay TV', true); });
+  airVideo.addEventListener('playing', () => { playError = null; if (airOn()) airStatus('Showing on your AirPlay TV', true); });
   airVideo.addEventListener('waiting', () => { if (airOn()) airStatus('Loading the pattern on the TV…', true); });
 }
 
