@@ -69,10 +69,12 @@ the browser (AirPlay in Safari, Cast elsewhere), with a link to switch.
 
 The hub shows the site's header: navigation, plus the **Appearance** button at
 the right (Auto, Light, Dark), as on every site page. Step screens leave the
-header out to stay focused; instead the **menu** icon at their top left opens
-**Back to the tvcal site** and the same Appearance choices, in the same pop-up
-style. The header and the Appearance items are written into
-`setup/index.html` by `tools/build_site.mjs` (between the `site-header` and
+header out to stay focused, but their top row keeps the same layout: the site's
+logo on the left (linking to the site) and the same Appearance button on the
+right. On narrow phones the progress label shows just the chapter name; the
+segments show the count, which screen readers still hear. The header, the
+Appearance button and its items are written into `setup/index.html` by
+`tools/build_site.mjs` (between the `site-header`, `appearance-button` and
 `appearance-items` markers), so edit them there, not in the tool.
 
 There's a light and a dark theme, with the site's amber accent. All colours are

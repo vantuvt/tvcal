@@ -93,13 +93,17 @@ function appearanceItems() {
   return AP_CHOICES.map(([k, label, sub]) =>
     `<button type="button" class="ap-item" role="menuitemradio" data-theme-pick="${k}" aria-checked="false"><span class="ap-mk" aria-hidden="true"></span><span><b>${label}</b>${sub ? `<small>${sub}</small>` : ''}</span></button>`).join('\n        ');
 }
-function appearanceHtml() {
-  return `<div class="ap">
-      <button type="button" class="ap-btn" data-ap-btn aria-haspopup="menu" aria-expanded="false" aria-controls="ap-menu" aria-label="Appearance">
+// The button alone; `controls` is the id of its menu.
+function appearanceButton(controls) {
+  return `<button type="button" class="ap-btn" data-ap-btn aria-haspopup="menu" aria-expanded="false" aria-controls="${controls}" aria-label="Appearance">
         <svg class="i-auto" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path class="fill" d="M12 4a8 8 0 0 1 0 16z"/></svg>
         <svg class="i-light" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6l1.4 1.4M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4L6 18M18 6l1.4-1.4"/></svg>
         <svg class="i-dark" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg>
-      </button>
+      </button>`;
+}
+function appearanceHtml() {
+  return `<div class="ap">
+      ${appearanceButton('ap-menu')}
       <div class="ap-menu" id="ap-menu" role="menu" aria-label="Appearance" hidden>
         <div class="ap-h" aria-hidden="true">Appearance</div>
         ${appearanceItems()}
@@ -330,6 +334,10 @@ for (const k of ALL_KEYS) written.push(brandGuide(k));
   const reItems = /(<!-- appearance-items:start[^>]*-->)[\s\S]*?(<!-- appearance-items:end -->)/;
   if (!reItems.test(next)) throw new Error('setup/index.html: missing the appearance-items markers');
   next = next.replace(reItems, (_, a, b) => a + '\n  ' + appearanceItems().replace(/\n {8}/g, '\n  ') + '\n  ' + b);
+  // The step screens' top row draws its Appearance button from this template.
+  const reBtn = /(<!-- appearance-button:start[^>]*-->)[\s\S]*?(<!-- appearance-button:end -->)/;
+  if (!reBtn.test(next)) throw new Error('setup/index.html: missing the appearance-button markers');
+  next = next.replace(reBtn, (_, a, b) => a + '\n<template id="apBtnTpl">' + appearanceButton('apMenuTool').replace(/\n {6,8}/g, '\n  ') + '</template>\n' + b);
   if (next !== tool) { fs.writeFileSync(toolPath, next); written.push('setup/index.html (header)'); }
 }
 console.log(written.map(w => '  ' + w).join('\n'));

@@ -208,16 +208,16 @@
     border-radius: 8px; padding: 9px 10px; font: inherit; font-size: 16px; }
   input::placeholder { color: var(--ph); }
 
-  /* ---------- Menu (top-left icon, step screens): back to the site, Appearance ----------
-     Looks come from .ap-menu in ../assets/shared.css, shared with the site header. */
-  .menu { position: fixed; }
-  /* The site's logo, small, for the menu's link back to the site. */
-  .site-mark { flex: none; display: flex; gap: 2px; width: 22px; justify-content: center; }
-  .site-mark span { width: 4px; height: 18px; display: block; }
-  .site-mark span:nth-child(1) { background: #3a3a3a; }
-  .site-mark span:nth-child(2) { background: #7a7a7a; }
-  .site-mark span:nth-child(3) { background: #bdbdbd; }
-  .site-mark span:nth-child(4) { background: #f2f2f2; box-shadow: inset 0 0 0 1px rgba(0,0,0,.15); }
+  /* ---------- Step screens' top row: site logo on the left, Appearance on the right ----------
+     The logo and the Appearance button are the site header's (../assets/shared.css). */
+  .tool-logo { flex: none; width: 44px; height: 44px; display: grid; place-items: center; border-radius: 10px; }
+  .tool-logo .logo-mark span { width: 6px; height: 20px; }
+  .tool-logo:focus-visible { outline: 2px solid var(--accent-text); outline-offset: 2px; }
+  .top .ap-btn { flex: none; }
+  .where-label { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  @media (max-width: 420px) {
+    .where-count { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  }
   .app-name { flex: 1; padding-left: 2px; font-size: 15px; font-weight: 600; color: var(--dim); }
   .top .icon[aria-expanded=true] { background: var(--panel2); }
 
@@ -326,9 +326,8 @@
   <section id="card"></section>
 </main>
 
-<div class="menu ap-menu" id="menu" role="menu" aria-label="Menu" hidden>
-  <a href="../" role="menuitem" class="ap-item"><span class="site-mark" aria-hidden="true"><span></span><span></span><span></span><span></span></span><span><b>Back to the tvcal site</b><small>Guides and troubleshooting. Your progress is saved.</small></span></a>
-  <div class="ap-sep" role="separator"></div>
+<!-- Appearance menu for the step screens' top row; the hub uses the site header's. -->
+<div class="ap-menu" id="apMenuTool" role="menu" aria-label="Appearance" data-ap-fixed hidden>
   <div class="ap-h" aria-hidden="true">Appearance</div>
   <!-- appearance-items:start (written by tools/build_site.mjs, same as the site header's) -->
   <button type="button" class="ap-item" role="menuitemradio" data-theme-pick="auto" aria-checked="false"><span class="ap-mk" aria-hidden="true"></span><span><b>Auto</b><small>Match your device</small></span></button>
@@ -336,6 +335,13 @@
   <button type="button" class="ap-item" role="menuitemradio" data-theme-pick="dark" aria-checked="false"><span class="ap-mk" aria-hidden="true"></span><span><b>Dark</b></span></button>
   <!-- appearance-items:end -->
 </div>
+<!-- appearance-button:start (written by tools/build_site.mjs, same as the site header's) -->
+<template id="apBtnTpl"><button type="button" class="ap-btn" data-ap-btn aria-haspopup="menu" aria-expanded="false" aria-controls="apMenuTool" aria-label="Appearance">
+  <svg class="i-auto" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path class="fill" d="M12 4a8 8 0 0 1 0 16z"/></svg>
+  <svg class="i-light" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6l1.4 1.4M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4L6 18M18 6l1.4-1.4"/></svg>
+  <svg class="i-dark" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg>
+  </button></template>
+<!-- appearance-button:end -->
 
 <div class="more" id="more" aria-hidden="true"><button id="moreBtn" tabindex="-1">More below <span aria-hidden="true">↓</span></button></div>
 <div class="bar" id="bar"><div class="inner" id="barInner"></div></div>
@@ -1055,33 +1061,6 @@ const siteHeader = document.querySelector('.site-header');
 const card = $('card'), top_ = $('top'), banner = $('banner'), bar = $('bar'), barInner = $('barInner');
 const sheet = $('sheet'), sheetBody = $('sheetBody'), sheetTitle = $('sheetTitle');
 const panel = $('connectPanel'), parking = $('parking');
-const menuEl = $('menu');
-const menuItems = () => [...menuEl.querySelectorAll('a, button')];
-function openMenu() {
-  window.tvcalTheme.sync();
-  menuEl.hidden = false;
-  const r = $('menuBtn').getBoundingClientRect();
-  menuEl.style.top = (r.bottom + 6) + 'px';
-  menuEl.style.left = Math.max(12, r.left) + 'px';
-  $('menuBtn').setAttribute('aria-expanded', 'true');
-  (menuItems().find(b => b.getAttribute('aria-checked') === 'true') || menuItems()[0]).focus();
-}
-function closeMenu(refocus) {
-  if (menuEl.hidden) return;
-  menuEl.hidden = true;
-  const b = $('menuBtn');
-  if (b) { b.setAttribute('aria-expanded', 'false'); if (refocus) b.focus(); }
-}
-// Arrow keys move between choices; Escape closes and returns to the menu icon.
-menuEl.addEventListener('keydown', e => {
-  const items = menuItems(), i = items.indexOf(document.activeElement);
-  if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
-    e.preventDefault();
-    items[(i + (e.key === 'ArrowDown' ? 1 : items.length - 1)) % items.length].focus();
-  } else if (e.key === 'Escape') { e.preventDefault(); closeMenu(true); }
-  else if (e.key === 'Tab') closeMenu();
-});
-
 function esc(s) { return String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
 // Help text written as collapsible <details> becomes a heading and paragraphs inside the Help sheet.
 function unfold(html) {
@@ -1100,7 +1079,6 @@ const ICON = {
   remote: svg('<rect x="7" y="2" width="10" height="20" rx="3"/><circle cx="12" cy="7" r="1.5"/><path d="M10 12h4M10 15h4"/>'),
   bulb: svg('<path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-4 10.5c.7.7 1 1.5 1 2.5h6c0-1 .3-1.8 1-2.5A6 6 0 0 0 12 3z"/>'),
   tips: svg('<path d="M4 6h16M4 12h16M4 18h10"/>'),
-  menu: svg('<path d="M4 7h16M4 12h16M4 17h16"/>'),
   chevron: svg('<path d="M6 9l6 6 6-6"/>')
 };
 
@@ -1138,7 +1116,7 @@ function go(i, back) {
   if (!back && i !== idx) { trail.push(STEPS[idx].id); if (trail.length > 60) trail.shift(); }
   idx = i; node = null; loops = 0;
   store.set('trailIds', trail); store.set('stepId', STEPS[idx].id);
-  closeSheet(); closeMenu(); render(); window.scrollTo(0, 0); requestAnimationFrame(updateMore);
+  closeSheet(); window.tvcalTheme.close(); render(); window.scrollTo(0, 0); requestAnimationFrame(updateMore);
   const h = card.querySelector('h2'); if (h) h.focus({ preventScroll: true });
 }
 function goBack() {
@@ -1175,6 +1153,7 @@ function render() {
 function renderChrome() {
   const s = S(idx);
   top_.innerHTML = topHtml(s);
+  window.tvcalTheme.sync();   // mark the redrawn Appearance button
   siteHeader.hidden = !s.hub;
   const judging = !s.flow || !!(s.flow[node].ask || s.flow[node].then);
   const pat = patternFor(idx);
@@ -1204,9 +1183,12 @@ function refreshChrome() {
   }, 60);
 }
 
-function menuBtn() {
-  return `<button class="icon" id="menuBtn" data-act="menu" aria-label="Menu" aria-haspopup="menu" aria-controls="menu" aria-expanded="${!menuEl.hidden}">${ICON.menu}</button>`;
+// The site's logo, linking back to the site, and the site's Appearance button
+// (its markup comes from the template the site build writes into this page).
+function logoLink() {
+  return `<a class="tool-logo" href="../" aria-label="tvcal home"><span class="logo-mark" aria-hidden="true"><span></span><span></span><span></span><span></span></span></a>`;
 }
+function apBtn() { return $('apBtnTpl').innerHTML.trim(); }
 function topHtml(s) {
   if (s.hub) {
     return `<div class="top"><div class="app-name">Picture setup</div>
@@ -1214,12 +1196,14 @@ function topHtml(s) {
   }
   const list = chSteps(s.chapter), k = list.findIndex(x => x.id === s.id);
   const segs = list.length > 1 ? `<div class="segs" style="width:${Math.min(40 * list.length, 220)}px">${list.map((x, i) => `<span class="${i <= k ? 'on' : ''}"></span>`).join('')}</div>` : '';
-  const label = list.length > 1 ? `${CHAPTERS[s.chapter].name} · ${k + 1} of ${list.length}` : CHAPTERS[s.chapter].name;
-  return `<div class="top">${menuBtn()}
+  // On narrow phones the count is visually hidden (the segments show it) but still read out.
+  const label = list.length > 1 ? `${CHAPTERS[s.chapter].name}<span class="where-count"> · ${k + 1} of ${list.length}</span>` : CHAPTERS[s.chapter].name;
+  return `<div class="top">${logoLink()}
     <button class="icon" data-act="back" aria-label="Back">${ICON.back}</button>
     <div class="where"><div class="where-label">${label}</div>${segs}</div>
     <button class="icon" data-act="hub" aria-label="All steps">${ICON.home}</button>
     ${helpTabs(s).length ? `<button class="pill" data-act="help">Help</button>` : ''}
+    ${apBtn()}
   </div>`;
 }
 
@@ -1499,12 +1483,11 @@ sheet.addEventListener('click', e => { if (e.target === sheet) closeSheet(); });
 
 /* ---------- Taps ---------- */
 document.addEventListener('click', e => {
-  if (!menuEl.hidden && !e.target.closest('#menu, #menuBtn')) closeMenu();
   const t = e.target.closest('button');
   if (!t || t.closest('#connectPanel')) return;
   const d = t.dataset;
   if (d.brand) { brand = d.brand; store.set('brand', brand); render(); return; }
-  if (d.themePick) { if (t.closest('#menu')) { window.tvcalTheme.set(d.themePick); closeMenu(true); } return; }
+  if (d.themePick || 'apBtn' in d) return;   // Appearance: handled by ../assets/theme.js
   if (d.check) {
     checks[d.check] = !checks[d.check]; store.set('checks', checks);
     t.setAttribute('aria-checked', String(!!checks[d.check]));
@@ -1529,7 +1512,6 @@ document.addEventListener('click', e => {
     node = to; render(); window.scrollTo(0, 0); requestAnimationFrame(updateMore); return;
   }
   switch (d.act) {
-    case 'menu': if (menuEl.hidden) openMenu(); else closeMenu(true); break;
     case 'back': goBack(); break;
     case 'hub': go(HUB); break;
     case 'help': openHelp(d.tab); break;

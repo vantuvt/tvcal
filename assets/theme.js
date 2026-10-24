@@ -4,10 +4,11 @@
    page first draws (no flash of the other theme). The choice is stored as
    tvcal2.theme ('auto', 'light' or 'dark'); Auto follows the device.
 
-   - Any [data-theme-pick] item gets aria-checked kept in step.
-   - The header's Appearance button ([data-ap-btn] + its [data-ap-menu]
-     popover) is wired here: open, arrow keys, Escape, outside click.
-   - Other menus (the tool's step-screen menu) call tvcalTheme.set(choice).  */
+   An Appearance button is [data-ap-btn] with aria-controls naming its menu
+   of [data-theme-pick] items. Clicks and keys are handled by delegation, so
+   buttons the setup tool re-draws keep working. A menu with data-ap-fixed is
+   placed under its button with fixed positioning (the tool's top row);
+   otherwise it sits in the button's .ap wrapper (the site header).        */
 (function () {
   'use strict';
   var KEY = 'tvcal2.theme';
@@ -37,6 +38,8 @@
     document.querySelectorAll('[data-ap-btn]').forEach(function (b) {
       b.setAttribute('data-mode', choice);
       b.setAttribute('aria-label', 'Appearance: ' + LABEL[choice]);
+      var m = document.getElementById(b.getAttribute('aria-controls'));
+      b.setAttribute('aria-expanded', String(!!(m && !m.hidden)));
     });
   }
 
@@ -47,49 +50,64 @@
     sync();
   }
 
-  window.tvcalTheme = { get: function () { return choice; }, set: set, sync: sync };
+  /* ---------- Menus ---------- */
+  var openMenu = null;   // the menu element currently shown
+  function buttonFor(menu) { return document.querySelector('[data-ap-btn][aria-controls="' + menu.id + '"]'); }
+  function items(menu) { return Array.prototype.slice.call(menu.querySelectorAll('[role^=menuitem]')); }
 
-  /* ---------- The header's Appearance popover ---------- */
-  function wire(btn) {
+  function open(btn) {
     var menu = document.getElementById(btn.getAttribute('aria-controls'));
     if (!menu) return;
-    var items = function () { return Array.prototype.slice.call(menu.querySelectorAll('[role^=menuitem]')); };
-    function open() {
-      sync();
-      menu.hidden = false;
-      btn.setAttribute('aria-expanded', 'true');
-      var list = items();
-      (list.find(function (i) { return i.getAttribute('aria-checked') === 'true'; }) || list[0]).focus();
+    close();
+    if (menu.hasAttribute('data-ap-fixed')) {
+      var r = btn.getBoundingClientRect();
+      menu.style.position = 'fixed';
+      menu.style.top = (r.bottom + 8) + 'px';
+      menu.style.right = Math.max(12, document.documentElement.clientWidth - r.right) + 'px';
+      menu.style.left = 'auto';
     }
-    function close(refocus) {
-      if (menu.hidden) return;
-      menu.hidden = true;
-      btn.setAttribute('aria-expanded', 'false');
-      if (refocus) btn.focus();
-    }
-    btn.addEventListener('click', function () { if (menu.hidden) open(); else close(); });
-    menu.addEventListener('click', function (e) {
-      var item = e.target.closest('[data-theme-pick]');
-      if (item) { set(item.getAttribute('data-theme-pick')); close(true); }
-    });
-    menu.addEventListener('keydown', function (e) {
-      var list = items(), i = list.indexOf(document.activeElement);
-      if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
-        e.preventDefault();
-        list[(i + (e.key === 'ArrowDown' ? 1 : list.length - 1)) % list.length].focus();
-      } else if (e.key === 'Home' || e.key === 'End') {
-        e.preventDefault(); list[e.key === 'Home' ? 0 : list.length - 1].focus();
-      } else if (e.key === 'Escape') { e.preventDefault(); close(true); }
-      else if (e.key === 'Tab') close();
-    });
-    document.addEventListener('click', function (e) {
-      if (!menu.hidden && !menu.contains(e.target) && !btn.contains(e.target)) close();
-    });
+    menu.hidden = false;
+    openMenu = menu;
+    sync();
+    var list = items(menu);
+    (list.find(function (i) { return i.getAttribute('aria-checked') === 'true'; }) || list[0]).focus();
+  }
+  function close(refocus) {
+    if (!openMenu) return;
+    var menu = openMenu;
+    menu.hidden = true;
+    openMenu = null;
+    sync();
+    var btn = buttonFor(menu);
+    if (refocus && btn) btn.focus();
   }
 
-  function init() {
-    document.querySelectorAll('[data-ap-btn]').forEach(wire);
-    sync();
-  }
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
+  document.addEventListener('click', function (e) {
+    var btn = e.target.closest && e.target.closest('[data-ap-btn]');
+    if (btn) {
+      var menu = document.getElementById(btn.getAttribute('aria-controls'));
+      if (menu && menu === openMenu) close(); else open(btn);
+      return;
+    }
+    if (!openMenu) return;
+    var pick = e.target.closest('[data-theme-pick]');
+    if (pick && openMenu.contains(pick)) { set(pick.getAttribute('data-theme-pick')); close(true); return; }
+    if (!openMenu.contains(e.target)) close();
+  });
+  document.addEventListener('keydown', function (e) {
+    if (!openMenu || !openMenu.contains(document.activeElement)) return;
+    var list = items(openMenu), i = list.indexOf(document.activeElement);
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      list[(i + (e.key === 'ArrowDown' ? 1 : list.length - 1)) % list.length].focus();
+    } else if (e.key === 'Home' || e.key === 'End') {
+      e.preventDefault(); list[e.key === 'Home' ? 0 : list.length - 1].focus();
+    } else if (e.key === 'Escape') { e.preventDefault(); close(true); }
+    else if (e.key === 'Tab') close();
+  });
+  window.addEventListener('resize', function () { close(); });
+
+  window.tvcalTheme = { get: function () { return choice; }, set: set, sync: sync, close: close };
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', sync); else sync();
 })();
