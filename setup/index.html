@@ -8,7 +8,10 @@
   // Apply the saved Appearance before the page draws, so there is no flash of the other theme.
   try { const t = JSON.parse(localStorage.getItem('tvcal2.theme')); if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t; } catch (e) {}
 </script>
-<title>TV Picture Setup</title>
+<title>TV Picture Setup · tvcal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;700&amp;display=swap">
 <style>
   /* Colours are theme tokens. Dark is the default; light follows the phone's
      setting (Auto), or is forced with data-theme on <html> from the hub's
@@ -61,6 +64,32 @@
   main { max-width: 520px; margin: 0 auto; padding: 8px 16px calc(var(--bar-h, 0px) + 24px); }
   button { font: inherit; color: inherit; cursor: pointer; touch-action: manipulation; }
   button:active { transform: scale(.98); }
+
+  /* ---------- Site header ----------
+     The same header as the rest of the site (markup written by
+     tools/build_site.mjs), shown on the hub only so the steps stay focused.
+     Styles mirror assets/site.css, scoped here so the two don't clash. */
+  .site-header { border-bottom: 1px solid var(--line); font-family: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  .site-header[hidden] { display: none; }
+  .site-header .wrap { max-width: 1200px; margin: 0 auto; padding: 14px 24px; display: flex; flex-wrap: wrap; align-items: center;
+    justify-content: space-between; gap: 8px 24px; }
+  .site-header .logo { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; color: var(--text); text-decoration: none;
+    font-weight: 700; font-size: 20px; letter-spacing: -0.01em; }
+  .site-header .logo-mark { display: flex; gap: 2px; }
+  .site-header .logo-mark span { width: 8px; height: 22px; display: block; }
+  .site-header .logo-mark span:nth-child(1) { background: #3a3a3a; }
+  .site-header .logo-mark span:nth-child(2) { background: #7a7a7a; }
+  .site-header .logo-mark span:nth-child(3) { background: #bdbdbd; }
+  .site-header .logo-mark span:nth-child(4) { background: #f2f2f2; box-shadow: inset 0 0 0 1px rgba(0,0,0,.12); }
+  .site-header .nav { display: flex; flex-wrap: wrap; gap: 0 22px; font-size: 15px; }
+  .site-header .nav a { color: var(--text); text-decoration: none; padding: 10px 0; }
+  .site-header .nav a:hover { color: var(--site-accent-hover); }
+  .site-header .nav a[aria-current=page] { color: var(--site-accent); }
+  .site-header a:focus-visible { outline: 2px solid var(--site-accent); outline-offset: 3px; border-radius: 4px; }
+  /* The site's amber, for the current-page link (darker in light mode so it reads on white). */
+  :root { --site-accent: #f2b544; --site-accent-hover: #ffd27a; }
+  @media (prefers-color-scheme: light) { :root:not([data-theme=dark]) { --site-accent: #8a5a00; --site-accent-hover: #6b4500; } }
+  :root[data-theme=light] { --site-accent: #8a5a00; --site-accent-hover: #6b4500; }
 
   /* ---------- Top row: back, chapter progress, all steps, help ---------- */
   .top { display: flex; align-items: center; gap: 8px; min-height: 52px; margin: 0 -8px 4px; }
@@ -224,8 +253,7 @@
   .site-mark span:nth-child(2) { background: #7a7a7a; }
   .site-mark span:nth-child(3) { background: #bdbdbd; }
   .site-mark span:nth-child(4) { background: #f2f2f2; box-shadow: inset 0 0 0 1px rgba(0,0,0,.15); }
-  .site-link { flex: 1; min-width: 0; display: flex; align-items: center; gap: 8px; min-height: 44px; padding-left: 2px;
-    color: var(--text); text-decoration: none; font-size: 16px; font-weight: 700; }
+  .app-name { flex: 1; padding-left: 2px; font-size: 15px; font-weight: 600; color: var(--dim); }
   .menu .mk { flex: none; width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--line3); display: grid; place-items: center; }
   .menu [aria-checked=true] .mk { border-color: var(--accent); }
   .menu [aria-checked=true] .mk::after { content: ""; width: 10px; height: 10px; border-radius: 50%; background: var(--accent); }
@@ -304,6 +332,19 @@
 </style>
 </head>
 <body>
+<!-- site-header:start (written by tools/build_site.mjs; edit NAV there) -->
+<header class="site-header">
+  <div class="wrap">
+    <a class="logo" href="../"><span class="logo-mark" aria-hidden="true"><span></span><span></span><span></span><span></span></span>tvcal</a>
+    <nav class="nav" aria-label="Main">
+      <a href="../setup/" aria-current="page">Setup</a>
+      <a href="../guides/">Brand guides</a>
+      <a href="../troubleshoot/">Troubleshoot</a>
+      <a href="../learn/">Learn</a>
+    </nav>
+  </div>
+</header>
+<!-- site-header:end -->
 <main>
   <div id="top"></div>
   <div id="banner"></div>
@@ -1045,6 +1086,7 @@ function chapterEntry(ch) {
 }
 
 const $ = id => document.getElementById(id);
+const siteHeader = document.querySelector('.site-header');
 const card = $('card'), top_ = $('top'), banner = $('banner'), bar = $('bar'), barInner = $('barInner');
 const sheet = $('sheet'), sheetBody = $('sheetBody'), sheetTitle = $('sheetTitle');
 const panel = $('connectPanel'), parking = $('parking');
@@ -1168,6 +1210,7 @@ function render() {
 function renderChrome() {
   const s = S(idx);
   top_.innerHTML = topHtml(s);
+  siteHeader.hidden = !s.hub;
   const judging = !s.flow || !!(s.flow[node].ask || s.flow[node].then);
   const pat = patternFor(idx);
   if (playError && playError === pat && connected()) {
@@ -1201,7 +1244,7 @@ function menuBtn() {
 }
 function topHtml(s) {
   if (s.hub) {
-    return `<div class="top">${menuBtn()}<a class="site-link" href="../" aria-label="tvcal site home"><span class="site-mark" aria-hidden="true"><span></span><span></span><span></span><span></span></span>tvcal</a>
+    return `<div class="top">${menuBtn()}<div class="app-name">Picture setup</div>
       <button class="chip" data-act="tv"><span class="dot${connected() ? ' on' : ''}"></span>${esc(brandInfo() ? brandInfo().name : 'TV')} · ${connected() ? 'Connected' : 'Not connected'}</button></div>`;
   }
   const list = chSteps(s.chapter), k = list.findIndex(x => x.id === s.id);

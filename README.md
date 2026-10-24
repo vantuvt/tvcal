@@ -63,7 +63,10 @@ when the pattern isn't showing on the TV. The connection method is picked from
 the browser (AirPlay in Safari, Cast elsewhere), with a link to switch.
 
 The **menu** icon at the top left of every screen starts with **Back to the tvcal
-site**, and the hub's top row shows the tvcal logo, which links there too.
+site**. The hub also shows the site's header and navigation, so it matches the
+rest of the site; step screens leave it out to stay focused. The header markup
+is written into `setup/index.html` by `tools/build_site.mjs` (between the
+`site-header` markers), so edit `NAV` there, not in the tool.
 
 There's a light and a dark theme. The same menu also opens **Appearance**: Auto (follow the phone's setting, the default), Light or Dark, and
 remembers the choice. All colours are CSS tokens on `:root`, with the light
