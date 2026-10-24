@@ -28,8 +28,8 @@ the connect screen and in a **Your TV** sheet; on a pattern step, a banner says
 when the pattern isn't showing on the TV. The connection method is picked from
 the browser (AirPlay in Safari, Cast elsewhere), with a link to switch.
 
-There's a light and a dark theme. **Appearance** at the bottom of the hub
-chooses Auto (follow the phone's setting, the default), Light or Dark, and
+There's a light and a dark theme. The **menu** icon at the top left of every
+screen opens **Appearance**: Auto (follow the phone's setting, the default), Light or Dark, and
 remembers the choice. All colours are CSS tokens on `:root`, with the light
 values under `prefers-color-scheme: light` and `[data-theme=light]`.
 

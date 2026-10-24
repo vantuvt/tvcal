@@ -69,7 +69,7 @@
   .segs span { flex: 1; height: 4px; border-radius: 2px; background: var(--line); }
   .segs span.on { background: var(--accent); }
   .pill { flex: none; height: 40px; padding: 0 16px; border-radius: 999px; border: 1px solid var(--line); background: var(--panel); font-size: 15px; font-weight: 600; }
-  .app-name { flex: 1; padding-left: 8px; font-size: 15px; font-weight: 600; color: var(--dim); }
+  .app-name { flex: 1; padding-left: 2px; font-size: 15px; font-weight: 600; color: var(--dim); }
   .chip { display: flex; align-items: center; gap: 8px; min-height: 40px; padding: 6px 14px; border-radius: 999px; border: 1px solid var(--line);
     background: none; font-size: 14px; color: var(--dim); }
   .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--dot-off); flex: none; }
@@ -189,10 +189,20 @@
     border-radius: 8px; padding: 9px 10px; font: inherit; font-size: 16px; }
   input::placeholder { color: var(--ph); }
 
-  .appearance { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 28px 0 8px; font-size: 15px; color: var(--dim); }
-  .seg { display: grid; grid-auto-flow: column; gap: 4px; background: var(--panel2); border: 1px solid var(--line); border-radius: 12px; padding: 3px; }
-  .seg button { border: none; background: none; border-radius: 9px; padding: 8px 14px; font-size: 14px; font-weight: 600; color: var(--dim); min-height: 36px; }
-  .seg button[aria-checked=true] { background: var(--tab-on); color: var(--text); box-shadow: 0 1px 2px var(--shadow); }
+  /* ---------- Menu (top-left icon): app settings such as Appearance ---------- */
+  .menu { position: fixed; z-index: 20; min-width: 248px; max-width: calc(100vw - 24px); padding: 8px; border-radius: 16px;
+    background: var(--sheet); border: 1px solid var(--line2); box-shadow: 0 12px 32px var(--shadow); }
+  .menu[hidden] { display: none; }
+  .menu-h { padding: 8px 12px 6px; font-size: 13px; font-weight: 600; letter-spacing: .5px; text-transform: uppercase; color: var(--dim); }
+  .menu button { width: 100%; display: flex; align-items: center; gap: 12px; text-align: left; padding: 10px 12px; min-height: 48px;
+    border: none; border-radius: 10px; background: none; }
+  .menu button:hover, .menu button:focus-visible { background: var(--panel2); outline: none; }
+  .menu button b { display: block; font-size: 16px; font-weight: 600; }
+  .menu button small { display: block; font-size: 13px; color: var(--dim); }
+  .menu .mk { flex: none; width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--line3); display: grid; place-items: center; }
+  .menu [aria-checked=true] .mk { border-color: var(--accent); }
+  .menu [aria-checked=true] .mk::after { content: ""; width: 10px; height: 10px; border-radius: 50%; background: var(--accent); }
+  .top .icon[aria-expanded=true] { background: var(--panel2); }
 
   /* ---------- Bottom bar ---------- */
   .bar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 5; background: var(--bar-bg);
@@ -267,6 +277,13 @@
   <div id="banner"></div>
   <section id="card"></section>
 </main>
+
+<div class="menu" id="menu" role="menu" aria-labelledby="menuAppearance" hidden>
+  <div class="menu-h" id="menuAppearance">Appearance</div>
+  <button role="menuitemradio" data-theme-pick="auto" aria-checked="false"><span class="mk" aria-hidden="true"></span><span><b>Auto</b><small>Match this phone’s setting</small></span></button>
+  <button role="menuitemradio" data-theme-pick="light" aria-checked="false"><span class="mk" aria-hidden="true"></span><span><b>Light</b></span></button>
+  <button role="menuitemradio" data-theme-pick="dark" aria-checked="false"><span class="mk" aria-hidden="true"></span><span><b>Dark</b></span></button>
+</div>
 
 <div class="more" id="more" aria-hidden="true"><button id="moreBtn" tabindex="-1">More below <span aria-hidden="true">↓</span></button></div>
 <div class="bar" id="bar"><div class="inner" id="barInner"></div></div>
@@ -987,6 +1004,32 @@ const $ = id => document.getElementById(id);
 const card = $('card'), top_ = $('top'), banner = $('banner'), bar = $('bar'), barInner = $('barInner');
 const sheet = $('sheet'), sheetBody = $('sheetBody'), sheetTitle = $('sheetTitle');
 const panel = $('connectPanel'), parking = $('parking');
+const menuEl = $('menu');
+const menuItems = () => [...menuEl.querySelectorAll('button')];
+function openMenu() {
+  menuItems().forEach(b => b.setAttribute('aria-checked', String(b.dataset.themePick === theme)));
+  menuEl.hidden = false;
+  const r = $('menuBtn').getBoundingClientRect();
+  menuEl.style.top = (r.bottom + 6) + 'px';
+  menuEl.style.left = Math.max(12, r.left) + 'px';
+  $('menuBtn').setAttribute('aria-expanded', 'true');
+  (menuItems().find(b => b.getAttribute('aria-checked') === 'true') || menuItems()[0]).focus();
+}
+function closeMenu(refocus) {
+  if (menuEl.hidden) return;
+  menuEl.hidden = true;
+  const b = $('menuBtn');
+  if (b) { b.setAttribute('aria-expanded', 'false'); if (refocus) b.focus(); }
+}
+// Arrow keys move between choices; Escape closes and returns to the menu icon.
+menuEl.addEventListener('keydown', e => {
+  const items = menuItems(), i = items.indexOf(document.activeElement);
+  if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+    e.preventDefault();
+    items[(i + (e.key === 'ArrowDown' ? 1 : items.length - 1)) % items.length].focus();
+  } else if (e.key === 'Escape') { e.preventDefault(); closeMenu(true); }
+  else if (e.key === 'Tab') closeMenu();
+});
 
 function esc(s) { return String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
 // Help text written as collapsible <details> becomes a heading and paragraphs inside the Help sheet.
@@ -1005,7 +1048,8 @@ const ICON = {
   plus: svg('<path d="M5 12h14M12 5v14"/>'),
   remote: svg('<rect x="7" y="2" width="10" height="20" rx="3"/><circle cx="12" cy="7" r="1.5"/><path d="M10 12h4M10 15h4"/>'),
   bulb: svg('<path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-4 10.5c.7.7 1 1.5 1 2.5h6c0-1 .3-1.8 1-2.5A6 6 0 0 0 12 3z"/>'),
-  tips: svg('<path d="M4 6h16M4 12h16M4 18h10"/>')
+  tips: svg('<path d="M4 6h16M4 12h16M4 18h10"/>'),
+  menu: svg('<path d="M4 7h16M4 12h16M4 17h16"/>')
 };
 
 /* Where the viewer should be for each step. Judging the picture is done from
@@ -1042,7 +1086,7 @@ function go(i, back) {
   if (!back && i !== idx) { trail.push(STEPS[idx].id); if (trail.length > 60) trail.shift(); }
   idx = i; node = null; loops = 0;
   store.set('trailIds', trail); store.set('stepId', STEPS[idx].id);
-  closeSheet(); render(); window.scrollTo(0, 0); requestAnimationFrame(updateMore);
+  closeSheet(); closeMenu(); render(); window.scrollTo(0, 0); requestAnimationFrame(updateMore);
   const h = card.querySelector('h2'); if (h) h.focus({ preventScroll: true });
 }
 function goBack() {
@@ -1100,15 +1144,18 @@ function refreshChrome() {
   }, 60);
 }
 
+function menuBtn() {
+  return `<button class="icon" id="menuBtn" data-act="menu" aria-label="Menu" aria-haspopup="menu" aria-controls="menu" aria-expanded="${!menuEl.hidden}">${ICON.menu}</button>`;
+}
 function topHtml(s) {
   if (s.hub) {
-    return `<div class="top"><div class="app-name">TV Picture Setup</div>
+    return `<div class="top">${menuBtn()}<div class="app-name">TV Picture Setup</div>
       <button class="chip" data-act="tv"><span class="dot${connected() ? ' on' : ''}"></span>${esc(brandInfo() ? brandInfo().name : 'TV')} · ${connected() ? 'Connected' : 'Not connected'}</button></div>`;
   }
   const list = chSteps(s.chapter), k = list.findIndex(x => x.id === s.id);
   const segs = list.length > 1 ? `<div class="segs" style="width:${Math.min(40 * list.length, 220)}px">${list.map((x, i) => `<span class="${i <= k ? 'on' : ''}"></span>`).join('')}</div>` : '';
   const label = list.length > 1 ? `${CHAPTERS[s.chapter].name} · ${k + 1} of ${list.length}` : CHAPTERS[s.chapter].name;
-  return `<div class="top">
+  return `<div class="top">${menuBtn()}
     <button class="icon" data-act="back" aria-label="Back">${ICON.back}</button>
     <div class="where"><div class="where-label">${label}</div>${segs}</div>
     <button class="icon" data-act="hub" aria-label="All steps">${ICON.home}</button>
@@ -1244,9 +1291,6 @@ function hubHtml() {
       </div>
       <div class="answers two"><button data-act="copy">Copy</button><button data-act="restart">Start over</button></div>`;
   }
-  const opt = (k, label) => `<button role="radio" aria-checked="${theme === k}" data-theme-pick="${k}">${label}</button>`;
-  h += `<div class="appearance"><span id="appearanceLabel">Appearance</span>
-    <div class="seg" role="radiogroup" aria-labelledby="appearanceLabel">${opt('auto', 'Auto')}${opt('light', 'Light')}${opt('dark', 'Dark')}</div></div>`;
   return h;
 }
 function chapterCard(c, num, current) {
@@ -1335,11 +1379,12 @@ sheet.addEventListener('click', e => { if (e.target === sheet) closeSheet(); });
 
 /* ---------- Taps ---------- */
 document.addEventListener('click', e => {
+  if (!menuEl.hidden && !e.target.closest('#menu, #menuBtn')) closeMenu();
   const t = e.target.closest('button');
   if (!t || t.closest('#connectPanel')) return;
   const d = t.dataset;
   if (d.brand) { brand = d.brand; store.set('brand', brand); render(); return; }
-  if (d.themePick) { theme = d.themePick; store.set('theme', theme); applyTheme(); render(); return; }
+  if (d.themePick) { theme = d.themePick; store.set('theme', theme); applyTheme(); closeMenu(true); return; }
   if (d.check) {
     checks[d.check] = !checks[d.check]; store.set('checks', checks);
     t.setAttribute('aria-pressed', String(!!checks[d.check])); return;
@@ -1357,6 +1402,7 @@ document.addEventListener('click', e => {
     node = to; render(); window.scrollTo(0, 0); requestAnimationFrame(updateMore); return;
   }
   switch (d.act) {
+    case 'menu': if (menuEl.hidden) openMenu(); else closeMenu(true); break;
     case 'back': goBack(); break;
     case 'hub': go(HUB); break;
     case 'help': openHelp(d.tab); break;
