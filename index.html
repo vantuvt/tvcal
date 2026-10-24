@@ -147,10 +147,10 @@
   .check li { margin-bottom: 8px; }
   .check li.sect { padding: 14px 2px 2px; margin: 0; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; color: var(--dim); }
   .check button { width: 100%; text-align: left; display: flex; gap: 14px; align-items: flex-start; background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 15px; }
-  .check button[aria-pressed=true] { background: var(--ok-bg); border-color: var(--ok-line); }
-  .check .tick { flex: none; width: 26px; height: 26px; border-radius: 50%; border: 2px solid var(--dim); display: grid; place-items: center; margin-top: 1px; }
-  .check [aria-pressed=true] .tick { background: var(--ok); border-color: var(--ok); }
-  .check [aria-pressed=true] .tick::after { content: ""; width: 10px; height: 6px; border-left: 3px solid var(--tick-ink); border-bottom: 3px solid var(--tick-ink); transform: rotate(-45deg) translate(1px, -1px); }
+  .check button[aria-checked=true] { background: var(--ok-bg); border-color: var(--ok-line); }
+  .check .tick { flex: none; width: 24px; height: 24px; border-radius: 6px; border: 2px solid var(--dim); display: grid; place-items: center; margin-top: 1px; }
+  .check [aria-checked=true] .tick { background: var(--ok); border-color: var(--ok); }
+  .check [aria-checked=true] .tick::after { content: ""; width: 10px; height: 6px; border-left: 3px solid var(--tick-ink); border-bottom: 3px solid var(--tick-ink); transform: rotate(-45deg) translate(1px, -1px); }
   .check .t { display: block; font-weight: 600; }
   .check .d { display: block; font-size: 14px; color: var(--dim); }
   /* Compact checklist (Devices and room): one line per tip, details behind an arrow. */
@@ -1250,7 +1250,7 @@ function cardHtml(s) {
     const item = ([t, d], i) => {
       if (t === '#') return `<li class="sect">${d}</li>`;
       const key = s.id + ':' + i;
-      return `<li><button aria-pressed="${!!checks[key]}" data-check="${key}"><span class="tick"></span><span><span class="t">${t}</span><span class="d">${d}</span></span></button></li>`;
+      return `<li><button role="checkbox" aria-checked="${!!checks[key]}" data-check="${key}"><span class="tick"></span><span><span class="t">${t}</span><span class="d">${d}</span></span></button></li>`;
     };
     if (s.id === 'mode') {
       // The three settings that matter most first; the rest behind "Also check".
@@ -1265,7 +1265,7 @@ function cardHtml(s) {
         if (t === '#') return `<li class="sect">${d}</li>`;
         const key = s.id + ':' + i, did = 'tip-' + i;
         return `<li class="${checks[key] ? 'on' : ''}"><div class="rowtop">
-            <button aria-pressed="${!!checks[key]}" data-check="${key}"><span class="tick"></span><span class="t">${t}</span></button>
+            <button role="checkbox" aria-checked="${!!checks[key]}" data-check="${key}"><span class="tick"></span><span class="t">${t}</span></button>
             <button class="more-i" data-more="${did}" aria-expanded="false" aria-controls="${did}" aria-label="Details: ${esc(t.replace(/<[^>]+>/g, ''))}">${ICON.chevron}</button>
           </div><div class="d" id="${did}" hidden>${d}</div></li>`;
       };
@@ -1413,7 +1413,7 @@ document.addEventListener('click', e => {
   if (d.themePick) { theme = d.themePick; store.set('theme', theme); applyTheme(); closeMenu(true); return; }
   if (d.check) {
     checks[d.check] = !checks[d.check]; store.set('checks', checks);
-    t.setAttribute('aria-pressed', String(!!checks[d.check]));
+    t.setAttribute('aria-checked', String(!!checks[d.check]));
     if (t.closest('.compact')) t.closest('li').classList.toggle('on', !!checks[d.check]);
     return;
   }
