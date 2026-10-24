@@ -1,0 +1,70 @@
+/* Shared by the site pages and the setup tool: the site header, the
+   Appearance button and the pop-up menu style (also used by the tool's
+   step-screen menu). Uses its own --sh-* colours so it looks the same on both,
+   whatever the host page's own tokens are. */
+:root {
+  --sh-bg: #111113; --sh-line: #2e2e35; --sh-text: #ededef; --sh-dim: #a3a3ad;
+  --sh-pop: #1c1c22; --sh-pop-line: #3a3a42; --sh-hover: #26262c; --sh-ring: #5a5a66;
+  --sh-accent: #f2b544; --sh-accent-hover: #ffd27a; --sh-shadow: rgba(0, 0, 0, .6);
+}
+@media (prefers-color-scheme: light) { :root:not([data-theme=dark]) {
+  --sh-bg: #f4f4f6; --sh-line: #dcdce3; --sh-text: #17171b; --sh-dim: #5b5b66;
+  --sh-pop: #ffffff; --sh-pop-line: #c8c8d1; --sh-hover: #ebebf0; --sh-ring: #8a8a95;
+  --sh-accent: #8a5a00; --sh-accent-hover: #6b4500; --sh-shadow: rgba(20, 20, 40, .18);
+} }
+:root[data-theme=light] {
+  --sh-bg: #f4f4f6; --sh-line: #dcdce3; --sh-text: #17171b; --sh-dim: #5b5b66;
+  --sh-pop: #ffffff; --sh-pop-line: #c8c8d1; --sh-hover: #ebebf0; --sh-ring: #8a8a95;
+  --sh-accent: #8a5a00; --sh-accent-hover: #6b4500; --sh-shadow: rgba(20, 20, 40, .18);
+}
+
+/* ---------- Site header ---------- */
+.site-header { border-bottom: 1px solid var(--sh-line); font-family: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+.site-header[hidden] { display: none; }
+.site-header .wrap { max-width: 1200px; margin: 0 auto; padding: 14px 24px; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 22px; box-sizing: border-box; }
+.site-header .logo { margin-right: auto; display: inline-flex; align-items: center; gap: 10px; min-height: 44px; color: var(--sh-text); text-decoration: none;
+  font-weight: 700; font-size: 20px; letter-spacing: -0.01em; }
+.site-header .logo:hover { color: var(--sh-text); }
+.logo-mark { display: flex; gap: 2px; }
+.logo-mark span { width: 8px; height: 22px; display: block; }
+.logo-mark span:nth-child(1) { background: #3a3a3a; }
+.logo-mark span:nth-child(2) { background: #7a7a7a; }
+.logo-mark span:nth-child(3) { background: #bdbdbd; }
+.logo-mark span:nth-child(4) { background: #f2f2f2; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .12); }
+.site-header .nav { display: flex; flex-wrap: wrap; gap: 0 22px; font-size: 15px; }
+.site-header .nav a { color: var(--sh-text); text-decoration: none; padding: 10px 0; }
+.site-header .nav a:hover { color: var(--sh-accent-hover); }
+.site-header .nav a[aria-current=page] { color: var(--sh-accent); }
+.site-header a:focus-visible, .ap-btn:focus-visible { outline: 2px solid var(--sh-accent); outline-offset: 3px; border-radius: 4px; }
+/* On a phone: logo and Appearance on the first row, the links below. */
+@media (max-width: 640px) {
+  .site-header .nav { order: 3; flex-basis: 100%; }
+}
+
+/* ---------- Appearance button ---------- */
+.ap { position: relative; }
+.ap-btn { width: 44px; height: 44px; display: grid; place-items: center; padding: 0; border-radius: 10px; cursor: pointer;
+  background: none; border: 1px solid var(--sh-line); color: var(--sh-text); }
+.ap-btn:hover { border-color: var(--sh-ring); }
+.ap-btn[aria-expanded=true] { background: var(--sh-hover); }
+.ap-btn svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.ap-btn .i-auto, .ap-btn .i-light, .ap-btn .i-dark { display: none; }
+.ap-btn[data-mode=auto] .i-auto, .ap-btn:not([data-mode]) .i-auto, .ap-btn[data-mode=light] .i-light, .ap-btn[data-mode=dark] .i-dark { display: block; }
+.ap-btn .i-auto .fill { fill: currentColor; stroke: none; }
+.ap .ap-menu { position: absolute; right: 0; top: calc(100% + 8px); }
+
+/* ---------- Pop-up menu (header Appearance, and the tool's step menu) ---------- */
+.ap-menu { z-index: 30; min-width: 248px; max-width: calc(100vw - 24px); padding: 8px; border-radius: 14px; box-sizing: border-box;
+  background: var(--sh-pop); border: 1px solid var(--sh-pop-line); box-shadow: 0 12px 32px var(--sh-shadow); color: var(--sh-text);
+  font-family: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; text-align: left; }
+.ap-menu[hidden] { display: none; }
+.ap-h { padding: 8px 12px 6px; font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--sh-dim); }
+.ap-item { width: 100%; display: flex; align-items: center; gap: 12px; padding: 10px 12px; min-height: 48px; border: none; border-radius: 10px;
+  background: none; color: inherit; font: inherit; text-align: left; text-decoration: none; cursor: pointer; }
+.ap-item:hover, .ap-item:focus-visible { background: var(--sh-hover); outline: none; color: inherit; }
+.ap-item b { display: block; font-size: 16px; font-weight: 600; }
+.ap-item small { display: block; font-size: 13px; color: var(--sh-dim); }
+.ap-mk { flex: none; width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--sh-ring); display: grid; place-items: center; box-sizing: border-box; }
+[aria-checked=true] > .ap-mk { border-color: var(--sh-accent); }
+[aria-checked=true] > .ap-mk::after { content: ""; width: 10px; height: 10px; border-radius: 50%; background: var(--sh-accent); }
+.ap-sep { height: 1px; margin: 6px 4px; background: var(--sh-line); }

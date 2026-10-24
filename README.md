@@ -14,10 +14,15 @@ and explainers) is plain static HTML; the tool lives at `setup/`.
 - `guides/<brand>/` — generated from `BRANDS` and `STEPS` in `setup/index.html`,
   so the guides always use the same menu names as the tool. After changing the
   tool's wording, rebuild.
-- `assets/site.css`, `assets/site.js` — shared styles and small enhancements
-  (device tabs, the brightness demo, "Your settings" fields). The site shares
-  the tool's `tvcal2.theme` and `tvcal2.values` storage, so Appearance and
-  written-down settings carry across.
+- `assets/site.css`, `assets/site.js` — the site pages' styles and small
+  enhancements (device tabs, the brightness demo, "Your settings" fields). The
+  site shares the tool's `tvcal2.values` storage, so written-down settings
+  carry across.
+- `assets/theme.js`, `assets/shared.css` — used by the site **and** the tool:
+  the Appearance setting (Auto, Light, Dark, stored as `tvcal2.theme`), the
+  header's Appearance button and pop-up, and the site header's styles. Load
+  `theme.js` in `<head>` without `defer` so the saved choice applies before the
+  page draws.
 - `tools/build_site.mjs` — the build: `node tools/build_site.mjs` (Node 18+, no
   dependencies). Commit the output; GitHub Pages serves it without a build step.
 
@@ -62,15 +67,18 @@ the connect screen and in a **Your TV** sheet; on a pattern step, a banner says
 when the pattern isn't showing on the TV. The connection method is picked from
 the browser (AirPlay in Safari, Cast elsewhere), with a link to switch.
 
-The **menu** icon at the top left of every screen starts with **Back to the tvcal
-site**. The hub also shows the site's header and navigation, so it matches the
-rest of the site; step screens leave it out to stay focused. The header markup
-is written into `setup/index.html` by `tools/build_site.mjs` (between the
-`site-header` markers), so edit `NAV` there, not in the tool.
+The hub shows the site's header: navigation, plus the **Appearance** button at
+the right (Auto, Light, Dark), as on every site page. Step screens leave the
+header out to stay focused; instead the **menu** icon at their top left opens
+**Back to the tvcal site** and the same Appearance choices, in the same pop-up
+style. The header and the Appearance items are written into
+`setup/index.html` by `tools/build_site.mjs` (between the `site-header` and
+`appearance-items` markers), so edit them there, not in the tool.
 
-There's a light and a dark theme. The same menu also opens **Appearance**: Auto (follow the phone's setting, the default), Light or Dark, and
-remembers the choice. All colours are CSS tokens on `:root`, with the light
-values under `prefers-color-scheme: light` and `[data-theme=light]`.
+There's a light and a dark theme, with the site's amber accent. All colours are
+CSS tokens on `:root`, with the light values under `prefers-color-scheme: light`
+and `[data-theme=light]`. `--accent` fills buttons; `--accent-text` is the
+readable shade for text, icons and outlines (darker amber in light mode).
 
 ## Files
 - `setup/index.html` — the phone wizard (Cast sender). Self-contained; loads patterns from `../patterns/`.

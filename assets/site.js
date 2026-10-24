@@ -1,6 +1,6 @@
 /* tvcal site behaviour. Everything here is an enhancement: every page reads
    fine without it. Storage keys are shared with the setup tool (tvcal2.*), so
-   the Appearance choice and written-down settings carry across. */
+   written-down settings carry across. Appearance is in theme.js. */
 (function () {
   'use strict';
   var root = document.documentElement;
@@ -10,17 +10,6 @@
     get: function (k) { try { return JSON.parse(localStorage.getItem('tvcal2.' + k)); } catch (e) { return null; } },
     set: function (k, v) { try { localStorage.setItem('tvcal2.' + k, JSON.stringify(v)); } catch (e) {} }
   };
-
-  /* ---------- Appearance (same setting as the setup tool's menu) ---------- */
-  var themeSel = document.getElementById('appearance');
-  if (themeSel) {
-    themeSel.value = store.get('theme') || 'auto';
-    themeSel.addEventListener('change', function () {
-      var t = themeSel.value;
-      store.set('theme', t);
-      if (t === 'light' || t === 'dark') root.dataset.theme = t; else delete root.dataset.theme;
-    });
-  }
 
   /* ---------- Tabs: the source-device page ----------
      Without JS every device is listed in turn; with it, one shows at a time. */
