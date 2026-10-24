@@ -72,7 +72,6 @@
   .segs span { flex: 1; height: 4px; border-radius: 2px; background: var(--line); }
   .segs span.on { background: var(--accent); }
   .pill { flex: none; height: 40px; padding: 0 16px; border-radius: 999px; border: 1px solid var(--line); background: var(--panel); font-size: 15px; font-weight: 600; }
-  .app-name { flex: 1; padding-left: 2px; font-size: 15px; font-weight: 600; color: var(--dim); }
   .chip { display: flex; align-items: center; gap: 8px; min-height: 40px; padding: 6px 14px; border-radius: 999px; border: 1px solid var(--line);
     background: none; font-size: 14px; color: var(--dim); }
   .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--dot-off); flex: none; }
@@ -213,9 +212,20 @@
   .menu-h { padding: 8px 12px 6px; font-size: 13px; font-weight: 600; letter-spacing: .5px; text-transform: uppercase; color: var(--dim); }
   .menu button { width: 100%; display: flex; align-items: center; gap: 12px; text-align: left; padding: 10px 12px; min-height: 48px;
     border: none; border-radius: 10px; background: none; }
-  .menu button:hover, .menu button:focus-visible { background: var(--panel2); outline: none; }
-  .menu button b { display: block; font-size: 16px; font-weight: 600; }
-  .menu button small { display: block; font-size: 13px; color: var(--dim); }
+  .menu a { display: flex; align-items: center; gap: 12px; padding: 10px 12px; min-height: 48px; border-radius: 10px; color: inherit; text-decoration: none; }
+  .menu button:hover, .menu button:focus-visible, .menu a:hover, .menu a:focus-visible { background: var(--panel2); outline: none; }
+  .menu button b, .menu a b { display: block; font-size: 16px; font-weight: 600; }
+  .menu button small, .menu a small { display: block; font-size: 13px; color: var(--dim); }
+  .menu-sep { height: 1px; margin: 6px 4px; background: var(--line); }
+  /* The site's logo: four grey bars. Links back to the website from the tool. */
+  .site-mark { flex: none; display: flex; gap: 2px; }
+  .site-mark span { width: 5px; height: 18px; display: block; }
+  .site-mark span:nth-child(1) { background: #3a3a3a; }
+  .site-mark span:nth-child(2) { background: #7a7a7a; }
+  .site-mark span:nth-child(3) { background: #bdbdbd; }
+  .site-mark span:nth-child(4) { background: #f2f2f2; box-shadow: inset 0 0 0 1px rgba(0,0,0,.15); }
+  .site-link { flex: 1; min-width: 0; display: flex; align-items: center; gap: 8px; min-height: 44px; padding-left: 2px;
+    color: var(--text); text-decoration: none; font-size: 16px; font-weight: 700; }
   .menu .mk { flex: none; width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--line3); display: grid; place-items: center; }
   .menu [aria-checked=true] .mk { border-color: var(--accent); }
   .menu [aria-checked=true] .mk::after { content: ""; width: 10px; height: 10px; border-radius: 50%; background: var(--accent); }
@@ -300,7 +310,9 @@
   <section id="card"></section>
 </main>
 
-<div class="menu" id="menu" role="menu" aria-labelledby="menuAppearance" hidden>
+<div class="menu" id="menu" role="menu" aria-label="Menu" hidden>
+  <a href="../" role="menuitem" class="menu-site"><span class="site-mark" aria-hidden="true"><span></span><span></span><span></span><span></span></span><span><b>Back to the tvcal site</b><small>Guides and troubleshooting. Your progress is saved.</small></span></a>
+  <div class="menu-sep" role="separator"></div>
   <div class="menu-h" id="menuAppearance">Appearance</div>
   <button role="menuitemradio" data-theme-pick="auto" aria-checked="false"><span class="mk" aria-hidden="true"></span><span><b>Auto</b><small>Match this phone’s setting</small></span></button>
   <button role="menuitemradio" data-theme-pick="light" aria-checked="false"><span class="mk" aria-hidden="true"></span><span><b>Light</b></span></button>
@@ -1037,9 +1049,9 @@ const card = $('card'), top_ = $('top'), banner = $('banner'), bar = $('bar'), b
 const sheet = $('sheet'), sheetBody = $('sheetBody'), sheetTitle = $('sheetTitle');
 const panel = $('connectPanel'), parking = $('parking');
 const menuEl = $('menu');
-const menuItems = () => [...menuEl.querySelectorAll('button')];
+const menuItems = () => [...menuEl.querySelectorAll('a, button')];
 function openMenu() {
-  menuItems().forEach(b => b.setAttribute('aria-checked', String(b.dataset.themePick === theme)));
+  menuEl.querySelectorAll('[data-theme-pick]').forEach(b => b.setAttribute('aria-checked', String(b.dataset.themePick === theme)));
   menuEl.hidden = false;
   const r = $('menuBtn').getBoundingClientRect();
   menuEl.style.top = (r.bottom + 6) + 'px';
@@ -1189,7 +1201,7 @@ function menuBtn() {
 }
 function topHtml(s) {
   if (s.hub) {
-    return `<div class="top">${menuBtn()}<div class="app-name">TV Picture Setup</div>
+    return `<div class="top">${menuBtn()}<a class="site-link" href="../" aria-label="tvcal site home"><span class="site-mark" aria-hidden="true"><span></span><span></span><span></span><span></span></span>tvcal</a>
       <button class="chip" data-act="tv"><span class="dot${connected() ? ' on' : ''}"></span>${esc(brandInfo() ? brandInfo().name : 'TV')} · ${connected() ? 'Connected' : 'Not connected'}</button></div>`;
   }
   const list = chSteps(s.chapter), k = list.findIndex(x => x.id === s.id);
@@ -1355,7 +1367,7 @@ function hubHtml() {
       <div class="answers"><button data-act="copy">Copy my settings</button></div>`;
   }
   if (hasSaved()) h += `<div class="resetrow"><button class="linkish" data-act="reset">Reset the tool</button></div>`;
-  h += `<p class="siterow"><a href="../">Guides, troubleshooting and test patterns</a></p>`;
+  h += `<p class="siterow"><a href="../">tvcal site: guides and troubleshooting</a></p>`;
   return h;
 }
 // Anything a reset would clear: progress, ticks, brand, written-down settings.
