@@ -190,6 +190,7 @@
   google-cast-launcher { width: 36px; height: 36px; display: inline-block; cursor: pointer; flex: none;
     --connected-color: var(--accent); --disconnected-color: var(--text); }
   #connectPanel button.wide { width: 100%; padding: 15px 16px; border-radius: 14px; border: 1px solid var(--line2); background: var(--panel2); font-weight: 600; }
+  #connectPanel button.wide.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
   #connectPanel details { border: 1px solid var(--line); border-radius: 12px; padding: 0 14px; margin-top: 12px; }
   #connectPanel summary { padding: 12px 0; cursor: pointer; font-size: 15px; list-style: none; display: flex; justify-content: space-between; }
   #connectPanel summary::-webkit-details-marker { display: none; }
@@ -222,7 +223,7 @@
 <div id="parking"><div id="connectPanel">
   <div class="status"><span class="dot" id="dot"></span><span id="statusText"></span><google-cast-launcher title="Cast to your TV"></google-cast-launcher></div>
   <div id="castUI" style="display:none">
-    <button id="connect" class="wide">Connect to TV</button>
+    <button id="connect" class="wide primary">Connect to TV</button>
     <div id="lnaBox" style="display:none;margin-top:12px">
       <button id="lnaBtn" class="wide">Let this page find my TV</button>
       <div id="lnaStatus" style="font-size:13px;color:var(--dim);margin-top:6px"></div>
@@ -1407,7 +1408,7 @@ window['__onGCastApiAvailable'] = function (available) {
   const CS = cast.framework.CastState;
   const onCastState = st => {
     connectBtn.textContent = st === CS.CONNECTED ? 'Disconnect from TV' : 'Connect to TV';
-    connectBtn.classList.toggle('primary', st === CS.NOT_CONNECTED);
+    connectBtn.classList.toggle('primary', st !== CS.CONNECTED);
     if (st === CS.NO_DEVICES_AVAILABLE) { castStatus('Looking for your TV… none found yet.'); help.style.display = 'block'; showLna(); }
     else if (st === CS.NOT_CONNECTED) { castStatus('TV found. Tap “Connect to TV”.'); help.style.display = 'none'; lnaBox.style.display = 'none'; }
     else if (st === CS.CONNECTING) castStatus('Connecting…', true);
