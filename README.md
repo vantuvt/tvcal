@@ -1,4 +1,31 @@
-# TV Picture Setup (Cast prototype)
+# tvcal: TV picture setup, by eye
+
+A website about setting up a TV's picture, built around a phone-guided setup
+tool. The site (home page, brand guides, troubleshooting, test-pattern downloads
+and explainers) is plain static HTML; the tool lives at `setup/`.
+
+## The website
+- `index.html`, `guides/`, `sources/`, `troubleshoot/`, `learn/`, `test-patterns/`:
+  generated pages. **Don't edit these by hand**; edit the sources and rebuild.
+- `src/pages/*.html` — hand-written page bodies. Each starts with a JSON comment
+  (`title`, `path`, `nav`, `description`); the build wraps it in the shared
+  header and footer. Placeholders: `{{root}}` (relative path to the site root),
+  `{{brandCards}}`, `{{blackNames}}`, `{{patternFiles}}`, `{{icon.*}}`.
+- `guides/<brand>/` — generated from `BRANDS` and `STEPS` in `setup/index.html`,
+  so the guides always use the same menu names as the tool. After changing the
+  tool's wording, rebuild.
+- `assets/site.css`, `assets/site.js` — shared styles and small enhancements
+  (device tabs, the brightness demo, "Your settings" fields). The site shares
+  the tool's `tvcal2.theme` and `tvcal2.values` storage, so Appearance and
+  written-down settings carry across.
+- `tools/build_site.mjs` — the build: `node tools/build_site.mjs` (Node 18+, no
+  dependencies). Commit the output; GitHub Pages serves it without a build step.
+
+The brand guides link to `setup/?brand=<key>`, which opens the tool with that
+brand already chosen.
+
+# The setup tool
+
 
 A phone-guided TV picture setup. The phone asks one yes/no question at a time
 ("Can you see box A?"), gives one remote action ("Press Brightness down by 1"),
@@ -37,7 +64,7 @@ remembers the choice. All colours are CSS tokens on `:root`, with the light
 values under `prefers-color-scheme: light` and `[data-theme=light]`.
 
 ## Files
-- `index.html` — the phone wizard (Cast sender). Self-contained.
+- `setup/index.html` — the phone wizard (Cast sender). Self-contained; loads patterns from `../patterns/`.
 - `patterns/*.mp4` — 1920x1080 H.264 High@4.1, 30 fps, 5 min (a verified 60 s loop repeated without re-encoding), limited range, BT.709 tagged. Loop on the TV.
 - `patterns/*.png` — "where to look" guides shown on the phone (faint boxes exaggerated), plus clean/halo sharpness examples.
 - `patterns/h*.mp4` — optional HDR10 set: 1920x1080 HEVC Main10 (`hvc1`), PQ / BT.2020, HDR10 metadata
@@ -76,7 +103,7 @@ so the below-black box (12) survives instead of being clipped. Decoded test patc
 were checked to match their intended values exactly.
 
 ## Brand-specific instructions
-The first setup screen asks for the TV brand; the model is optional and entered on the hub with the saved settings. The connect screen picks **Google Cast** or **AirPlay** from the browser, with a link to switch, and warns if the browser can't use it (for example Chromecast on an iPhone). The quick-settings Help follows the choice (Chromecast or Apple TV). `BRANDS` in `index.html` holds per-brand
+The first setup screen asks for the TV brand; the model is optional and entered on the hub with the saved settings. The connect screen picks **Google Cast** or **AirPlay** from the browser, with a link to switch, and warns if the browser can't use it (for example Chromecast on an iPhone). The quick-settings Help follows the choice (Chromecast or Apple TV). `BRANDS` in `setup/index.html` holds per-brand
 overrides for any part of a step (wording, checklist items, flow nodes, summary
 labels); anything not overridden falls back to the generic text in `STEPS`.
 Currently, in the order the picker shows them (alphabetical, with the generic
@@ -91,7 +118,7 @@ Only add a brand once its menu names are checked against the manufacturer's docs
 ## Hosting (GitHub Pages, ~5 minutes)
 1. Create a public GitHub repo and upload everything in this folder (live copy: github.com/vantuvt/tvcal).
 2. Settings → Pages → Deploy from branch → `main` / root.
-3. Open `https://<you>.github.io/<repo>/` in **Chrome on Android** (or desktop Chrome)
+3. Open `https://<you>.github.io/<repo>/setup/` in **Chrome on Android** (or desktop Chrome)
    on the same Wi-Fi as the Chromecast.
 
 Casting requires HTTPS — it won't work from a local file. GitHub Pages serves MP4s

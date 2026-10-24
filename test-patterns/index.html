@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#111113">
+<script>
+  // Apply the saved Appearance (shared with the setup tool) before the page draws.
+  try { var t = JSON.parse(localStorage.getItem('tvcal2.theme')); if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t; } catch (e) {}
+</script>
+<title>Test patterns · tvcal</title>
+<meta name="description" content="Free TV test pattern videos for SDR and HDR10: brightness, contrast, sharpness, colour temperature and HDR highlights. Play them from a USB stick or media player.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20rx%3D%226%22%20fill%3D%22%23111113%22%2F%3E%3Crect%20x%3D%225%22%20y%3D%227%22%20width%3D%225%22%20height%3D%2218%22%20fill%3D%22%233a3a3a%22%2F%3E%3Crect%20x%3D%2211%22%20y%3D%227%22%20width%3D%225%22%20height%3D%2218%22%20fill%3D%22%237a7a7a%22%2F%3E%3Crect%20x%3D%2217%22%20y%3D%227%22%20width%3D%225%22%20height%3D%2218%22%20fill%3D%22%23bdbdbd%22%2F%3E%3Crect%20x%3D%2223%22%20y%3D%227%22%20width%3D%224%22%20height%3D%2218%22%20fill%3D%22%23f2f2f2%22%2F%3E%3C%2Fsvg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&amp;family=IBM+Plex+Sans:wght@400;500;600;700&amp;display=swap">
+<link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-header">
+  <div class="wrap">
+    <a class="logo" href="../"><span class="logo-mark" aria-hidden="true"><span></span><span></span><span></span><span></span></span>tvcal</a>
+    <nav class="nav" aria-label="Main">
+      <a href="../setup/">Setup</a>
+      <a href="../guides/">Brand guides</a>
+      <a href="../troubleshoot/">Troubleshoot</a>
+      <a href="../test-patterns/" aria-current="page">Test patterns</a>
+      <a href="../learn/">Learn</a>
+    </nav>
+  </div>
+</header>
+<main id="main">
+<div class="wrap narrow">
+<div class="page-head">
+  <p class="eyebrow">Test patterns</p>
+  <h1 class="page-title">Play the patterns yourself</h1>
+  <p class="lead">Every pattern the guided setup uses, as video files. Copy them to a USB stick or a media server and play them on the TV, then follow your <a href="../guides/">brand guide</a> for what to look for.</p>
+</div>
+
+<div class="callout" style="margin-top: 28px"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16.5v.01"/></svg><p>Play these files directly, not copies uploaded to YouTube or a cloud service: re-compression changes the exact levels the patterns depend on. Each file is about five minutes long, so loop it if your player allows.</p></div>
+
+<section aria-label="Pattern files">
+<h2 class="section-h" id="sdr" style="font-size: 26px; margin-top: 40px">SDR</h2>
+<ul class="files">
+  <li><div class="f-name"><strong>Fit to screen</strong><span>A thin white border with arrows in each corner. Checks nothing is cut off.</span></div><span class="f-meta">01-fit.mp4 · 2.8 MB</span><a class="btn btn-ghost" href="../patterns/01-fit.mp4" download>Download</a></li>
+  <li><div class="f-name"><strong>Brightness (black level)</strong><span>Box A below black should vanish; box B should be faintly visible.</span></div><span class="f-meta">02-brightness.mp4 · 1.5 MB</span><a class="btn btn-ghost" href="../patterns/02-brightness.mp4" download>Download</a></li>
+  <li><div class="f-name"><strong>Contrast</strong><span>Three near-white boxes. All three should stay visible.</span></div><span class="f-meta">03-contrast.mp4 · 1.7 MB</span><a class="btn btn-ghost" href="../patterns/03-contrast.mp4" download>Download</a></li>
+  <li><div class="f-name"><strong>Sharpness, 1080p</strong><span>Fine lines. Lower sharpness until the bright outlines go.</span></div><span class="f-meta">04-sharpness.mp4 · 2.5 MB</span><a class="btn btn-ghost" href="../patterns/04-sharpness.mp4" download>Download</a></li>
+  <li><div class="f-name"><strong>Sharpness, native 4K</strong><span>The same pattern at 3840×2160, so the TV doesn’t upscale it.</span></div><span class="f-meta">04-sharpness-4k.mp4 · 5.1 MB</span><a class="btn btn-ghost" href="../patterns/04-sharpness-4k.mp4" download>Download</a></li>
+  <li><div class="f-name"><strong>Colour temperature</strong><span>White, greys, skin, foliage and sky, for comparing the Warm options.</span></div><span class="f-meta">06-temp.mp4 · 1.4 MB</span><a class="btn btn-ghost" href="../patterns/06-temp.mp4" download>Download</a></li>
+  <li><div class="f-name"><strong>Final grey check</strong><span>Grey squares from dark to white. Each should look plain grey.</span></div><span class="f-meta">05-final.mp4 · 1.3 MB</span><a class="btn btn-ghost" href="../patterns/05-final.mp4" download>Download</a></li>
+</ul>
+<h2 class="section-h" id="hdr10" style="font-size: 26px; margin-top: 40px">HDR10</h2>
+<ul class="files">
+  <li><div class="f-name"><strong>HDR black level</strong><span>The black-level boxes in HDR10 (PQ, BT.2020).</span></div><span class="f-meta">h1-black.mp4 · 1.9 MB</span><a class="btn btn-ghost" href="../patterns/h1-black.mp4" download>Download</a></li>
+  <li><div class="f-name"><strong>HDR highlights</strong><span>Four boxes from 400 to 1000 nits on a 100-nit background. Tests tone mapping.</span></div><span class="f-meta">h2-highlights.mp4 · 1.9 MB</span><a class="btn btn-ghost" href="../patterns/h2-highlights.mp4" download>Download</a></li>
+  <li><div class="f-name"><strong>HDR grey steps</strong><span>Twelve grey steps from 0.05 to 1000 nits.</span></div><span class="f-meta">h3-steps.mp4 · 1.8 MB</span><a class="btn btn-ghost" href="../patterns/h3-steps.mp4" download>Download</a></li>
+</ul>
+</section>
+
+<section class="section prose" aria-labelledby="spec-h">
+  <h2 class="section-h" id="spec-h" style="font-size: 26px">About the files</h2>
+  <p><b>SDR:</b> 1920×1080, H.264, 30 fps, limited range, tagged BT.709. The sharpness pattern also comes in native 3840×2160 (HEVC), so a 4K TV doesn’t add its own upscaling to it.</p>
+  <p><b>HDR10:</b> 1920×1080, HEVC Main10, PQ and BT.2020, with HDR10 metadata (mastering display P3-D65, 1000 nits; MaxCLL 1000, MaxFALL 400). Greyscale only.</p>
+  <p>Levels are written directly as video code values, so the below-black box survives instead of being clipped. The generators are in the <a href="https://github.com/vantuvt/tvcal/tree/main/tools">project’s tools folder</a>.</p>
+  <p>There are no Dolby Vision patterns: Dolby Vision fits itself to the TV, and making Dolby Vision test videos needs Dolby’s licensed encoder.</p>
+</section>
+</div>
+</main>
+<footer class="site-footer">
+  <div class="wrap">
+    <span>tvcal · free and open source</span>
+    <div class="links">
+      <a href="https://github.com/vantuvt/tvcal">GitHub</a>
+      <a href="https://github.com/vantuvt/tvcal/issues/new">Report a problem</a>
+      <label>Appearance
+        <select id="appearance">
+          <option value="auto">Auto</option>
+          <option value="light">Light</option>
+          <option value="dark">Dark</option>
+        </select>
+      </label>
+    </div>
+  </div>
+</footer>
+<script src="../assets/site.js" defer></script>
+</body>
+</html>

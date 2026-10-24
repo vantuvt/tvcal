@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#111113">
+<script>
+  // Apply the saved Appearance (shared with the setup tool) before the page draws.
+  try { var t = JSON.parse(localStorage.getItem('tvcal2.theme')); if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t; } catch (e) {}
+</script>
+<title>Blacks look grey or washed out · tvcal</title>
+<meta name="description" content="Why dark scenes look foggy and blacks look grey on your TV, and how to fix it: black level, HDMI range mismatch, room light and local dimming.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20rx%3D%226%22%20fill%3D%22%23111113%22%2F%3E%3Crect%20x%3D%225%22%20y%3D%227%22%20width%3D%225%22%20height%3D%2218%22%20fill%3D%22%233a3a3a%22%2F%3E%3Crect%20x%3D%2211%22%20y%3D%227%22%20width%3D%225%22%20height%3D%2218%22%20fill%3D%22%237a7a7a%22%2F%3E%3Crect%20x%3D%2217%22%20y%3D%227%22%20width%3D%225%22%20height%3D%2218%22%20fill%3D%22%23bdbdbd%22%2F%3E%3Crect%20x%3D%2223%22%20y%3D%227%22%20width%3D%224%22%20height%3D%2218%22%20fill%3D%22%23f2f2f2%22%2F%3E%3C%2Fsvg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&amp;family=IBM+Plex+Sans:wght@400;500;600;700&amp;display=swap">
+<link rel="stylesheet" href="../../assets/site.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-header">
+  <div class="wrap">
+    <a class="logo" href="../../"><span class="logo-mark" aria-hidden="true"><span></span><span></span><span></span><span></span></span>tvcal</a>
+    <nav class="nav" aria-label="Main">
+      <a href="../../setup/">Setup</a>
+      <a href="../../guides/">Brand guides</a>
+      <a href="../../troubleshoot/" aria-current="page">Troubleshoot</a>
+      <a href="../../test-patterns/">Test patterns</a>
+      <a href="../../learn/">Learn</a>
+    </nav>
+  </div>
+</header>
+<main id="main">
+<div class="wrap">
+<div class="page-head">
+  <nav class="crumbs" aria-label="Breadcrumb"><a href="../../troubleshoot/">Troubleshoot</a> <span aria-hidden="true">›</span> Grey blacks</nav>
+  <h1 class="page-title">Blacks look grey or washed out</h1>
+  <p class="lead">Dark scenes look foggy and night skies look dark grey instead of black. Work down the list: the most likely causes come first.</p>
+</div>
+
+<div class="split">
+<ol class="split-main" style="list-style: none; margin: 0; padding: 0">
+  <li class="step">
+    <div class="step-head" style="justify-content: space-between; flex-wrap: wrap"><h2>Black level is set too high</h2><span class="tag tag-accent">Most common</span></div>
+    <p class="body">The control that sets where black sits is often turned up to see more in dark scenes. Depending on the brand it’s called Brightness, Black Level, Shadow Detail or Screen Brightness.</p>
+    <a class="btn btn-primary" href="../../setup/">Run the guided setup</a>
+  </li>
+
+  <li class="step">
+    <div class="step-head"><h2>Your box and TV disagree on range</h2></div>
+    <p class="body">Video can be sent as limited range (black at 16) or full range (black at 0). If a streaming box, console or PC sends one and the TV expects the other, black arrives wrong before you touch a setting.</p>
+    <figure class="ramps" style="margin-top: 18px">
+      <div><span class="ramp-label">Matched: correct</span><div class="ramp ok" role="img" aria-label="Gradient from true black to white"></div></div>
+      <div><span class="ramp-label">Box sends limited, TV expects full: grey blacks</span><div class="ramp grey" role="img" aria-label="Gradient starting at dark grey instead of black"></div></div>
+      <div><span class="ramp-label">Box sends full, TV expects limited: crushed blacks</span><div class="ramp crush" role="img" aria-label="Gradient where the darkest part is solid black"></div></div>
+    </figure>
+    <p class="body">Fix: set both the device and the TV to Auto, or set them to match. Then set black level again.</p>
+    <div class="chips">
+      <a class="chip" href="../../sources/#apple-tv">Apple TV</a>
+      <a class="chip" href="../../sources/#google-tv">Google TV / Chromecast</a>
+      <a class="chip" href="../../sources/#fire-tv">Fire TV</a>
+      <a class="chip" href="../../sources/#playstation">PlayStation 5</a>
+      <a class="chip" href="../../sources/#xbox">Xbox</a>
+      <a class="chip" href="../../sources/#pc">PC</a>
+    </div>
+  </li>
+
+  <li class="step">
+    <div class="step-head"><h2>The room is too bright</h2></div>
+    <p class="body" style="margin: 0">Light from windows and lamps reflects off the screen, and no TV can look darker than its own reflection. Try the same scene with the lights down before changing anything.</p>
+  </li>
+
+  <li class="step">
+    <div class="step-head"><h2>Local dimming is off or low</h2></div>
+    <p class="body">On LCD TVs, local dimming turns the backlight down behind dark areas. With it off, the backlight glows through and blacks look grey. OLED TVs don’t have it and don’t need it.</p>
+    <p class="body" style="margin: 0">Turned up too high, it can hide shadow detail instead. Your brand guide explains what your TV calls it.</p>
+  </li>
+
+  <li class="step">
+    <div class="step-head"><h2>It’s the panel, not a setting</h2></div>
+    <p class="body" style="margin: 0">Some LCD panels can’t reach a deep black, especially seen from an angle. If black level is right and the room is dark, there may be nothing left to fix.</p>
+  </li>
+</ol>
+
+<aside class="split-aside">
+  <div class="card" data-feedback>
+    <h2 style="margin: 0 0 14px; font-size: 19px">Did this fix it?</h2>
+    <div class="feedback-btns" data-ask>
+      <button class="btn btn-ghost" type="button" data-answer="yes">Yes</button>
+      <button class="btn btn-ghost" type="button" data-answer="no">No</button>
+    </div>
+    <p data-reply="yes" hidden tabindex="-1">Glad it’s sorted. Next, check <a href="../../guides/">contrast</a> so whites keep their detail.</p>
+    <p data-reply="no" hidden tabindex="-1">Sorry about that. <a href="https://github.com/vantuvt/tvcal/issues/new">Tell us your TV model and source</a> and we’ll add it to this page.</p>
+  </div>
+  <div class="card">
+    <h2 style="margin: 0 0 10px; font-size: 19px">Related</h2>
+    <div class="rows">
+      <a class="row-link" style="font-size: 16px; min-height: 48px" href="../../learn/brightness/">Brightness, backlight and contrast <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></a>
+      <a class="row-link" style="font-size: 16px; min-height: 48px; border-bottom: 0" href="../../sources/">Streaming box and console settings <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></a>
+    </div>
+  </div>
+</aside>
+</div>
+</div>
+</main>
+<footer class="site-footer">
+  <div class="wrap">
+    <span>tvcal · free and open source</span>
+    <div class="links">
+      <a href="https://github.com/vantuvt/tvcal">GitHub</a>
+      <a href="https://github.com/vantuvt/tvcal/issues/new">Report a problem</a>
+      <label>Appearance
+        <select id="appearance">
+          <option value="auto">Auto</option>
+          <option value="light">Light</option>
+          <option value="dark">Dark</option>
+        </select>
+      </label>
+    </div>
+  </div>
+</footer>
+<script src="../../assets/site.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,100 @@
+<!--{"title": "", "path": "", "nav": "", "description": "Free, phone-guided TV picture setup. Your phone asks one simple question at a time and shows the matching test pattern on your TV. Plus brand guides, troubleshooting and test patterns."}-->
+<div class="wrap">
+<section class="hero">
+  <div class="hero-copy">
+    <p class="eyebrow">TV picture setup, by eye</p>
+    <h1>Make your TV look the way the film was mastered.</h1>
+    <p class="lead">A free, phone-guided setup. Your phone asks one simple question at a time and shows the matching test pattern on your TV. No meter, no jargon.</p>
+    <div class="btn-row">
+      <a class="btn btn-primary" href="{{root}}setup/">Start setup {{icon.arrow}}</a>
+      <a class="btn btn-ghost" href="#brands">Pick your TV brand</a>
+    </div>
+    <p class="hero-note">Casts to Chromecast and Google TV from Chrome, or AirPlays to an Apple TV or AirPlay TV from Safari.</p>
+  </div>
+  <div class="hero-art">
+    <div class="tvmock" role="img" aria-label="A TV showing the brightness test pattern: two boxes inside grey frames. Box A has vanished and box B is faintly visible.">
+      <div class="tvmock-screen">
+        <div class="tvmock-frame"><div class="tvmock-in"><span class="tvmock-label">A</span></div></div>
+        <div class="tvmock-frame"><div class="tvmock-in b"><div class="tvmock-box"></div><span class="tvmock-label">B</span></div></div>
+      </div>
+    </div>
+    <div class="tvmock-stand" aria-hidden="true"></div>
+    <p class="tvmock-cap">“Can you see box B?” One question, one remote press, repeat.</p>
+  </div>
+</section>
+</div>
+
+<div class="greystrip" aria-hidden="true"><span style="background:#000"></span><span style="background:#1a1a1a"></span><span style="background:#333"></span><span style="background:#4d4d4d"></span><span style="background:#666"></span><span style="background:#808080"></span><span style="background:#999"></span><span style="background:#b3b3b3"></span><span style="background:#ccc"></span><span style="background:#e6e6e6"></span><span style="background:#fff"></span></div>
+
+<div class="wrap">
+<section class="section" aria-labelledby="before-h">
+  <h2 class="section-h" id="before-h">Before you start</h2>
+  <p class="section-lead">Three things that matter more than any slider. Get these right and the setup takes care of the rest.</p>
+  <div class="grid">
+    <div class="card">
+      <p class="card-num">01</p>
+      <h3>Pick the most accurate mode</h3>
+      <p>Filmmaker, Movie or Cinema mode. Then turn off motion smoothing, dynamic contrast and energy saving.</p>
+      <a href="#brands">See your brand’s guide</a>
+    </div>
+    <div class="card">
+      <p class="card-num">02</p>
+      <h3>Check your streaming box</h3>
+      <p>A range mismatch between your box and TV makes blacks grey or crushed before you touch a single setting.</p>
+      <a href="{{root}}sources/">Streaming box and console settings</a>
+    </div>
+    <div class="card">
+      <p class="card-num">03</p>
+      <h3>Set up for when you watch</h3>
+      <p>Adjust in the lighting you usually watch in. Many people keep one setting for daytime and one for night.</p>
+      <a href="{{root}}guides/other/#devices-room">Room and lighting tips</a>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="brands" aria-labelledby="brands-h">
+  <h2 class="section-h" id="brands-h">Guides for your TV</h2>
+  <p class="section-lead">Every brand names its controls differently. Pick yours for the exact menu names.</p>
+  {{brandCards}}
+</section>
+
+<section class="section" aria-labelledby="ts-h">
+  <h2 class="section-h" id="ts-h">Something look wrong?</h2>
+  <p class="section-lead">Start from what you see. Each page lists the likely causes, most common first.</p>
+  <div class="rows rows-2">
+    <a class="row-link" href="{{root}}troubleshoot/grey-blacks/">Blacks look grey or washed out {{icon.chevron}}</a>
+    <a class="row-link" href="{{root}}troubleshoot/">See all problems {{icon.chevron}}</a>
+  </div>
+</section>
+
+<section class="section" aria-labelledby="pat-h">
+  <h2 class="section-h" id="pat-h">Test patterns</h2>
+  <p class="section-lead">Every pattern the setup uses, as video files you can play from a USB stick or a media player. Use these rather than copies on YouTube: re-compression changes the levels the patterns depend on.</p>
+  <div class="grid" style="--min: 280px">
+    <div class="card">
+      <h3>SDR set</h3>
+      <p class="mono small muted">1920×1080 · H.264 · BT.709<br>Fit, brightness, contrast, sharpness, colour</p>
+      <a class="btn btn-ghost" href="{{root}}test-patterns/#sdr">Download</a>
+    </div>
+    <div class="card">
+      <h3>HDR10 set</h3>
+      <p class="mono small muted">1920×1080 · HEVC Main10 · PQ / BT.2020<br>Black level, highlights, grey steps</p>
+      <a class="btn btn-ghost" href="{{root}}test-patterns/#hdr10">Download</a>
+    </div>
+    <div class="card">
+      <h3>4K sharpness</h3>
+      <p class="mono small muted">3840×2160 · HEVC · BT.709<br>Native 4K, so the TV doesn’t upscale it</p>
+      <a class="btn btn-ghost" href="{{root}}test-patterns/#sdr">Download</a>
+    </div>
+  </div>
+</section>
+
+<section class="section" aria-labelledby="learn-h">
+  <h2 class="section-h" id="learn-h">Learn what the settings do</h2>
+  <p class="section-lead">Short explainers for the settings you’ll meet along the way.</p>
+  <div class="grid" style="--min: 300px">
+    <a class="card" href="{{root}}learn/brightness/"><span class="tag">Basics</span><span class="card-title">Brightness isn’t how bright your TV is</span><span class="card-body">Brightness, backlight and contrast, and which one to change. With an interactive demo.</span></a>
+    <a class="card" href="{{root}}learn/"><span class="tag">All articles</span><span class="card-title">More explainers</span><span class="card-body">Colour temperature, gamma, HDR formats, local dimming and motion are on the way.</span></a>
+  </div>
+</section>
+</div>

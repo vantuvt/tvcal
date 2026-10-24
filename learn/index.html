@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#111113">
+<script>
+  // Apply the saved Appearance (shared with the setup tool) before the page draws.
+  try { var t = JSON.parse(localStorage.getItem('tvcal2.theme')); if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t; } catch (e) {}
+</script>
+<title>Learn · tvcal</title>
+<meta name="description" content="Short explainers for TV picture settings: brightness and backlight, colour temperature, gamma, HDR formats, local dimming and motion.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20rx%3D%226%22%20fill%3D%22%23111113%22%2F%3E%3Crect%20x%3D%225%22%20y%3D%227%22%20width%3D%225%22%20height%3D%2218%22%20fill%3D%22%233a3a3a%22%2F%3E%3Crect%20x%3D%2211%22%20y%3D%227%22%20width%3D%225%22%20height%3D%2218%22%20fill%3D%22%237a7a7a%22%2F%3E%3Crect%20x%3D%2217%22%20y%3D%227%22%20width%3D%225%22%20height%3D%2218%22%20fill%3D%22%23bdbdbd%22%2F%3E%3Crect%20x%3D%2223%22%20y%3D%227%22%20width%3D%224%22%20height%3D%2218%22%20fill%3D%22%23f2f2f2%22%2F%3E%3C%2Fsvg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&amp;family=IBM+Plex+Sans:wght@400;500;600;700&amp;display=swap">
+<link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-header">
+  <div class="wrap">
+    <a class="logo" href="../"><span class="logo-mark" aria-hidden="true"><span></span><span></span><span></span><span></span></span>tvcal</a>
+    <nav class="nav" aria-label="Main">
+      <a href="../setup/">Setup</a>
+      <a href="../guides/">Brand guides</a>
+      <a href="../troubleshoot/">Troubleshoot</a>
+      <a href="../test-patterns/">Test patterns</a>
+      <a href="../learn/" aria-current="page">Learn</a>
+    </nav>
+  </div>
+</header>
+<main id="main">
+<div class="wrap">
+<div class="page-head">
+  <p class="eyebrow">Learn</p>
+  <h1 class="page-title">What the settings do</h1>
+  <p class="lead">Short explainers for the settings you’ll meet along the way. Read them if you’re curious; you don’t need them to run the setup.</p>
+</div>
+<section class="section" style="padding-top: 32px" aria-label="Articles">
+  <div class="grid" style="--min: 300px">
+    <a class="card" href="../learn/brightness/"><span class="tag">Basics</span><span class="card-title">Brightness isn’t how bright your TV is</span><span class="card-body">Brightness, backlight and contrast, and which one to change. With an interactive demo.</span></a>
+    <div class="card soon"><span class="tag">Colour · Coming soon</span><h3 style="margin: 4px 0">Why “Warm” is the correct white</h3><p>Colour temperature, and why Cool looks brighter but wrong.</p></div>
+    <div class="card soon"><span class="tag">Basics · Coming soon</span><h3 style="margin: 4px 0">Gamma, in one picture</h3><p>How mid-tones get from the signal to your eye.</p></div>
+    <div class="card soon"><span class="tag">HDR · Coming soon</span><h3 style="margin: 4px 0">HDR10, HDR10+ and Dolby Vision</h3><p>What each format does, and what tone mapping means for you.</p></div>
+    <div class="card soon"><span class="tag">Panels · Coming soon</span><h3 style="margin: 4px 0">Local dimming and blooming</h3><p>Why bright objects glow on dark backgrounds.</p></div>
+    <div class="card soon"><span class="tag">Motion · Coming soon</span><h3 style="margin: 4px 0">Judder, 24p and the soap opera effect</h3><p>Smooth panning without the video look.</p></div>
+  </div>
+</section>
+</div>
+</main>
+<footer class="site-footer">
+  <div class="wrap">
+    <span>tvcal · free and open source</span>
+    <div class="links">
+      <a href="https://github.com/vantuvt/tvcal">GitHub</a>
+      <a href="https://github.com/vantuvt/tvcal/issues/new">Report a problem</a>
+      <label>Appearance
+        <select id="appearance">
+          <option value="auto">Auto</option>
+          <option value="light">Light</option>
+          <option value="dark">Dark</option>
+        </select>
+      </label>
+    </div>
+  </div>
+</footer>
+<script src="../assets/site.js" defer></script>
+</body>
+</html>
