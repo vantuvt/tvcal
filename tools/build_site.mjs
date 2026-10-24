@@ -19,7 +19,6 @@ import { fileURLToPath } from 'node:url';
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const rel = (...p) => path.join(ROOT, ...p);
 const SITE_NAME = 'tvcal';
-const REPO = 'https://github.com/vantuvt/tvcal';
 
 /* ---------- Read the tool's data ---------- */
 function loadToolData() {
@@ -114,10 +113,8 @@ ${body.trim()}
 </main>
 <footer class="site-footer">
   <div class="wrap">
-    <span>${SITE_NAME} · free and open source</span>
+    <span>${SITE_NAME}</span>
     <div class="links">
-      <a href="${REPO}">GitHub</a>
-      <a href="${REPO}/issues/new">Report a problem</a>
       <label>Appearance
         <select id="appearance">
           <option value="auto">Auto</option>
