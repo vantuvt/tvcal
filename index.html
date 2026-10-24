@@ -1269,7 +1269,17 @@ function cardHtml(s) {
             <button class="more-i" data-more="${did}" aria-expanded="false" aria-controls="${did}" aria-label="Details: ${esc(t.replace(/<[^>]+>/g, ''))}">${ICON.chevron}</button>
           </div><div class="d" id="${did}" hidden>${d}</div></li>`;
       };
-      return h + `<ul class="check compact">${s.checklist.map(row).join('')}</ul>`;
+      // Within each section, tips marked "(optional)" go last. Each keeps its
+      // original index, so saved ticks stay on the right tip.
+      const ordered = [], optional = [];
+      const flush = () => { ordered.push(...optional); optional.length = 0; };
+      s.checklist.forEach((x, i) => {
+        if (x[0] === '#') { flush(); ordered.push([x, i]); }
+        else if (/\(optional\)/i.test(x[0])) optional.push([x, i]);
+        else ordered.push([x, i]);
+      });
+      flush();
+      return h + `<ul class="check compact">${ordered.map(([x, i]) => row(x, i)).join('')}</ul>`;
     }
     return h + `<ul class="check">${s.checklist.map(item).join('')}</ul>`;
   }
