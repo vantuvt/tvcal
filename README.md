@@ -79,7 +79,8 @@ were checked to match their intended values exactly.
 The first setup screen asks for the TV brand; the model is optional and entered on the hub with the saved settings. The connect screen picks **Google Cast** or **AirPlay** from the browser, with a link to switch, and warns if the browser can't use it (for example Chromecast on an iPhone). The quick-settings Help follows the choice (Chromecast or Apple TV). `BRANDS` in `index.html` holds per-brand
 overrides for any part of a step (wording, checklist items, flow nodes, summary
 labels); anything not overridden falls back to the generic text in `STEPS`.
-Currently: **Samsung**, **LG**, **Sony**, **TCL**, **Hisense** and **Another brand**
+Currently, in the order the picker shows them (alphabetical, with the generic
+option last): **Hisense**, **LG**, **Samsung**, **Sony**, **TCL** and **Another brand**
 (generic wording). TCL is written out in full; the other four are built with
 `brandFrom()` from a short description of each brand's menus. Key differences:
 the black-level control is Shadow Detail (Samsung 2022+), Screen Brightness (LG),

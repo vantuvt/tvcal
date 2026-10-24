@@ -1251,7 +1251,7 @@ function cardHtml(s) {
     const opt = (k, label) => `<button class="${brand === k ? 'on' : ''}" aria-pressed="${brand === k}" data-brand="${k}">${label}</button>`;
     const note = brandInfo() ? brandInfo().note
       : brand === 'other' ? 'Using general names that work on most TVs. Your TV may use slightly different words.' : '';
-    return h + `<div class="brands" id="brands">${opt('samsung', 'Samsung')}${opt('lg', 'LG')}${opt('sony', 'Sony')}${opt('tcl', 'TCL')}${opt('hisense', 'Hisense')}${opt('other', 'Another brand')}</div>
+    return h + `<div class="brands" id="brands">${Object.keys(BRANDS).sort((a, b) => BRANDS[a].name.localeCompare(BRANDS[b].name)).map(k => opt(k, BRANDS[k].name)).join('')}${opt('other', 'Another brand')}</div>
       ${note ? `<p class="note">${note}</p>` : ''}`;
   }
   if (s.connect) {
