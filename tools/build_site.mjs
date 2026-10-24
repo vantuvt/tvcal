@@ -71,10 +71,23 @@ const NAV = [
   ['learn', 'Learn', 'learn/'],
 ];
 
-function layout({ title, description, nav, body, root }) {
-  const fullTitle = title ? `${title} · ${SITE_NAME}` : `${SITE_NAME} · TV picture setup, by eye`;
+// The site header. Also written into setup/index.html (between the
+// site-header markers) so the tool's home screen matches the rest of the site.
+function headerHtml(root, nav) {
   const navHtml = NAV.map(([k, label, href]) =>
     `<a href="${root}${href}"${k === nav ? ' aria-current="page"' : ''}>${label}</a>`).join('\n      ');
+  return `<header class="site-header">
+  <div class="wrap">
+    <a class="logo" href="${root}"><span class="logo-mark" aria-hidden="true"><span></span><span></span><span></span><span></span></span>${SITE_NAME}</a>
+    <nav class="nav" aria-label="Main">
+      ${navHtml}
+    </nav>
+  </div>
+</header>`;
+}
+
+function layout({ title, description, nav, body, root }) {
+  const fullTitle = title ? `${title} · ${SITE_NAME}` : `${SITE_NAME} · TV picture setup, by eye`;
   return `<!doctype html>
 <html lang="en">
 <head>
@@ -95,14 +108,7 @@ function layout({ title, description, nav, body, root }) {
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
-<header class="site-header">
-  <div class="wrap">
-    <a class="logo" href="${root}"><span class="logo-mark" aria-hidden="true"><span></span><span></span><span></span><span></span></span>${SITE_NAME}</a>
-    <nav class="nav" aria-label="Main">
-      ${navHtml}
-    </nav>
-  </div>
-</header>
+${headerHtml(root, nav)}
 <main id="main">
 ${body.trim()}
 </main>
@@ -305,5 +311,15 @@ for (const f of fs.readdirSync(pagesDir).filter(f => f.endsWith('.html')).sort()
   written.push(writePage(meta.path, layout({ ...meta, body: fill(src.slice(m[0].length), root), root })));
 }
 for (const k of ALL_KEYS) written.push(brandGuide(k));
+
+// Keep the setup tool's copy of the header in step with the site's.
+{
+  const toolPath = rel('setup', 'index.html');
+  const tool = fs.readFileSync(toolPath, 'utf8');
+  const re = /(<!-- site-header:start[^>]*-->)[\s\S]*?(<!-- site-header:end -->)/;
+  if (!re.test(tool)) throw new Error('setup/index.html: missing the site-header markers');
+  const next = tool.replace(re, (_, a, b) => a + '\n' + headerHtml('../', 'setup') + '\n' + b);
+  if (next !== tool) { fs.writeFileSync(toolPath, next); written.push('setup/index.html (header)'); }
+}
 console.log(written.map(w => '  ' + w).join('\n'));
 console.log(`Built ${written.length} pages.`);
