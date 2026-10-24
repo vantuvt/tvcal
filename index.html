@@ -153,6 +153,20 @@
   .check [aria-pressed=true] .tick::after { content: ""; width: 10px; height: 6px; border-left: 3px solid var(--tick-ink); border-bottom: 3px solid var(--tick-ink); transform: rotate(-45deg) translate(1px, -1px); }
   .check .t { display: block; font-weight: 600; }
   .check .d { display: block; font-size: 14px; color: var(--dim); }
+  /* Compact checklist (Devices and room): one line per tip, details behind an arrow. */
+  .check.compact li:not(.sect) { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; margin-bottom: 6px; }
+  .check.compact li.on { background: var(--ok-bg); border-color: var(--ok-line); }
+  .check.compact .rowtop { display: flex; align-items: center; }
+  .check.compact button[data-check] { flex: 1; min-width: 0; align-items: center; background: none; border: none; padding: 9px 4px 9px 14px; }
+  .check.compact .t { font-size: 16px; }
+  .check.compact .tick { margin-top: 0; }
+  .check.compact button.more-i { flex: none; width: 48px; height: 44px; display: grid; place-items: center; border: none; background: none; color: var(--dim); padding: 0; }
+  .check.compact button.more-i svg { width: 20px; height: 20px; transition: transform .15s; }
+  .check.compact button.more-i[aria-expanded=true] svg { transform: rotate(180deg); }
+  .check.compact .d { padding: 0 16px 14px 54px; }
+  .check.compact .d[hidden] { display: none; }
+  .check.compact li.sect { padding: 8px 2px 4px; }
+  .check.compact li.sect:first-child { padding-top: 0; }
   details.also { border: 1px dashed var(--line2); border-radius: 14px; padding: 0 14px; margin-bottom: 12px; }
   details.also > summary { padding: 14px 0; cursor: pointer; font-size: 15px; list-style: none; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
   details.also > summary > span { flex: 1; color: var(--text); }
@@ -900,8 +914,8 @@ const STEPS = [
     }
   },
   {
-    id: 'extras', chapter: 'tips', pos: 'any', title: 'Your devices and room (optional)', pattern: null,
-    lead: 'A few things outside the picture menu that also make a difference. Tap the ones you’ve done, and skip any that don’t apply.',
+    id: 'extras', chapter: 'tips', title: 'Your devices and room', pattern: null, compact: true,
+    lead: 'Optional. Tick what you’ve done; the arrow shows details.',
     checklist: [
       ['#', 'Your devices'],
       ['HDMI black level: Auto', 'For anything plugged in by HDMI (game console, Blu-ray, streaming stick). Also called RGB range or HDMI Black Level. Set Auto on both the TV and the device. A mismatch crushes or washes out blacks.'],
@@ -1049,7 +1063,8 @@ const ICON = {
   remote: svg('<rect x="7" y="2" width="10" height="20" rx="3"/><circle cx="12" cy="7" r="1.5"/><path d="M10 12h4M10 15h4"/>'),
   bulb: svg('<path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-4 10.5c.7.7 1 1.5 1 2.5h6c0-1 .3-1.8 1-2.5A6 6 0 0 0 12 3z"/>'),
   tips: svg('<path d="M4 6h16M4 12h16M4 18h10"/>'),
-  menu: svg('<path d="M4 7h16M4 12h16M4 17h16"/>')
+  menu: svg('<path d="M4 7h16M4 12h16M4 17h16"/>'),
+  chevron: svg('<path d="M6 9l6 6 6-6"/>')
 };
 
 /* Where the viewer should be for each step. Judging the picture is done from
@@ -1245,6 +1260,17 @@ function cardHtml(s) {
         <details class="also"><summary><span>Also check <span>· ${esc(names)}</span></span></summary>
         <ul class="check">${rest.map((x, i) => item(x, i + 3)).join('')}</ul></details>`;
     }
+    if (s.compact) {
+      const row = ([t, d], i) => {
+        if (t === '#') return `<li class="sect">${d}</li>`;
+        const key = s.id + ':' + i, did = 'tip-' + i;
+        return `<li class="${checks[key] ? 'on' : ''}"><div class="rowtop">
+            <button aria-pressed="${!!checks[key]}" data-check="${key}"><span class="tick"></span><span class="t">${t}</span></button>
+            <button class="more-i" data-more="${did}" aria-expanded="false" aria-controls="${did}" aria-label="Details: ${esc(t.replace(/<[^>]+>/g, ''))}">${ICON.chevron}</button>
+          </div><div class="d" id="${did}" hidden>${d}</div></li>`;
+      };
+      return h + `<ul class="check compact">${s.checklist.map(row).join('')}</ul>`;
+    }
     return h + `<ul class="check">${s.checklist.map(item).join('')}</ul>`;
   }
   return h;
@@ -1387,7 +1413,14 @@ document.addEventListener('click', e => {
   if (d.themePick) { theme = d.themePick; store.set('theme', theme); applyTheme(); closeMenu(true); return; }
   if (d.check) {
     checks[d.check] = !checks[d.check]; store.set('checks', checks);
-    t.setAttribute('aria-pressed', String(!!checks[d.check])); return;
+    t.setAttribute('aria-pressed', String(!!checks[d.check]));
+    if (t.closest('.compact')) t.closest('li').classList.toggle('on', !!checks[d.check]);
+    return;
+  }
+  if (d.more) {
+    const open = t.getAttribute('aria-expanded') !== 'true', el = $(d.more);
+    t.setAttribute('aria-expanded', String(open)); el.hidden = !open;
+    return;
   }
   if (d.tab && !d.act) { helpTab = d.tab; fillHelp(); return; }
   if (d.go) {
