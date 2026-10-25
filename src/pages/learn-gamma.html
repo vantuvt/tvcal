@@ -1,0 +1,54 @@
+<!--{"title": "Gamma, in one picture", "path": "learn/gamma/", "nav": "learn", "description": "What a TV’s gamma setting does to mid-tones and shadows, why 2.4 suits a dark room and 2.2 a bright one, and why HDR doesn’t use it. With an interactive demo."}-->
+<article class="wrap narrow" style="padding-top: 40px; padding-bottom: 40px">
+  <nav class="crumbs" aria-label="Breadcrumb"><a href="{{root}}learn/">Learn</a> <span aria-hidden="true">›</span> Basics</nav>
+  <h1 class="page-title">Gamma, in one picture</h1>
+  <p class="lead" style="margin-bottom: 36px">Black level sets where black sits, and contrast sets where white sits. Gamma decides everything in between: how quickly the picture climbs out of black, and so how dark or open the shadows and mid-tones look.</p>
+
+  <figure class="demo" data-demo-gamma>
+    <div class="demo-ramp" data-ramp="full" role="img" aria-label="Grey scale from black to white in eleven steps"></div>
+    <div class="demo-ramp demo-ramp-short" data-ramp="dark" role="img" aria-label="The darkest fifth of the scale, in eleven steps"></div>
+    <fieldset class="seg">
+      <legend>Gamma</legend>
+      <label><input type="radio" name="demo-gamma" value="1.8"><span>1.8</span></label>
+      <label><input type="radio" name="demo-gamma" value="2.2"><span>2.2</span></label>
+      <label><input type="radio" name="demo-gamma" value="2.4" checked><span>2.4</span></label>
+      <label><input type="radio" name="demo-gamma" value="2.6"><span>2.6</span></label>
+    </fieldset>
+    <figcaption>The top bar is the full scale; the bottom bar zooms in on the darkest fifth, where gamma matters most. (The demo needs JavaScript. It shows the difference between settings; your own screen adds its own gamma.)</figcaption>
+  </figure>
+
+  <div class="prose">
+  <h2 class="section-h">What gamma does</h2>
+  <p>A video signal isn’t light: it’s a list of levels from black to white. Gamma is the curve the TV uses to turn those levels into light. The ends are fixed, so black stays black and white stays white, but the curve bends the middle.</p>
+  <p>A <b>higher</b> gamma bends it further down: shadows and mid-tones come out darker, and the picture looks richer and more contrasty. A <b>lower</b> gamma lifts them: more detail in dark areas, but a flatter, greyer look.</p>
+
+  <h2 class="section-h">Which one to use</h2>
+  <p>HD and 4K SDR video is made for a standard called <b>BT.1886</b>. On a TV with good blacks it behaves almost exactly like gamma 2.4, and it assumes a dim room, like a grading suite.</p>
+  <div class="settings-table" style="margin-bottom: 20px">
+    <div class="settings-row"><div class="k"><strong>2.4 or BT.1886</strong></div><div class="v"><span>A dark or dim room. Closest to what the colourist saw.</span></div></div>
+    <div class="settings-row"><div class="k"><strong>2.2</strong></div><div class="v"><span>A bright room. Room light washes out shadows, so lifting them a little brings detail back.</span></div></div>
+    <div class="settings-row"><div class="k"><strong>Lower than 2.2, or higher than 2.4</strong></div><div class="v"><span>Rarely right. Low values look washed out; high ones hide shadow detail.</span></div></div>
+  </div>
+  <p>If you watch in both, use 2.4 at night and 2.2 by day, or keep 2.4 and accept slightly darker shadows in daylight. Some TVs number gamma differently, as steps like −3 to +3 instead of 2.2 or 2.4. If yours does, the default is usually the right starting point.</p>
+
+  <h2 class="section-h">Gamma isn’t black level</h2>
+  <p>If dark scenes look murky, it’s tempting to lower gamma. Check <a href="{{root}}learn/brightness/">black level</a> first: if black is set too low, the darkest detail disappears whatever the gamma, and if it’s too high, black turns grey. Set black level with a pattern, then choose gamma for your room.</p>
+
+  <h2 class="section-h">HDR doesn’t use it</h2>
+  <p>HDR video describes actual brightness rather than relative levels, using a curve called PQ, or HLG for broadcasts. Many TVs grey out the gamma setting when HDR is playing. For HDR, the settings that matter are black level and tone mapping: see <a href="{{root}}learn/hdr-formats/">HDR10, HDR10+ and Dolby Vision</a>.</p>
+
+  <h2 class="section-h">What your TV calls it</h2>
+  <p>What the setup suggests for each brand:</p>
+  </div>
+  {{names.gamma}}
+
+  <div class="card highlight" style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 18px">
+    <div style="flex: 1 1 320px; min-width: 0">
+      <h2 style="margin: 0 0 6px; font-size: 22px">Part of the quick settings</h2>
+      <p style="margin: 0">The setup covers gamma with the other settings to check first, using your TV’s menu names.</p>
+    </div>
+    <a class="btn btn-primary" href="{{root}}setup/">Start setup</a>
+  </div>
+
+  {{articleNav:gamma}}
+</article>

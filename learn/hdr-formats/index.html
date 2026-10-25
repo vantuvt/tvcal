@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#111113">
+<script src="../../assets/theme.js"></script>
+<title>HDR10, HDR10+ and Dolby Vision · tvcal</title>
+<meta name="description" content="What HDR10, HDR10+, Dolby Vision and HLG each do, which TV brands play which, and what tone mapping means for your picture. With an interactive demo.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20rx%3D%226%22%20fill%3D%22%23111113%22%2F%3E%3Crect%20x%3D%225%22%20y%3D%227%22%20width%3D%225%22%20height%3D%2218%22%20fill%3D%22%233a3a3a%22%2F%3E%3Crect%20x%3D%2211%22%20y%3D%227%22%20width%3D%225%22%20height%3D%2218%22%20fill%3D%22%237a7a7a%22%2F%3E%3Crect%20x%3D%2217%22%20y%3D%227%22%20width%3D%225%22%20height%3D%2218%22%20fill%3D%22%23bdbdbd%22%2F%3E%3Crect%20x%3D%2223%22%20y%3D%227%22%20width%3D%224%22%20height%3D%2218%22%20fill%3D%22%23f2f2f2%22%2F%3E%3C%2Fsvg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&amp;family=IBM+Plex+Sans:wght@400;500;600;700&amp;display=swap">
+<link rel="stylesheet" href="../../assets/shared.css">
+<link rel="stylesheet" href="../../assets/site.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-header">
+  <div class="wrap">
+    <a class="logo" href="../../"><span class="logo-mark" aria-hidden="true"><span></span><span></span><span></span><span></span></span>tvcal</a>
+    <nav class="nav" aria-label="Main">
+      <a href="../../setup/">Setup</a>
+      <a href="../../guides/">Brand guides</a>
+      <a href="../../troubleshoot/">Troubleshoot</a>
+      <a href="../../learn/" aria-current="page">Learn</a>
+    </nav>
+    <div class="ap">
+      <button type="button" class="ap-btn" data-ap-btn aria-haspopup="menu" aria-expanded="false" aria-controls="ap-menu" aria-label="Appearance">
+        <svg class="i-auto" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path class="fill" d="M12 4a8 8 0 0 1 0 16z"/></svg>
+        <svg class="i-light" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6l1.4 1.4M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4L6 18M18 6l1.4-1.4"/></svg>
+        <svg class="i-dark" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg>
+      </button>
+      <div class="ap-menu" id="ap-menu" role="menu" aria-label="Appearance" hidden>
+        <div class="ap-h" aria-hidden="true">Appearance</div>
+        <button type="button" class="ap-item" role="menuitemradio" data-theme-pick="auto" aria-checked="false"><span class="ap-mk" aria-hidden="true"></span><span><b>Auto</b><small>Match your device</small></span></button>
+        <button type="button" class="ap-item" role="menuitemradio" data-theme-pick="light" aria-checked="false"><span class="ap-mk" aria-hidden="true"></span><span><b>Light</b></span></button>
+        <button type="button" class="ap-item" role="menuitemradio" data-theme-pick="dark" aria-checked="false"><span class="ap-mk" aria-hidden="true"></span><span><b>Dark</b></span></button>
+      </div>
+    </div>
+  </div>
+</header>
+<main id="main">
+<article class="wrap narrow" style="padding-top: 40px; padding-bottom: 40px">
+  <nav class="crumbs" aria-label="Breadcrumb"><a href="../../learn/">Learn</a> <span aria-hidden="true">›</span> HDR</nav>
+  <h1 class="page-title">HDR10, HDR10+ and Dolby Vision</h1>
+  <p class="lead" style="margin-bottom: 36px">All three are ways of delivering the same thing: video with much brighter highlights and richer colour than ordinary TV. The difference is how much help they give your TV in fitting that picture to what its screen can actually do.</p>
+
+  <div class="prose">
+  <h2 class="section-h">What HDR adds</h2>
+  <p>Ordinary video (SDR) is made for a screen of about 100 nits, a modest brightness. HDR describes brightness in absolute terms, up to 10,000 nits, and most HDR films are graded on monitors that reach 1,000 or 4,000. It also carries a wider range of colours and finer steps between shades.</p>
+  <p>No TV can show all of that. A typical one peaks somewhere between a few hundred and a couple of thousand nits. So every HDR TV has to decide what to do with highlights brighter than it can go. That’s <b>tone mapping</b>.</p>
+  </div>
+
+  <figure class="demo" data-demo-tm>
+    <div class="tm-chart" aria-hidden="true"></div>
+    <div class="tm-swatches">
+      <div><span class="small muted">Clipped (highlights in nits below)</span><div class="tm-row" data-row="clip" role="img" aria-label="Highlights at 600, 1,000, 2,000 and 4,000 nits, clipped"></div></div>
+      <div><span class="small muted">Tone mapped</span><div class="tm-row" data-row="map" role="img" aria-label="The same highlights, tone mapped"></div></div>
+      <div class="tm-labels small muted mono" aria-hidden="true"><span>600</span><span>1,000</span><span>2,000</span><span>4,000</span></div>
+    </div>
+    <div class="demo-controls">
+      <div>
+        <label for="demo-peak"><b>Your TV’s peak brightness</b><span class="mono muted" data-out="peak">800 nits</span></label>
+        <input id="demo-peak" type="range" min="400" max="2000" step="100" value="800">
+      </div>
+    </div>
+    <figcaption>The film was graded up to 4,000 nits. (The demo needs JavaScript.)</figcaption>
+  </figure>
+
+  <div class="prose">
+  <p>A TV that simply <b>clips</b> shows everything above its peak as the same flat white: the sun, a lamp and the sky around them merge. A TV that <b>tone maps</b> starts easing off below its peak, so the brightest things stay a little different from each other. They’re dimmer than the film intended, but they keep their detail.</p>
+
+  <h2 class="section-h">The four formats</h2>
+  <div class="settings-table" style="margin-bottom: 20px">
+    <div class="settings-row"><div class="k"><strong>HDR10</strong></div><div class="v"><span>The base format: every HDR TV and every HDR service supports it. It describes the whole film once, with its brightest pixel and average brightness, so the TV picks one tone mapping for the entire film.</span></div></div>
+    <div class="settings-row"><div class="k"><strong>HDR10+</strong></div><div class="v"><span>HDR10 plus scene-by-scene descriptions, so the TV can tone map a dark scene differently from a bright one. Royalty-free, and led by Samsung.</span></div></div>
+    <div class="settings-row"><div class="k"><strong>Dolby Vision</strong></div><div class="v"><span>Also scene by scene, with Dolby’s own tone mapping tuned to each TV model. Licensed from Dolby, and the most common dynamic format on streaming services and discs.</span></div></div>
+    <div class="settings-row"><div class="k"><strong>HLG</strong></div><div class="v"><span>Made for live broadcasts. It needs no extra information and still looks reasonable on a TV without HDR.</span></div></div>
+  </div>
+  <p>Services and discs that offer Dolby Vision or HDR10+ also offer HDR10, so a TV that doesn’t support a format still plays the film in HDR, just as HDR10.</p>
+
+  <h2 class="section-h">Which TVs play which</h2>
+  <div class="settings-table" style="margin-bottom: 14px">
+    <div class="settings-row"><div class="k"><strong>Samsung</strong></div><div class="v"><span>HDR10, HDR10+ and HLG. No Dolby Vision.</span></div></div>
+    <div class="settings-row"><div class="k"><strong>LG</strong></div><div class="v"><span>HDR10, Dolby Vision and HLG. No HDR10+.</span></div></div>
+    <div class="settings-row"><div class="k"><strong>Sony</strong></div><div class="v"><span>HDR10, Dolby Vision and HLG. No HDR10+.</span></div></div>
+    <div class="settings-row"><div class="k"><strong>TCL and Hisense</strong></div><div class="v"><span>Usually all four, depending on the model.</span></div></div>
+  </div>
+  <p class="small muted">Support varies by model and year, and newer versions (Dolby Vision 2, HDR10+ Advanced) are arriving on some 2026 TVs. Check your model’s specifications to be sure.</p>
+
+  <h2 class="section-h">What it means for you</h2>
+  <p>You don’t choose a format: the TV, streaming device and app agree on the best one they all support, automatically. The format makes less difference than people think. How bright your TV can get, and how well it’s set up, matter more.</p>
+  <p>Three settings do matter:</p>
+  <ul>
+    <li><b>Picture mode.</b> HDR has its own picture modes. Choose Filmmaker, Movie or Cinema while HDR is playing, and Dolby Vision Dark (or Cinema) for Dolby Vision.</li>
+    <li><b>Black level.</b> Most TVs keep a separate one for HDR, so it needs setting again.</li>
+    <li><b>Tone mapping.</b> For HDR10, many TVs offer their own scene-by-scene tone mapping. It usually helps on TVs that can’t get very bright. Try it on and off and keep whichever keeps highlights distinct without dimming the whole picture.</li>
+  </ul>
+
+  <h2 class="section-h">What your TV calls tone mapping</h2>
+  </div>
+  <ul class="grid names" style="--min: 200px; list-style: none; padding: 0; margin: 0 0 40px; gap: 10px">
+  <li class="card" style="padding: 14px 16px"><span class="muted small">Samsung</span><br>HDR Tone Mapping</li>
+  <li class="card" style="padding: 14px 16px"><span class="muted small">LG</span><br>Dynamic Tone Mapping</li>
+  <li class="card" style="padding: 14px 16px"><span class="muted small">Sony</span><br>HDR tone mapping</li>
+  <li class="card" style="padding: 14px 16px"><span class="muted small">TCL</span><br>Dynamic Tone Mapping</li>
+  <li class="card" style="padding: 14px 16px"><span class="muted small">Hisense</span><br>Dynamic Tone Mapping</li>
+</ul>
+
+  <div class="card highlight" style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 18px">
+    <div style="flex: 1 1 320px; min-width: 0">
+      <h2 style="margin: 0 0 6px; font-size: 22px">Check your HDR settings</h2>
+      <p style="margin: 0">The setup’s optional HDR chapter checks HDR is on, then sets black level and highlights with HDR patterns.</p>
+    </div>
+    <a class="btn btn-primary" href="../../setup/">Start setup</a>
+  </div>
+
+  <nav class="article-nav" aria-label="More articles">
+    <a href="../../learn/gamma/">← Gamma, in one picture</a>
+    <a href="../../learn/local-dimming/">Local dimming and blooming →</a>
+  </nav>
+</article>
+</main>
+<footer class="site-footer">
+  <div class="wrap">
+    <span>tvcal</span>
+  </div>
+</footer>
+<script src="../../assets/site.js" defer></script>
+</body>
+</html>

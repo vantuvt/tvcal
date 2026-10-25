@@ -162,10 +162,48 @@ ${ALL_KEYS.map(k => `  <a class="card${k === 'other' ? ' dashed' : ''}" href="${
 </div>`;
 }
 
-function blackNames() {
-  return `<ul class="grid" style="--min: 200px; list-style: none; padding: 0; margin: 0 0 40px; gap: 10px">
-${BRAND_KEYS.map(k => `  <li class="card" style="padding: 14px 16px"><span class="muted small">${esc(BRANDS[k].name)}</span><br>${esc(blackName(k))}</li>`).join('\n')}
+// "What your TV calls it" grids for the Learn articles, read from the tool's
+// own brand data so they always match the guides and the setup.
+const plain = h => String(h || '').replace(/<[^>]+>/g, '').replace(/&amp;/g, '&').trim();
+const firstBold = h => { const m = String(h || '').match(/<b>(.*?)<\/b>/); return m ? plain(m[1]) : ''; };
+const NAMES = {
+  black: k => blackName(k),
+  temp: k => { const t = merged(k, 'temp'); return `${firstBold(t.where) || 'Color Temperature'} → ${t.ph}`; },
+  gamma: k => { const i = merged(k, 'mode').checklist.find(([t]) => /^Gamma/i.test(t)); if (!i) return ''; const t = plain(i[0]).replace(/^Gamma:\s*/i, ''); return t.charAt(0).toUpperCase() + t.slice(1); },
+  motion: k => { const i = merged(k, 'mode').checklist[1]; return plain(i[0]); },
+  dimming: k => { const m = String(BRANDS[k].dimmingHelp || '').match(/<summary>About (.*?)<\/summary>/); return m ? plain(m[1]).replace(/\s*\(local dimming\)$/, '') : 'Local dimming'; },
+  tonemap: k => { const t = merged(k, 'hdrhigh'); return t.record || ''; },
+};
+function namesGrid(kind) {
+  return `<ul class="grid names" style="--min: 200px; list-style: none; padding: 0; margin: 0 0 40px; gap: 10px">
+${BRAND_KEYS.map(k => `  <li class="card" style="padding: 14px 16px"><span class="muted small">${esc(BRANDS[k].name)}</span><br>${esc(NAMES[kind](k))}</li>`).join('\n')}
 </ul>`;
+}
+const blackNames = () => namesGrid('black');
+
+/* ---------- Learn articles (order = reading order) ---------- */
+const ARTICLES = [
+  ['brightness', 'Basics', 'Brightness isn’t how bright your TV is', 'Brightness, backlight and contrast, and which one to change.'],
+  ['colour-temperature', 'Colour', 'Why “Warm” is the correct white', 'Colour temperature, D65, and why Cool looks brighter but wrong.'],
+  ['gamma', 'Basics', 'Gamma, in one picture', 'How mid-tones get from the signal to the screen, and which setting suits your room.'],
+  ['hdr-formats', 'HDR', 'HDR10, HDR10+ and Dolby Vision', 'What each format does, which TVs play which, and what tone mapping means.'],
+  ['local-dimming', 'Panels', 'Local dimming and blooming', 'Why bright objects glow on dark backgrounds, and how to set it.'],
+  ['motion', 'Motion', 'Judder, 24p and the soap opera effect', 'Smooth camera pans without the video look.'],
+];
+function learnCards(root, only) {
+  const list = only ? ARTICLES.filter(a => only.includes(a[0])) : ARTICLES;
+  return `<div class="grid" style="--min: 300px">
+${list.map(([slug, tag, title, desc]) => `  <a class="card" href="${root}learn/${slug}/"><span class="tag">${tag}</span><span class="card-title">${esc(title)}</span><span class="card-body">${esc(desc)}</span></a>`).join('\n')}
+</div>`;
+}
+function articleNav(root, slug) {
+  const i = ARTICLES.findIndex(a => a[0] === slug);
+  if (i < 0) throw new Error('articleNav: unknown article ' + slug);
+  const prev = ARTICLES[i - 1], next = ARTICLES[i + 1];
+  return `<nav class="article-nav" aria-label="More articles">
+    ${prev ? `<a href="${root}learn/${prev[0]}/">← ${esc(prev[2])}</a>` : `<a href="${root}learn/">All articles</a>`}
+    ${next ? `<a href="${root}learn/${next[0]}/">${esc(next[2])} →</a>` : `<a href="${root}learn/">All articles</a>`}
+  </nav>`;
 }
 
 // Display names for the patterns the guides mention. The pattern files are
@@ -180,6 +218,10 @@ function fill(body, root) {
   return body
     .replaceAll('{{brandCards}}', brandCards(root))
     .replaceAll('{{blackNames}}', blackNames())
+    .replace(/\{\{names\.(\w+)\}\}/g, (_, k) => { if (!NAMES[k]) throw new Error('unknown names.' + k); return namesGrid(k); })
+    .replaceAll('{{learnCards}}', learnCards(root))
+    .replace(/\{\{learnCards:([\w,-]+)\}\}/g, (_, l) => learnCards(root, l.split(',')))
+    .replace(/\{\{articleNav:([\w-]+)\}\}/g, (_, slug) => articleNav(root, slug))
     .replaceAll('{{icon.arrow}}', ICON.arrow)
     .replaceAll('{{icon.chevron}}', ICON.chevron)
     .replaceAll('{{icon.info}}', ICON.info)

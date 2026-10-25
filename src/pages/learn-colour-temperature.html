@@ -1,0 +1,61 @@
+<!--{"title": "Why “Warm” is the correct white", "path": "learn/colour-temperature/", "nav": "learn", "description": "Why a TV’s Warm colour temperature, not Cool or Standard, matches the white films and shows are mastered to (D65), with an interactive demo."}-->
+<article class="wrap narrow" style="padding-top: 40px; padding-bottom: 40px">
+  <nav class="crumbs" aria-label="Breadcrumb"><a href="{{root}}learn/">Learn</a> <span aria-hidden="true">›</span> Colour</nav>
+  <h1 class="page-title">Why “Warm” is the correct white</h1>
+  <p class="lead" style="margin-bottom: 36px">Switch a TV to its Warm colour temperature and the picture looks yellow for a minute. Give your eyes time, though, and Warm is almost always the setting closest to the white the film was made with. Cool looks brighter and crisper, but it’s wrong.</p>
+
+  <figure class="demo" data-demo-temp>
+    <div class="temp-scene" role="img" aria-label="White, grey, skin, foliage and sky patches at the chosen colour temperature">
+      <span class="temp-patch" data-base="#f2f2f2"><small>White</small></span>
+      <span class="temp-patch" data-base="#9a9a9a"><small>Grey</small></span>
+      <span class="temp-patch" data-base="#d9a58a"><small>Skin</small></span>
+      <span class="temp-patch" data-base="#6f8f4e"><small>Foliage</small></span>
+      <span class="temp-patch" data-base="#8fb4d9"><small>Sky</small></span>
+    </div>
+    <div class="demo-controls">
+      <div>
+        <label for="demo-temp"><b>Colour temperature</b><span class="mono muted" data-out="temp">6500 K</span></label>
+        <input id="demo-temp" type="range" min="5000" max="10000" step="250" value="6500" aria-describedby="temp-scale">
+        <div class="range-scale small muted" id="temp-scale" aria-hidden="true"><span>Warmer</span><span>Cooler</span></div>
+      </div>
+    </div>
+    <figcaption>Move the slider to compare. (The demo needs JavaScript, and your own screen’s white affects what you see.)</figcaption>
+  </figure>
+
+  <div class="prose">
+  <h2 class="section-h">What colour temperature is</h2>
+  <p>A TV makes white by mixing red, green and blue light. Tip the mix towards blue and white looks cool; tip it towards red and it looks warm. Colour temperature describes that balance, in kelvin: higher numbers are bluer.</p>
+  <p>It affects everything on screen, not just white. Skin, grass and sky all take on the same tint, which is why the wrong setting makes faces look pale and blue, or orange.</p>
+
+  <h2 class="section-h">The white everything is made for</h2>
+  <p>Films, TV shows and streaming video are graded on studio monitors set to one standard white, called <b>D65</b>. It’s roughly 6500 K, like daylight at midday. The aim at home is the same white, so you see the colours the colourist chose.</p>
+  <p>Most TVs come out of the box in a Standard or Cool setting, well above 6500 K. Next to other TVs in a shop, a bluer white looks brighter and more vivid. At home, it makes everything look slightly cold.</p>
+  <p>On most TVs, a <b>Warm</b> option is the closest to D65. Exactly which one varies by brand and model, and getting it precisely right needs a measuring instrument. By eye, the warmest option, or one step cooler, gets you most of the way.</p>
+
+  <h2 class="section-h">Why Warm looks wrong at first</h2>
+  <p>Your eyes adapt to whatever white they’ve been looking at. If your TV has been on Cool for years, the correct white looks yellow by comparison. After a minute or two, it starts to look neutral, and switching back to Cool looks distinctly blue.</p>
+  <p>That’s why the setup asks you to wait before judging, and to look at the white and grey areas rather than at colourful ones.</p>
+
+  <h2 class="section-h">Not the same as Colour or Tint</h2>
+  <div class="settings-table" style="margin-bottom: 40px">
+    <div class="settings-row"><div class="k"><strong>Colour temperature</strong></div><div class="v"><span>The colour of white and greys: blue to yellow. Set it to Warm.</span></div></div>
+    <div class="settings-row"><div class="k"><strong>Colour (or Saturation)</strong></div><div class="v"><span>How strong colours are. Leave it at the picture mode’s default.</span></div></div>
+    <div class="settings-row"><div class="k"><strong>Tint (or Hue)</strong></div><div class="v"><span>Shifts colours between green and magenta. Leave it at the default.</span></div></div>
+  </div>
+  <p>Filmmaker Mode, where your TV has it, sets the standard white for you, along with switching off most extra processing.</p>
+
+  <h2 class="section-h">What your TV calls it</h2>
+  <p>The setting and its warmest standard option, by brand:</p>
+  </div>
+  {{names.temp}}
+
+  <div class="card highlight" style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 18px">
+    <div style="flex: 1 1 320px; min-width: 0">
+      <h2 style="margin: 0 0 6px; font-size: 22px">Set yours with a pattern</h2>
+      <p style="margin: 0">The setup shows white, greys, skin, foliage and sky on your TV while you compare the options.</p>
+    </div>
+    <a class="btn btn-primary" href="{{root}}setup/">Start setup</a>
+  </div>
+
+  {{articleNav:colour-temperature}}
+</article>

@@ -1,0 +1,53 @@
+<!--{"title": "Local dimming and blooming", "path": "learn/local-dimming/", "nav": "learn", "description": "How local dimming makes LCD TV blacks deeper, why it causes blooming around bright objects, and how to set it. With an interactive demo."}-->
+<article class="wrap narrow" style="padding-top: 40px; padding-bottom: 40px">
+  <nav class="crumbs" aria-label="Breadcrumb"><a href="{{root}}learn/">Learn</a> <span aria-hidden="true">›</span> Panels</nav>
+  <h1 class="page-title">Local dimming and blooming</h1>
+  <p class="lead" style="margin-bottom: 36px">On an LCD TV, local dimming is what makes black look black. It’s also why subtitles, stars and white text sometimes wear a faint glow on a dark background. Both come from the same idea.</p>
+
+  <figure class="demo" data-demo-dim>
+    <canvas class="dim-canvas" width="640" height="360" role="img" aria-label="A dark scene with a bright moon and a subtitle"></canvas>
+    <fieldset class="seg">
+      <legend>Backlight</legend>
+      <label><input type="radio" name="demo-dim" value="off"><span>No dimming</span></label>
+      <label><input type="radio" name="demo-dim" value="few" checked><span>32 zones</span></label>
+      <label><input type="radio" name="demo-dim" value="many"><span>512 zones</span></label>
+      <label><input type="radio" name="demo-dim" value="oled"><span>OLED</span></label>
+    </fieldset>
+    <figcaption>Exaggerated so the effect is easy to see. (The demo needs JavaScript.)</figcaption>
+  </figure>
+
+  <div class="prose">
+  <h2 class="section-h">Why LCD blacks glow</h2>
+  <p>An LCD TV has a backlight behind the screen and a layer of liquid crystals that block or let through its light. The crystals can’t block it completely, so some always leaks through. With the backlight fully on, black comes out as a dark grey, most visibly in a dark room.</p>
+
+  <h2 class="section-h">What local dimming does</h2>
+  <p>Local dimming splits the backlight into zones and turns each one down behind dark parts of the picture. Where the scene is black, the light behind it is too, so very little leaks through.</p>
+  <p>The zones are much bigger than pixels, though. A zone behind a small bright object, like a star or a line of subtitles, has to light up for it, and it lights the black around it too. That halo is <b>blooming</b>. It’s worse when you sit off to one side.</p>
+  <p>More zones means smaller halos. Mini-LED TVs use thousands of tiny LEDs and can have hundreds or thousands of zones. Cheaper edge-lit TVs light the screen from its edges and may have only a handful, so dimming shows up as bright columns or bands.</p>
+
+  <h2 class="section-h">OLED doesn’t need it</h2>
+  <p>Each pixel on an OLED TV makes its own light and switches off completely for black. There’s no backlight, so there’s no glow and no blooming, and OLED TVs have no local dimming setting.</p>
+
+  <h2 class="section-h">How to set it</h2>
+  <p>Most LCD TVs offer Off, Low, Medium and High:</p>
+  <div class="settings-table" style="margin-bottom: 20px">
+    <div class="settings-row"><div class="k"><strong>Higher</strong></div><div class="v"><span>Deeper blacks and brighter highlights, but more blooming. On some TVs it also dims small highlights or hides shadow detail.</span></div></div>
+    <div class="settings-row"><div class="k"><strong>Lower</strong></div><div class="v"><span>Less blooming and truer shadows, but greyer blacks.</span></div></div>
+  </div>
+  <p>Medium is a good place to start. Go higher if blacks look grey in a dark room, lower if halos distract you or dark detail disappears. Avoid Off unless blooming really bothers you: blacks will be noticeably grey.</p>
+  <p>The setup’s black-level pattern surrounds its boxes with grey frames, so the zones stay lit as they would in a real dark scene. If box B never appears however high you set black level, local dimming is hiding it, and turning it down one step usually fixes it.</p>
+
+  <h2 class="section-h">What your TV calls it</h2>
+  </div>
+  {{names.dimming}}
+
+  <div class="card highlight" style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 18px">
+    <div style="flex: 1 1 320px; min-width: 0">
+      <h2 style="margin: 0 0 6px; font-size: 22px">Blacks still look grey?</h2>
+      <p style="margin: 0">Local dimming is one of several causes. The troubleshooting page goes through them in order.</p>
+    </div>
+    <a class="btn btn-ghost" href="{{root}}troubleshoot/grey-blacks/">Grey blacks</a>
+  </div>
+
+  {{articleNav:local-dimming}}
+</article>
