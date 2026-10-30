@@ -1,0 +1,72 @@
+<!--{"title": "HDR10, HDR10+ and Dolby Vision", "path": "learn/hdr-formats/", "nav": "learn", "description": "What HDR10, HDR10+, Dolby Vision and HLG each do, which TV brands play which, and what tone mapping means for your picture. With an interactive demo."}-->
+<article class="wrap narrow" style="padding-top: 40px; padding-bottom: 40px">
+  <nav class="crumbs" aria-label="Breadcrumb"><a href="{{root}}learn/">Learn</a> <span aria-hidden="true">›</span> HDR</nav>
+  <h1 class="page-title">HDR10, HDR10+ and Dolby Vision</h1>
+  <p class="lead" style="margin-bottom: 36px">All three are ways of delivering the same thing: video with much brighter highlights and richer colour than ordinary TV. The difference is how much help they give your TV in fitting that picture to what its screen can actually do.</p>
+
+  <div class="prose">
+  <h2 class="section-h">What HDR adds</h2>
+  <p>Ordinary video (SDR) is made for a screen of about 100 nits, a modest brightness. HDR describes brightness in absolute terms, up to 10,000 nits, and most HDR films are graded on monitors that reach 1,000 or 4,000. It also carries a wider range of colours and finer steps between shades.</p>
+  <p>No TV can show all of that. A typical one peaks somewhere between a few hundred and a couple of thousand nits. So every HDR TV has to decide what to do with highlights brighter than it can go. That’s <b>tone mapping</b>.</p>
+  </div>
+
+  <figure class="demo" data-demo-tm>
+    <div class="tm-chart" aria-hidden="true"></div>
+    <div class="tm-swatches">
+      <div><span class="small muted">Clipped (highlights in nits below)</span><div class="tm-row" data-row="clip" role="img" aria-label="Highlights at 600, 1,000, 2,000 and 4,000 nits, clipped"></div></div>
+      <div><span class="small muted">Tone mapped</span><div class="tm-row" data-row="map" role="img" aria-label="The same highlights, tone mapped"></div></div>
+      <div class="tm-labels small muted mono" aria-hidden="true"><span>600</span><span>1,000</span><span>2,000</span><span>4,000</span></div>
+    </div>
+    <div class="demo-controls">
+      <div>
+        <label for="demo-peak"><b>Your TV’s peak brightness</b><span class="mono muted" data-out="peak">800 nits</span></label>
+        <input id="demo-peak" type="range" min="400" max="2000" step="100" value="800">
+      </div>
+    </div>
+    <figcaption>The film was graded up to 4,000 nits. (The demo needs JavaScript.)</figcaption>
+  </figure>
+
+  <div class="prose">
+  <p>A TV that simply <b>clips</b> shows everything above its peak as the same flat white: the sun, a lamp and the sky around them merge. A TV that <b>tone maps</b> starts easing off below its peak, so the brightest things stay a little different from each other. They’re dimmer than the film intended, but they keep their detail.</p>
+
+  <h2 class="section-h">The four formats</h2>
+  <div class="settings-table" style="margin-bottom: 20px">
+    <div class="settings-row"><div class="k"><strong>HDR10</strong></div><div class="v"><span>The base format: every HDR TV and every HDR service supports it. It describes the whole film once, with its brightest pixel and average brightness, so the TV picks one tone mapping for the entire film.</span></div></div>
+    <div class="settings-row"><div class="k"><strong>HDR10+</strong></div><div class="v"><span>HDR10 plus scene-by-scene descriptions, so the TV can tone map a dark scene differently from a bright one. Royalty-free, and led by Samsung.</span></div></div>
+    <div class="settings-row"><div class="k"><strong>Dolby Vision</strong></div><div class="v"><span>Also scene by scene, with Dolby’s own tone mapping tuned to each TV model. Licensed from Dolby, and the most common dynamic format on streaming services and discs.</span></div></div>
+    <div class="settings-row"><div class="k"><strong>HLG</strong></div><div class="v"><span>Made for live broadcasts. It needs no extra information and still looks reasonable on a TV without HDR.</span></div></div>
+  </div>
+  <p>Services and discs that offer Dolby Vision or HDR10+ also offer HDR10, so a TV that doesn’t support a format still plays the film in HDR, just as HDR10.</p>
+
+  <h2 class="section-h">Which TVs play which</h2>
+  <div class="settings-table" style="margin-bottom: 14px">
+    <div class="settings-row"><div class="k"><strong>Samsung</strong></div><div class="v"><span>HDR10, HDR10+ and HLG. No Dolby Vision.</span></div></div>
+    <div class="settings-row"><div class="k"><strong>LG</strong></div><div class="v"><span>HDR10, Dolby Vision and HLG. No HDR10+.</span></div></div>
+    <div class="settings-row"><div class="k"><strong>Sony</strong></div><div class="v"><span>HDR10, Dolby Vision and HLG. No HDR10+.</span></div></div>
+    <div class="settings-row"><div class="k"><strong>TCL and Hisense</strong></div><div class="v"><span>Usually all four, depending on the model.</span></div></div>
+  </div>
+  <p class="small muted">Support varies by model and year, and newer versions (Dolby Vision 2, HDR10+ Advanced) are arriving on some 2026 TVs. Check your model’s specifications to be sure.</p>
+
+  <h2 class="section-h">What it means for you</h2>
+  <p>You don’t choose a format: the TV, streaming device and app agree on the best one they all support, automatically. The format makes less difference than people think. How bright your TV can get, and how well it’s set up, matter more.</p>
+  <p>Three settings do matter:</p>
+  <ul>
+    <li><b>Picture mode.</b> HDR has its own picture modes. Choose Filmmaker, Movie or Cinema while HDR is playing, and Dolby Vision Dark (or Cinema) for Dolby Vision.</li>
+    <li><b>Black level.</b> Most TVs keep a separate one for HDR, so it needs setting again.</li>
+    <li><b>Tone mapping.</b> For HDR10, many TVs offer their own scene-by-scene tone mapping. It usually helps on TVs that can’t get very bright. Try it on and off and keep whichever keeps highlights distinct without dimming the whole picture.</li>
+  </ul>
+
+  <h2 class="section-h">What your TV calls tone mapping</h2>
+  </div>
+  {{names.tonemap}}
+
+  <div class="card highlight" style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 18px">
+    <div style="flex: 1 1 320px; min-width: 0">
+      <h2 style="margin: 0 0 6px; font-size: 22px">Check your HDR settings</h2>
+      <p style="margin: 0">The setup’s optional HDR chapter checks HDR is on, then sets black level and highlights with HDR patterns.</p>
+    </div>
+    <a class="btn btn-primary" href="{{root}}setup/">Start setup</a>
+  </div>
+
+  {{articleNav:hdr-formats}}
+</article>

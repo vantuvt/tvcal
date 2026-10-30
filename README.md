@@ -10,7 +10,11 @@ and explainers) is plain static HTML; the tool lives at `setup/`.
 - `src/pages/*.html` — hand-written page bodies. Each starts with a JSON comment
   (`title`, `path`, `nav`, `description`); the build wraps it in the shared
   header and footer. Placeholders: `{{root}}` (relative path to the site root),
-  `{{brandCards}}`, `{{blackNames}}`, `{{icon.*}}`.
+  `{{brandCards}}`, `{{blackNames}}`, `{{names.<kind>}}` (what each brand calls a
+  setting: black, temp, gamma, motion, dimming, tonemap; read from the tool),
+  `{{learnCards}}` / `{{learnCards:a,b}}` and `{{articleNav:<slug>}}` (from the
+  `ARTICLES` list in the build, which sets the Learn reading order), `{{icon.*}}`.
+  The Learn demos are in `assets/site.js`.
 - `guides/<brand>/` — generated from `BRANDS` and `STEPS` in `setup/index.html`,
   so the guides always use the same menu names as the tool. After changing the
   tool's wording, rebuild.

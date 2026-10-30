@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#111113">
+<script src="../../assets/theme.js"></script>
+<title>Gamma, in one picture · tvcal</title>
+<meta name="description" content="What a TV’s gamma setting does to mid-tones and shadows, why 2.4 suits a dark room and 2.2 a bright one, and why HDR doesn’t use it. With an interactive demo.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20rx%3D%226%22%20fill%3D%22%23111113%22%2F%3E%3Crect%20x%3D%225%22%20y%3D%227%22%20width%3D%225%22%20height%3D%2218%22%20fill%3D%22%233a3a3a%22%2F%3E%3Crect%20x%3D%2211%22%20y%3D%227%22%20width%3D%225%22%20height%3D%2218%22%20fill%3D%22%237a7a7a%22%2F%3E%3Crect%20x%3D%2217%22%20y%3D%227%22%20width%3D%225%22%20height%3D%2218%22%20fill%3D%22%23bdbdbd%22%2F%3E%3Crect%20x%3D%2223%22%20y%3D%227%22%20width%3D%224%22%20height%3D%2218%22%20fill%3D%22%23f2f2f2%22%2F%3E%3C%2Fsvg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&amp;family=IBM+Plex+Sans:wght@400;500;600;700&amp;display=swap">
+<link rel="stylesheet" href="../../assets/shared.css">
+<link rel="stylesheet" href="../../assets/site.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-header">
+  <div class="wrap">
+    <a class="logo" href="../../"><span class="logo-mark" aria-hidden="true"><span></span><span></span><span></span><span></span></span>tvcal</a>
+    <nav class="nav" aria-label="Main">
+      <a href="../../setup/">Setup</a>
+      <a href="../../guides/">Brand guides</a>
+      <a href="../../troubleshoot/">Troubleshoot</a>
+      <a href="../../learn/" aria-current="page">Learn</a>
+    </nav>
+    <div class="ap">
+      <button type="button" class="ap-btn" data-ap-btn aria-haspopup="menu" aria-expanded="false" aria-controls="ap-menu" aria-label="Appearance">
+        <svg class="i-auto" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path class="fill" d="M12 4a8 8 0 0 1 0 16z"/></svg>
+        <svg class="i-light" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6l1.4 1.4M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4L6 18M18 6l1.4-1.4"/></svg>
+        <svg class="i-dark" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg>
+      </button>
+      <div class="ap-menu" id="ap-menu" role="menu" aria-label="Appearance" hidden>
+        <div class="ap-h" aria-hidden="true">Appearance</div>
+        <button type="button" class="ap-item" role="menuitemradio" data-theme-pick="auto" aria-checked="false"><span class="ap-mk" aria-hidden="true"></span><span><b>Auto</b><small>Match your device</small></span></button>
+        <button type="button" class="ap-item" role="menuitemradio" data-theme-pick="light" aria-checked="false"><span class="ap-mk" aria-hidden="true"></span><span><b>Light</b></span></button>
+        <button type="button" class="ap-item" role="menuitemradio" data-theme-pick="dark" aria-checked="false"><span class="ap-mk" aria-hidden="true"></span><span><b>Dark</b></span></button>
+      </div>
+    </div>
+  </div>
+</header>
+<main id="main">
+<article class="wrap narrow" style="padding-top: 40px; padding-bottom: 40px">
+  <nav class="crumbs" aria-label="Breadcrumb"><a href="../../learn/">Learn</a> <span aria-hidden="true">›</span> Basics</nav>
+  <h1 class="page-title">Gamma, in one picture</h1>
+  <p class="lead" style="margin-bottom: 36px">Black level sets where black sits, and contrast sets where white sits. Gamma decides everything in between: how quickly the picture climbs out of black, and so how dark or open the shadows and mid-tones look.</p>
+
+  <figure class="demo" data-demo-gamma>
+    <div class="demo-ramp" data-ramp="full" role="img" aria-label="Grey scale from black to white in eleven steps"></div>
+    <div class="demo-ramp demo-ramp-short" data-ramp="dark" role="img" aria-label="The darkest fifth of the scale, in eleven steps"></div>
+    <fieldset class="seg">
+      <legend>Gamma</legend>
+      <label><input type="radio" name="demo-gamma" value="1.8"><span>1.8</span></label>
+      <label><input type="radio" name="demo-gamma" value="2.2"><span>2.2</span></label>
+      <label><input type="radio" name="demo-gamma" value="2.4" checked><span>2.4</span></label>
+      <label><input type="radio" name="demo-gamma" value="2.6"><span>2.6</span></label>
+    </fieldset>
+    <figcaption>The top bar is the full scale; the bottom bar zooms in on the darkest fifth, where gamma matters most. (The demo needs JavaScript. It shows the difference between settings; your own screen adds its own gamma.)</figcaption>
+  </figure>
+
+  <div class="prose">
+  <h2 class="section-h">What gamma does</h2>
+  <p>A video signal isn’t light: it’s a list of levels from black to white. Gamma is the curve the TV uses to turn those levels into light. The ends are fixed, so black stays black and white stays white, but the curve bends the middle.</p>
+  <p>A <b>higher</b> gamma bends it further down: shadows and mid-tones come out darker, and the picture looks richer and more contrasty. A <b>lower</b> gamma lifts them: more detail in dark areas, but a flatter, greyer look.</p>
+
+  <h2 class="section-h">Which one to use</h2>
+  <p>HD and 4K SDR video is made for a standard called <b>BT.1886</b>. On a TV with good blacks it behaves almost exactly like gamma 2.4, and it assumes a dim room, like a grading suite.</p>
+  <div class="settings-table" style="margin-bottom: 20px">
+    <div class="settings-row"><div class="k"><strong>2.4 or BT.1886</strong></div><div class="v"><span>A dark or dim room. Closest to what the colourist saw.</span></div></div>
+    <div class="settings-row"><div class="k"><strong>2.2</strong></div><div class="v"><span>A bright room. Room light washes out shadows, so lifting them a little brings detail back.</span></div></div>
+    <div class="settings-row"><div class="k"><strong>Lower than 2.2, or higher than 2.4</strong></div><div class="v"><span>Rarely right. Low values look washed out; high ones hide shadow detail.</span></div></div>
+  </div>
+  <p>If you watch in both, use 2.4 at night and 2.2 by day, or keep 2.4 and accept slightly darker shadows in daylight. Some TVs number gamma differently, as steps like −3 to +3 instead of 2.2 or 2.4. If yours does, the default is usually the right starting point.</p>
+
+  <h2 class="section-h">Gamma isn’t black level</h2>
+  <p>If dark scenes look murky, it’s tempting to lower gamma. Check <a href="../../learn/brightness/">black level</a> first: if black is set too low, the darkest detail disappears whatever the gamma, and if it’s too high, black turns grey. Set black level with a pattern, then choose gamma for your room.</p>
+
+  <h2 class="section-h">HDR doesn’t use it</h2>
+  <p>HDR video describes actual brightness rather than relative levels, using a curve called PQ, or HLG for broadcasts. Many TVs grey out the gamma setting when HDR is playing. For HDR, the settings that matter are black level and tone mapping: see <a href="../../learn/hdr-formats/">HDR10, HDR10+ and Dolby Vision</a>.</p>
+
+  <h2 class="section-h">What your TV calls it</h2>
+  <p>What the setup suggests for each brand:</p>
+  </div>
+  <ul class="grid names" style="--min: 200px; list-style: none; padding: 0; margin: 0 0 40px; gap: 10px">
+  <li class="card" style="padding: 14px 16px"><span class="muted small">Samsung</span><br>BT.1886 in a dark room, 2.2 in a bright one</li>
+  <li class="card" style="padding: 14px 16px"><span class="muted small">LG</span><br>BT.1886 or 2.4 in a dark room, 2.2 in a bright one</li>
+  <li class="card" style="padding: 14px 16px"><span class="muted small">Sony</span><br>Leave at the default</li>
+  <li class="card" style="padding: 14px 16px"><span class="muted small">TCL</span><br>2.4 in a dark room, 2.2 in a bright one</li>
+  <li class="card" style="padding: 14px 16px"><span class="muted small">Hisense</span><br>2.4 or BT1886 in a dark room, 2.2 in a bright one</li>
+</ul>
+
+  <div class="card highlight" style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 18px">
+    <div style="flex: 1 1 320px; min-width: 0">
+      <h2 style="margin: 0 0 6px; font-size: 22px">Part of the quick settings</h2>
+      <p style="margin: 0">The setup covers gamma with the other settings to check first, using your TV’s menu names.</p>
+    </div>
+    <a class="btn btn-primary" href="../../setup/">Start setup</a>
+  </div>
+
+  <nav class="article-nav" aria-label="More articles">
+    <a href="../../learn/colour-temperature/">← Why “Warm” is the correct white</a>
+    <a href="../../learn/hdr-formats/">HDR10, HDR10+ and Dolby Vision →</a>
+  </nav>
+</article>
+</main>
+<footer class="site-footer">
+  <div class="wrap">
+    <span>tvcal</span>
+  </div>
+</footer>
+<script src="../../assets/site.js" defer></script>
+</body>
+</html>

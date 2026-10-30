@@ -67,6 +67,8 @@ code { font-size: 0.88em; background: var(--code-bg); padding: 1px 6px; border-r
 .prose p, .prose li { color: var(--body); }
 .prose b, .prose strong { color: var(--text); font-weight: 600; }
 .prose p { margin: 0 0 14px; }
+.prose h2 { margin-top: 40px; }
+.prose > h2:first-child { margin-top: 0; }
 
 /* ---------- Buttons ---------- */
 .btn { display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 48px; padding: 0 22px; border-radius: 8px; font: inherit; font-weight: 600; text-decoration: none; cursor: pointer; border: 1px solid transparent; }
@@ -214,3 +216,51 @@ details > .inner p { font-size: 15px; }
 
 .sources { font-size: 14px; color: var(--dim); }
 .sources ul { padding-left: 18px; margin: 6px 0 0; }
+
+/* ---------- Learn demos ---------- */
+.demo canvas { display: block; width: 100%; height: auto; border-radius: 8px; border: 1px solid var(--line); }
+.demo-ramp-short { height: 44px; }
+.range-scale { display: flex; justify-content: space-between; margin-top: -4px; }
+
+/* Segmented choice: radio buttons drawn as pills. */
+.seg { border: 0; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.seg legend { float: left; width: 100%; padding: 0; margin-bottom: 8px; font-size: 15px; font-weight: 600; }
+.seg label { position: relative; }
+.seg input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.seg span { display: inline-flex; align-items: center; min-height: 44px; padding: 0 16px; border-radius: 22px; border: 1px solid var(--line2); cursor: pointer; font-size: 15px; }
+.seg span:hover { border-color: var(--dim); }
+.seg input:checked + span { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); font-weight: 600; }
+.seg input:focus-visible + span { outline: 2px solid var(--focus); outline-offset: 3px; }
+
+/* Colour temperature */
+.temp-scene { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 0; height: 120px; border-radius: 8px; overflow: hidden; border: 1px solid var(--line); }
+.temp-patch { display: flex; align-items: flex-end; padding: 8px; }
+.temp-patch small { font-size: 12px; color: #111; background: rgba(255,255,255,.75); padding: 1px 6px; border-radius: 4px; }
+@media (max-width: 480px) { .temp-patch small { font-size: 11px; padding: 1px 4px; } }
+
+/* HDR tone mapping */
+.tm-chart { width: 100%; }
+.tm-chart svg { display: block; width: 100%; height: auto; }
+.tm-grid { stroke: var(--line); stroke-width: 1; }
+.tm-tick, .tm-note, .tm-axis { fill: var(--dim); font: 12px "IBM Plex Sans", system-ui, sans-serif; }
+.tm-peak { stroke: var(--dim); stroke-width: 1.5; stroke-dasharray: 5 4; }
+.tm-clip, .tm-map { fill: none; stroke-width: 3; stroke-linejoin: round; }
+.tm-clip { stroke: var(--dim); }
+.tm-map { stroke: var(--accent-text); }
+.tm-legend { display: flex; flex-wrap: wrap; gap: 4px 18px; margin-top: 6px; color: var(--soft); }
+.tm-legend i { display: inline-block; width: 18px; height: 3px; margin-right: 6px; vertical-align: middle; border-radius: 2px; }
+.tm-legend .k-clip { background: var(--dim); }
+.tm-legend .k-map { background: var(--accent-text); }
+.tm-swatches { display: grid; gap: 8px; }
+.tm-row { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); height: 40px; border-radius: 6px; overflow: hidden; border: 1px solid var(--line); margin-top: 4px; }
+.tm-labels { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); }
+
+/* Motion cadence diagram */
+.cadence { display: flex; flex-direction: column; gap: 10px; margin: 6px 0 22px; }
+.cadence-row { display: flex; align-items: center; gap: 4px; }
+.cadence-label { flex: 0 0 110px; }
+.cadence .f { height: 32px; display: grid; place-items: center; border-radius: 5px; font: 600 13px "IBM Plex Mono", monospace; }
+.cadence .a { background: var(--accent); color: var(--accent-ink); }
+.cadence .b { background: var(--panel2); border: 1px solid var(--line2); color: var(--text); }
+.cadence .w3 { flex: 3; } .cadence .w2 { flex: 2; } .cadence .w25 { flex: 2.5; }
+@media (max-width: 480px) { .cadence-label { flex-basis: 80px; } }

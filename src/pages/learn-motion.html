@@ -1,0 +1,58 @@
+<!--{"title": "Judder, 24p and the soap opera effect", "path": "learn/motion/", "nav": "learn", "description": "Why films stutter on some TVs, what motion smoothing does and why it makes films look like soap operas, and which TV settings give smooth, natural film motion. With an interactive demo."}-->
+<article class="wrap narrow" style="padding-top: 40px; padding-bottom: 40px">
+  <nav class="crumbs" aria-label="Breadcrumb"><a href="{{root}}learn/">Learn</a> <span aria-hidden="true">›</span> Motion</nav>
+  <h1 class="page-title">Judder, 24p and the soap opera effect</h1>
+  <p class="lead" style="margin-bottom: 36px">Films are shot at 24 frames a second, and that slightly stepped motion is part of how a film looks. TVs can get it wrong in two opposite ways: by showing those frames unevenly, or by inventing new frames until film looks like video.</p>
+
+  <figure class="demo" data-demo-motion>
+    <canvas class="motion-canvas" width="640" height="200" role="img" aria-label="Two bars panning across: one at 24 frames a second, one smoothed"></canvas>
+    <div class="demo-controls">
+      <div>
+        <label for="demo-speed"><b>Camera pan speed</b><span class="mono muted" data-out="speed">Slow</span></label>
+        <input id="demo-speed" type="range" min="1" max="5" step="1" value="2">
+      </div>
+      <div style="display: flex; align-items: flex-end">
+        <button class="btn btn-ghost" type="button" data-play style="width: 100%">Play</button>
+      </div>
+    </div>
+    <figcaption>Top: 24 frames a second, as filmed. Bottom: motion smoothing, with frames added in between. (The demo needs JavaScript. Your screen’s own refresh rate shapes what you see, so treat it as a rough guide.)</figcaption>
+  </figure>
+
+  <div class="prose">
+  <h2 class="section-h">Why films judder on TV</h2>
+  <p>Most TVs refresh 60 times a second, and 60 isn’t a multiple of 24. To fit, frames are held unevenly: one for three refreshes, the next for two, and so on. During slow camera pans that uneven rhythm shows up as a stutter, called <b>judder</b>.</p>
+  <div class="cadence" aria-label="How four film frames fit into refreshes" role="img">
+    <div class="cadence-row"><span class="cadence-label small muted">60 Hz</span><span class="f a w3">A</span><span class="f b w2">B</span><span class="f a w3">C</span><span class="f b w2">D</span></div>
+    <div class="cadence-row"><span class="cadence-label small muted">120 Hz or 24p</span><span class="f a w25">A</span><span class="f b w25">B</span><span class="f a w25">C</span><span class="f b w25">D</span></div>
+  </div>
+  <p>The fix is to show every frame for the same time. A TV running at 120 Hz can hold each frame for exactly five refreshes, and some TVs switch to 24 Hz for films. Your streaming box needs to send films at 24 frames a second for this to work: that’s its <a href="{{root}}sources/">match frame rate</a> setting.</p>
+  <p>Even shown perfectly, 24 frames a second isn’t perfectly smooth. Fast pans look a little stepped in a cinema too. That’s the film look, and it’s how the director saw it.</p>
+
+  <h2 class="section-h">The soap opera effect</h2>
+  <p><b>Motion smoothing</b> (also called motion interpolation) works out what the in-between frames would have looked like and adds them. Pans become silky smooth, but film loses its look and starts to resemble live TV or a home video. That’s the soap opera effect. Smoothing can also leave shimmering artefacts around moving edges.</p>
+  <p>Many directors have asked for it to be off by default. Filmmaker Mode turns it off, along with sharpening and noise reduction.</p>
+
+  <h2 class="section-h">What to set</h2>
+  <div class="settings-table" style="margin-bottom: 20px">
+    <div class="settings-row"><div class="k"><strong>Films and drama</strong></div><div class="v"><span>Motion smoothing off. If your TV has a natural-cinema option (Real Cinema, Cinematic Movement, CineMotion), turn it on for even 24p.</span></div></div>
+    <div class="settings-row"><div class="k"><strong>If pans bother you</strong></div><div class="v"><span>Some TVs let you set a little judder reduction on its own, without blur reduction. A low setting smooths pans without the full video look. It’s a personal choice.</span></div></div>
+    <div class="settings-row"><div class="k"><strong>Sport</strong></div><div class="v"><span>Usually broadcast at 50 or 60 frames a second already, so smoothing adds less. Some people like a low setting.</span></div></div>
+    <div class="settings-row"><div class="k"><strong>Games</strong></div><div class="v"><span>Use Game mode. Smoothing adds delay between your controller and the screen.</span></div></div>
+  </div>
+  <p>OLED TVs switch pixels so fast that each film frame stays perfectly sharp, then jumps to the next. That can make 24p stutter more noticeable than on an LCD, and is why some OLED owners keep a little judder reduction.</p>
+
+  <h2 class="section-h">What your TV calls it</h2>
+  <p>The motion smoothing setting, and what the setup suggests:</p>
+  </div>
+  {{names.motion}}
+
+  <div class="card highlight" style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 18px">
+    <div style="flex: 1 1 320px; min-width: 0">
+      <h2 style="margin: 0 0 6px; font-size: 22px">Part of the quick settings</h2>
+      <p style="margin: 0">The setup turns motion smoothing off with the other settings to check first, using your TV’s menu names.</p>
+    </div>
+    <a class="btn btn-primary" href="{{root}}setup/">Start setup</a>
+  </div>
+
+  {{articleNav:motion}}
+</article>
